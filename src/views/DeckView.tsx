@@ -1,10 +1,11 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { type ChangeEvent, useRef } from "react";
+import { type ChangeEvent, useRef, useState } from "react";
 import { parseDeckJson, serializeDeck } from "../deck/io";
 import { useDeckStore } from "../deck/store";
 import { downloadText } from "../lib/download";
 import { newId } from "../lib/id";
 import { nowIso } from "../lib/time";
+import { BrowseApiModal } from "./BrowseApiModal";
 import styles from "./DeckView.module.css";
 
 export function DeckView() {
@@ -14,6 +15,7 @@ export function DeckView() {
   const replaceDeck = useDeckStore((s) => s.replaceDeck);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
+  const [browseOpen, setBrowseOpen] = useState(false);
 
   const handleNew = () => {
     const id = newId();
@@ -52,6 +54,11 @@ export function DeckView() {
     e.target.value = "";
   };
 
+  const handleApiSelected = (id: string) => {
+    setBrowseOpen(false);
+    navigate({ to: "/editor/$id", params: { id } });
+  };
+
   return (
     <section>
       <header className={styles.header}>
@@ -69,6 +76,9 @@ export function DeckView() {
           />
           <button type="button" onClick={handleExport} disabled={deck.cards.length === 0}>
             Export JSON
+          </button>
+          <button type="button" onClick={() => setBrowseOpen(true)}>
+            Browse from API
           </button>
           <button type="button" onClick={handleNew}>
             New card
@@ -101,6 +111,10 @@ export function DeckView() {
             </li>
           ))}
         </ul>
+      )}
+
+      {browseOpen && (
+        <BrowseApiModal onClose={() => setBrowseOpen(false)} onSelected={handleApiSelected} />
       )}
     </section>
   );
