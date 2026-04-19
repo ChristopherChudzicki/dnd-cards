@@ -45,6 +45,17 @@
   background: #f0f0f0;
 }
 
+.templateNotice {
+  background: #fff8e1;
+  border: 1px solid #e0c97d;
+  border-radius: 0.3rem;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+  color: #4a3c10;
+  line-height: 1.4;
+}
+
 .preview {
   display: flex;
   flex-direction: column;

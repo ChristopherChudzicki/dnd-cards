@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, test } from "vitest";
 import { Card } from "./Card";
 import { itemCardFactory } from "./factories";
@@ -36,5 +36,13 @@ describe("<Card>", () => {
     render(<Card card={card} layout="4-up" />);
     expect(screen.getByText("First paragraph.")).toBeInTheDocument();
     expect(screen.getByText("Second paragraph.")).toBeInTheDocument();
+  });
+
+  test("hides the image when the src fails to load", () => {
+    const card = itemCardFactory.build({ imageUrl: "https://example.com/broken.png" });
+    render(<Card card={card} layout="4-up" />);
+    const img = screen.getByTestId("card-image");
+    fireEvent.error(img);
+    expect(screen.queryByTestId("card-image")).not.toBeInTheDocument();
   });
 });

@@ -48,6 +48,10 @@
   padding-right: 4.5em;
 }
 
+.headerNoImage {
+  padding-right: 0;
+}
+
 .title {
   margin: 0 0 0.2em;
   font-size: 1.2em;

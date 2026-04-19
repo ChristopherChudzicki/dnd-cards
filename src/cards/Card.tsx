@@ -1,3 +1,4 @@
+import { useState } from "react";
 import styles from "./Card.module.css";
 import type { ItemCard } from "./types";
 
@@ -16,12 +17,23 @@ const splitParagraphs = (text: string): string[] =>
 
 export function Card({ card, layout }: Props) {
   const layoutClass = layout === "4-up" ? styles["four-up"] : styles["two-up"];
+  const [brokenUrl, setBrokenUrl] = useState<string | null>(null);
+
+  const showImage = card.imageUrl !== undefined && brokenUrl !== card.imageUrl;
+  const headerPadsForImage = showImage ? "" : styles.headerNoImage;
+
   return (
     <div className={`${styles.card} ${layoutClass}`} data-role="card-root">
-      {card.imageUrl && (
-        <img className={styles.image} src={card.imageUrl} alt="" data-testid="card-image" />
+      {showImage && (
+        <img
+          className={styles.image}
+          src={card.imageUrl}
+          alt=""
+          data-testid="card-image"
+          onError={() => setBrokenUrl(card.imageUrl ?? null)}
+        />
       )}
-      <div className={styles.header}>
+      <div className={`${styles.header} ${headerPadsForImage}`}>
         <h3 className={styles.title}>{card.name}</h3>
         <div className={styles.typeLine}>{card.typeLine}</div>
       </div>

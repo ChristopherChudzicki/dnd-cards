@@ -60,6 +60,38 @@ describe("<EditorView>", () => {
     expect(useDeckStore.getState().deck.cards[0]?.name).toBe("Original");
   });
 
+  test("shows template notice for API items whose body says '(Any …)'", async () => {
+    const card = itemCardFactory.build({
+      source: "api",
+      apiRef: { system: "dnd5eapi", slug: "flame-tongue", ruleset: "2024" },
+      body: "Weapon (Any Melee Weapon). While holding this magic weapon…",
+    });
+    useDeckStore.setState({ deck: { version: 1, cards: [card] } });
+    await renderWithRouter(<EditorView cardId={card.id} />);
+    expect(screen.getByTestId("template-notice")).toBeInTheDocument();
+  });
+
+  test("does not show template notice for concrete API items", async () => {
+    const card = itemCardFactory.build({
+      source: "api",
+      apiRef: { system: "dnd5eapi", slug: "bag-of-holding", ruleset: "2024" },
+      body: "This bag has an interior space considerably larger…",
+    });
+    useDeckStore.setState({ deck: { version: 1, cards: [card] } });
+    await renderWithRouter(<EditorView cardId={card.id} />);
+    expect(screen.queryByTestId("template-notice")).not.toBeInTheDocument();
+  });
+
+  test("does not show template notice for custom items even if body contains '(any'", async () => {
+    const card = itemCardFactory.build({
+      source: "custom",
+      body: "Any hostile creature within 30 feet…",
+    });
+    useDeckStore.setState({ deck: { version: 1, cards: [card] } });
+    await renderWithRouter(<EditorView cardId={card.id} />);
+    expect(screen.queryByTestId("template-notice")).not.toBeInTheDocument();
+  });
+
   test("Cancel removes a pristine new card from the store", async () => {
     const now = "2026-04-19T12:00:00.000Z";
     const pristine = itemCardFactory.build({
