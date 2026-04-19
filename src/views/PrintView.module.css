@@ -1,0 +1,82 @@
+.controls {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  padding: 0.75rem 0;
+  flex-wrap: wrap;
+}
+
+.controls button,
+.controls select {
+  font: inherit;
+  padding: 0.4rem 0.8rem;
+  border: 1px solid #bbb;
+  border-radius: 0.3rem;
+  background: #fff;
+  cursor: pointer;
+}
+
+.controls button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.tip {
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.sheet {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: center;
+}
+
+.page {
+  width: 8.5in;
+  height: 11in;
+  background: #fff;
+  padding: 0.5in;
+  box-sizing: border-box;
+  display: grid;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  page-break-after: always;
+  break-after: page;
+}
+
+.fourUp {
+  grid-template-columns: 3.75in 3.75in;
+  grid-template-rows: 5in 5in;
+  gap: 0;
+  justify-content: center;
+  align-content: center;
+}
+
+.twoUp {
+  grid-template-columns: 7.5in;
+  grid-template-rows: 5in 5in;
+  gap: 0;
+  justify-content: center;
+  align-content: center;
+}
+
+.slot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media print {
+  .controls {
+    display: none;
+  }
+  .sheet {
+    gap: 0;
+  }
+  .page {
+    box-shadow: none;
+    padding: 0;
+    break-after: page;
+  }
+}

@@ -18,3 +18,14 @@ body {
   background: #f7f7f7;
   line-height: 1.4;
 }
+
+@page {
+  size: letter portrait;
+  margin: 0.5in;
+}
+
+@media print {
+  body {
+    background: #fff;
+  }
+}
