@@ -1,0 +1,40 @@
+import { render, screen } from "@testing-library/react";
+import { describe, expect, test } from "vitest";
+import { Card } from "./Card";
+import { itemCardFactory } from "./factories";
+
+describe("<Card>", () => {
+  test("shows name, type line, and body", () => {
+    const card = itemCardFactory.build();
+    render(<Card card={card} layout="4-up" />);
+    expect(screen.getByRole("heading", { name: card.name })).toBeInTheDocument();
+    expect(screen.getByText(card.typeLine)).toBeInTheDocument();
+    expect(screen.getByText(card.body)).toBeInTheDocument();
+  });
+
+  test("renders cost/weight when present", () => {
+    const card = itemCardFactory.build({ costWeight: "500 gp · 15 lb" });
+    render(<Card card={card} layout="4-up" />);
+    expect(screen.getByText("500 gp · 15 lb")).toBeInTheDocument();
+  });
+
+  test("omits footer when cost/weight is absent", () => {
+    const card = itemCardFactory.build({ costWeight: undefined });
+    render(<Card card={card} layout="4-up" />);
+    expect(screen.queryByTestId("card-footer")).not.toBeInTheDocument();
+  });
+
+  test("renders image when imageUrl is set", () => {
+    const card = itemCardFactory.build({ imageUrl: "https://example.com/pic.png" });
+    render(<Card card={card} layout="4-up" />);
+    const img = screen.getByTestId("card-image");
+    expect(img).toHaveAttribute("src", "https://example.com/pic.png");
+  });
+
+  test("splits body on blank lines into paragraphs", () => {
+    const card = itemCardFactory.build({ body: "First paragraph.\n\nSecond paragraph." });
+    render(<Card card={card} layout="4-up" />);
+    expect(screen.getByText("First paragraph.")).toBeInTheDocument();
+    expect(screen.getByText("Second paragraph.")).toBeInTheDocument();
+  });
+});
