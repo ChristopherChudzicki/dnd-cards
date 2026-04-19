@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import type { ReactNode } from "react";
+import { type ReactNode, StrictMode } from "react";
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, test, vi } from "vitest";
 import { magicItemDetail2024Factory, magicItemIndexEntryFactory } from "../api/factories";
 import { useDeckStore } from "../deck/store";
@@ -91,6 +91,36 @@ describe("<BrowseApiModal>", () => {
     const created = useDeckStore.getState().deck.cards[0];
     expect(created?.source).toBe("api");
     expect(onSelected).toHaveBeenCalledWith(created?.id);
+  });
+
+  test("clicking the same row only creates one card even under StrictMode double-render", async () => {
+    const entry = magicItemIndexEntryFactory.build({ name: "Flame Tongue" });
+    const detail = magicItemDetail2024Factory.build({
+      index: entry.index,
+      name: entry.name,
+    });
+    server.use(
+      magicItemIndexHandler("2024", { count: 1, results: [entry] }),
+      magicItemDetailHandler("2024", entry.index, detail),
+    );
+
+    const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    render(
+      <StrictMode>
+        <QueryClientProvider client={client}>
+          <BrowseApiModal onClose={() => {}} onSelected={() => {}} />
+        </QueryClientProvider>
+      </StrictMode>,
+    );
+
+    await userEvent.click(await screen.findByText("Flame Tongue"));
+
+    await waitFor(() => {
+      expect(useDeckStore.getState().deck.cards).toHaveLength(1);
+    });
+    // Give any stray effects a chance to fire before asserting final count.
+    await new Promise((r) => setTimeout(r, 50));
+    expect(useDeckStore.getState().deck.cards).toHaveLength(1);
   });
 
   test("Escape calls onClose", async () => {

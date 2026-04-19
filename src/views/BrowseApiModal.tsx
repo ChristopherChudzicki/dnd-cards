@@ -1,6 +1,7 @@
+import { useQueryClient } from "@tanstack/react-query";
 import { type MouseEvent, useEffect, useMemo, useState } from "react";
-import type { Ruleset } from "../api/endpoints/magicItems";
-import { useMagicItemDetail, useMagicItemIndex } from "../api/hooks";
+import { fetchMagicItemDetail, type Ruleset } from "../api/endpoints/magicItems";
+import { useMagicItemIndex } from "../api/hooks";
 import { magicItemDetailToCard } from "../api/mappers/magicItems";
 import { useDeckStore } from "../deck/store";
 import styles from "./BrowseApiModal.module.css";
@@ -10,13 +11,15 @@ type Props = {
   onSelected: (cardId: string) => void;
 };
 
+const DAY_MS = 24 * 60 * 60 * 1000;
+
 export function BrowseApiModal({ onClose, onSelected }: Props) {
   const [ruleset, setRuleset] = useState<Ruleset>("2024");
   const [query, setQuery] = useState("");
-  const [pickedSlug, setPickedSlug] = useState<string | null>(null);
+  const [pickingSlug, setPickingSlug] = useState<string | null>(null);
 
   const index = useMagicItemIndex(ruleset);
-  const detail = useMagicItemDetail(ruleset, pickedSlug);
+  const queryClient = useQueryClient();
   const upsertCard = useDeckStore((s) => s.upsertCard);
 
   const filtered = useMemo(() => {
@@ -34,14 +37,23 @@ export function BrowseApiModal({ onClose, onSelected }: Props) {
     return () => window.removeEventListener("keydown", onKey);
   }, [onClose]);
 
-  useEffect(() => {
-    if (detail.data && pickedSlug) {
-      const card = magicItemDetailToCard(detail.data);
+  const handlePick = async (slug: string) => {
+    if (pickingSlug !== null) return;
+    setPickingSlug(slug);
+    try {
+      const detail = await queryClient.fetchQuery({
+        queryKey: ["magic-items", ruleset, "detail", slug],
+        queryFn: () => fetchMagicItemDetail(ruleset, slug),
+        staleTime: DAY_MS,
+      });
+      const card = magicItemDetailToCard(detail);
       upsertCard(card);
       onSelected(card.id);
-      setPickedSlug(null);
+    } catch (err) {
+      console.error("Failed to fetch magic-item detail", err);
+      setPickingSlug(null);
     }
-  }, [detail.data, pickedSlug, upsertCard, onSelected]);
+  };
 
   const onBackdropClick = (e: MouseEvent<HTMLDivElement>) => {
     if (e.target === e.currentTarget) onClose();
@@ -109,13 +121,11 @@ export function BrowseApiModal({ onClose, onSelected }: Props) {
                 key={entry.index}
                 type="button"
                 className={styles.row}
-                onClick={() => setPickedSlug(entry.index)}
-                disabled={detail.isFetching && pickedSlug === entry.index}
+                onClick={() => handlePick(entry.index)}
+                disabled={pickingSlug !== null}
               >
                 <span className={styles.rowName}>{entry.name}</span>
-                {detail.isFetching && pickedSlug === entry.index && (
-                  <span className={styles.rowMeta}>Loading…</span>
-                )}
+                {pickingSlug === entry.index && <span className={styles.rowMeta}>Loading…</span>}
               </button>
             ))}
         </div>
