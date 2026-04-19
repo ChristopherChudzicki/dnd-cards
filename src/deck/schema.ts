@@ -3,6 +3,7 @@ import { z } from "zod";
 const apiRefSchema = z.object({
   system: z.literal("dnd5eapi"),
   slug: z.string(),
+  ruleset: z.enum(["2014", "2024"]),
 });
 
 const baseCardSchema = z.object({

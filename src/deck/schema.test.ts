@@ -20,6 +20,51 @@ describe("itemCardSchema", () => {
     const result = itemCardSchema.safeParse({ id: "a", name: "x" });
     expect(result.success).toBe(false);
   });
+
+  test("accepts an item card with a 2024 apiRef", () => {
+    const card = {
+      id: "abc",
+      kind: "item" as const,
+      name: "Bag of Holding",
+      typeLine: "Wondrous item, uncommon",
+      body: "Big bag.",
+      source: "api" as const,
+      apiRef: { system: "dnd5eapi" as const, slug: "bag-of-holding", ruleset: "2024" as const },
+      createdAt: "2026-04-19T00:00:00.000Z",
+      updatedAt: "2026-04-19T00:00:00.000Z",
+    };
+    expect(itemCardSchema.safeParse(card).success).toBe(true);
+  });
+
+  test("accepts an item card with a 2014 apiRef", () => {
+    const card = {
+      id: "abc",
+      kind: "item" as const,
+      name: "Bag of Holding",
+      typeLine: "Wondrous item, uncommon",
+      body: "Big bag.",
+      source: "api" as const,
+      apiRef: { system: "dnd5eapi" as const, slug: "bag-of-holding", ruleset: "2014" as const },
+      createdAt: "2026-04-19T00:00:00.000Z",
+      updatedAt: "2026-04-19T00:00:00.000Z",
+    };
+    expect(itemCardSchema.safeParse(card).success).toBe(true);
+  });
+
+  test("rejects an apiRef without a ruleset", () => {
+    const card = {
+      id: "abc",
+      kind: "item" as const,
+      name: "X",
+      typeLine: "",
+      body: "",
+      source: "api" as const,
+      apiRef: { system: "dnd5eapi" as const, slug: "x" },
+      createdAt: "2026-04-19T00:00:00.000Z",
+      updatedAt: "2026-04-19T00:00:00.000Z",
+    };
+    expect(itemCardSchema.safeParse(card).success).toBe(false);
+  });
 });
 
 describe("deckSchema", () => {
