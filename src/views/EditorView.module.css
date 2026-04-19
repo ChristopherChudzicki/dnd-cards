@@ -9,15 +9,40 @@
   min-width: 0;
 }
 
-.back {
-  display: inline-block;
-  margin-bottom: 1rem;
-  color: #444;
-  text-decoration: none;
+.formActions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e0e0e0;
 }
 
-.back:hover {
-  text-decoration: underline;
+.primaryBtn,
+.secondaryBtn {
+  font: inherit;
+  padding: 0.5rem 1rem;
+  border-radius: 0.3rem;
+  cursor: pointer;
+}
+
+.primaryBtn {
+  background: #2a5a8a;
+  color: #fff;
+  border: 1px solid #2a5a8a;
+}
+
+.primaryBtn:hover {
+  background: #1e4570;
+}
+
+.secondaryBtn {
+  background: #fff;
+  color: #333;
+  border: 1px solid #bbb;
+}
+
+.secondaryBtn:hover {
+  background: #f0f0f0;
 }
 
 .preview {
