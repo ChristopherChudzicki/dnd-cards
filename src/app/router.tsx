@@ -1,5 +1,6 @@
 import { createRootRoute, createRoute, createRouter, RouterProvider } from "@tanstack/react-router";
 import { DeckView } from "../views/DeckView";
+import { EditorView } from "../views/EditorView";
 import { Root } from "./Root";
 
 const rootRoute = createRootRoute({ component: Root });
@@ -13,7 +14,7 @@ const deckRoute = createRoute({
 const editorRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/editor/$id",
-  component: () => <div>Editor (placeholder)</div>,
+  component: () => <EditorView />,
 });
 
 const printRoute = createRoute({
