@@ -1,3 +1,5 @@
+import { RouterProvider, router } from "./app/router";
+
 export default function App() {
-  return <h1>D&D Cards</h1>;
+  return <RouterProvider router={router} />;
 }
