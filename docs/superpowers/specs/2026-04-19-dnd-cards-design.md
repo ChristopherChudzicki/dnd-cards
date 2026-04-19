@@ -154,12 +154,17 @@ Encapsulated in a single `<AutoFitCard>` component.
 ```
 src/
   app/              router, layout, app-level wiring
-  deck/             Zustand store, persistence, JSON import/export, Zod schema
+  deck/
+    store.ts        Zustand store + persistence
+    schema.ts       Zod schemas (Card union, Deck)
+    io.ts           JSON import/export
+    factories.ts    Fishery factories for tests (deckFactory)
   cards/
     types.ts        Card union + Deck type
     Card.tsx        pure renderer (takes Card + layout)
     AutoFitCard.tsx wrapper that measures and scales
     ItemEditor.tsx  form for ItemCard
+    factories.ts    Fishery factories (itemCardFactory, …)
   views/
     DeckView.tsx    / route
     EditorView.tsx  /editor/:id route
@@ -170,6 +175,15 @@ src/
 ## Testing
 
 Vitest + React Testing Library. No e2e / Playwright in v1.
+
+**Test data — factory-driven.** We use **Fishery** + **@faker-js/faker** for test data. Hand-rolled factories are fine for 1–2 shapes, but we'll have at least `ItemCard`, `Deck`, and soon `SpellCard` / `AbilityCard`; Fishery's sequences, transients, and association helpers earn their keep here.
+
+- Factories live in `src/cards/factories.ts` and `src/deck/factories.ts`.
+- Each factory produces fully-valid, realistic-but-varied data by default (e.g., `itemCardFactory.build()` returns a plausible magic item with a faker-generated name, type line, and body).
+- **Tests only override fields they actually assert on.** If a test doesn't care about `name`, it doesn't pass `name`. If it asserts on `typeLine`, it overrides `typeLine` explicitly. This keeps test intent obvious at a glance and prevents misleading values (e.g., `name: "test"` in a test that isn't about names).
+- Fishery's sequence helper generates deterministic unique `id`s across a test run.
+
+**What we test:**
 
 - `deck` store: add/edit/delete, JSON round-trip, Zod rejects malformed input, version-mismatch handling.
 - `ItemEditor`: typing updates the preview.
