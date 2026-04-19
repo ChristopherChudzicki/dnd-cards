@@ -21,6 +21,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.12",
+    "@faker-js/faker": "^10.4.0",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.6.1",
@@ -28,6 +29,7 @@
     "@types/react-dom": "^18.3.5",
     "@vitejs/plugin-react": "^4.3.4",
     "@vitest/ui": "^4.1.4",
+    "fishery": "^2.4.0",
     "jsdom": "^29.0.2",
     "typescript": "^5.7.2",
     "vite": "^6.0.5",
