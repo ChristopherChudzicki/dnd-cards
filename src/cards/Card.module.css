@@ -43,13 +43,27 @@
   display: block;
 }
 
+.fallbackIcon {
+  position: absolute;
+  top: 0.95em;
+  right: 0.95em;
+  width: 3.5em;
+  height: 3.5em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #666;
+}
+
+.fallbackIcon svg {
+  width: 85%;
+  height: 85%;
+  stroke-width: 1.5;
+}
+
 .header {
   flex-shrink: 0;
   padding-right: 4.5em;
-}
-
-.headerNoImage {
-  padding-right: 0;
 }
 
 .title {

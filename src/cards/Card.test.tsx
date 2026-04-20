@@ -38,11 +38,19 @@ describe("<Card>", () => {
     expect(screen.getByText("Second paragraph.")).toBeInTheDocument();
   });
 
-  test("hides the image when the src fails to load", () => {
+  test("replaces the image with a fallback icon when the src fails to load", () => {
     const card = itemCardFactory.build({ imageUrl: "https://example.com/broken.png" });
     render(<Card card={card} layout="4-up" />);
     const img = screen.getByTestId("card-image");
     fireEvent.error(img);
     expect(screen.queryByTestId("card-image")).not.toBeInTheDocument();
+    expect(screen.getByTestId("card-fallback-icon")).toBeInTheDocument();
+  });
+
+  test("shows a fallback icon when the card has no imageUrl", () => {
+    const card = itemCardFactory.build({ imageUrl: undefined });
+    render(<Card card={card} layout="4-up" />);
+    expect(screen.queryByTestId("card-image")).not.toBeInTheDocument();
+    expect(screen.getByTestId("card-fallback-icon")).toBeInTheDocument();
   });
 });

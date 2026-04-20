@@ -1,5 +1,6 @@
 import { useState } from "react";
 import styles from "./Card.module.css";
+import { pickIcon } from "./iconRules";
 import type { ItemCard } from "./types";
 
 export type CardLayout = "4-up" | "2-up";
@@ -20,11 +21,11 @@ export function Card({ card, layout }: Props) {
   const [brokenUrl, setBrokenUrl] = useState<string | null>(null);
 
   const showImage = card.imageUrl !== undefined && brokenUrl !== card.imageUrl;
-  const headerPadsForImage = showImage ? "" : styles.headerNoImage;
+  const Icon = pickIcon(card);
 
   return (
     <div className={`${styles.card} ${layoutClass}`} data-role="card-root">
-      {showImage && (
+      {showImage ? (
         <img
           className={styles.image}
           src={card.imageUrl}
@@ -32,8 +33,12 @@ export function Card({ card, layout }: Props) {
           data-testid="card-image"
           onError={() => setBrokenUrl(card.imageUrl ?? null)}
         />
+      ) : (
+        <div className={styles.fallbackIcon} data-testid="card-fallback-icon" aria-hidden="true">
+          <Icon />
+        </div>
       )}
-      <div className={`${styles.header} ${headerPadsForImage}`}>
+      <div className={styles.header}>
         <h3 className={styles.title}>{card.name}</h3>
         <div className={styles.typeLine}>{card.typeLine}</div>
       </div>
