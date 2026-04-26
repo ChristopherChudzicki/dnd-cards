@@ -11,7 +11,8 @@
     "lint:fix": "biome check --write src",
     "format": "biome format --write src",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "gen:schema": "tsx scripts/gen-card-schema.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.104.1",
