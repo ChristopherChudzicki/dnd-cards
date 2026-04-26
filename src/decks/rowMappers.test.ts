@@ -1,7 +1,18 @@
 import { describe, expect, it } from "vitest";
 import type { Card } from "../cards/types";
-import { makeCardRow, makeItemPayload } from "../test/factories";
+import {
+  makeAbilityPayload,
+  makeCardRow,
+  makeItemPayload,
+  makeSpellPayload,
+} from "../test/factories";
 import { cardToInsertRow, cardToUpdatePayload, rowToCard } from "./rowMappers";
+
+const builders = [
+  ["item", makeItemPayload],
+  ["spell", makeSpellPayload],
+  ["ability", makeAbilityPayload],
+] as const;
 
 describe("rowMappers", () => {
   it("rowToCard fuses row.id into payload", () => {
@@ -29,15 +40,24 @@ describe("rowMappers", () => {
     expect(update.name).toBe(card.name);
   });
 
-  it("round-trips a card through cardToInsertRow → rowToCard", () => {
-    const original: Card = { id: "card-id", ...makeItemPayload.build() };
+  it.each(
+    builders,
+  )("round-trips a %s card through cardToInsertRow → rowToCard preserving discriminator", (_kind, builder) => {
+    const original = { id: "card-id", ...builder.build() } as Card;
     const insert = cardToInsertRow(original, "deck-id", 0);
-    const row = makeCardRow.build({
+    // Construct the row literal directly — Fishery deep-merges overrides,
+    // which would leak ItemCard fields into a Spell/Ability payload.
+    const now = new Date().toISOString();
+    const row = {
       id: original.id,
       deck_id: "deck-id",
+      position: 0,
       payload: insert.payload,
-    });
+      created_at: now,
+      updated_at: now,
+    };
     const restored = rowToCard(row);
     expect(restored).toEqual(original);
+    expect(restored.kind).toBe(original.kind);
   });
 });

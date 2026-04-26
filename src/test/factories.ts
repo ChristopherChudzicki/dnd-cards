@@ -1,6 +1,6 @@
 import { faker } from "@faker-js/faker";
 import { Factory } from "fishery";
-import type { ItemCard } from "../cards/types";
+import type { AbilityCard, ItemCard, SpellCard } from "../cards/types";
 import type { CardRow, DeckRow } from "../decks/types";
 
 // Re-export DB row types for tests that want them via this barrel.
@@ -23,6 +23,30 @@ export const makeItemPayload = Factory.define<Omit<ItemCard, "id">>(() => {
     kind: "item",
     name: faker.commerce.productName(),
     typeLine: "Weapon",
+    body: faker.lorem.paragraph(),
+    source: "custom",
+    createdAt: now,
+    updatedAt: now,
+  };
+});
+
+export const makeSpellPayload = Factory.define<Omit<SpellCard, "id">>(() => {
+  const now = faker.date.recent().toISOString();
+  return {
+    kind: "spell",
+    name: faker.lorem.words(2),
+    body: faker.lorem.paragraph(),
+    source: "custom",
+    createdAt: now,
+    updatedAt: now,
+  };
+});
+
+export const makeAbilityPayload = Factory.define<Omit<AbilityCard, "id">>(() => {
+  const now = faker.date.recent().toISOString();
+  return {
+    kind: "ability",
+    name: faker.lorem.words(2),
     body: faker.lorem.paragraph(),
     source: "custom",
     createdAt: now,
