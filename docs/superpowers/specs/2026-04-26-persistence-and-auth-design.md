@@ -133,7 +133,7 @@ create policy cards_write_owner on cards for all
 ### JSON Schema synchronization
 
 - Source of truth: Zod `cardSchema` in `src/decks/schema.ts` (renamed from `src/deck/schema.ts`).
-- Codegen: `npm run gen:schema` runs `zod-to-json-schema` and writes `supabase/schemas/card-payload.json`.
+- Codegen: `npm run gen:schema` runs Zod's native `toJSONSchema` and writes `supabase/schemas/card-payload.json`. (The plan originally specified the `zod-to-json-schema` library, but that lib is incompatible with Zod v4 and is no longer needed; Zod 4 ships its own JSON Schema export.)
 - The schema file is committed. Migrations that change the `cards_payload_valid` constraint reference it.
 - CI guard: `gen:schema` must produce a no-op diff. Drift fails the build, forcing the developer to ship a constraint-swap migration.
 

@@ -6,7 +6,7 @@
 
 **Architecture:** Vite SPA on Vercel + Supabase backend. TanStack Query owns server state via thin query/mutation hooks. `@supabase/supabase-js` is the only module that talks to Supabase directly. Local dev uses Docker-based `supabase start`; the cloud project is prod. Card payloads are validated client-side via Zod and server-side via `pg_jsonschema` (JSON Schema generated from Zod at build time).
 
-**Tech Stack:** React 18 + TypeScript + Vite, TanStack Router, TanStack Query, `@supabase/supabase-js`, Zod, `zod-to-json-schema`, MSW, Vitest, RTL, Fishery + faker, pgTAP for SQL tests.
+**Tech Stack:** React 18 + TypeScript + Vite, TanStack Router, TanStack Query, `@supabase/supabase-js`, Zod (using Zod 4's native `toJSONSchema`), MSW, Vitest, RTL, Fishery + faker, pgTAP for SQL tests.
 
 **Spec:** [`docs/superpowers/specs/2026-04-26-persistence-and-auth-design.md`](../specs/2026-04-26-persistence-and-auth-design.md)
 
@@ -341,16 +341,17 @@ git commit -m "Add initial migration: decks + cards with RLS"
 
 ```ts
 // scripts/gen-card-schema.ts
+// NOTE: This project is ESM ("type": "module"), so use import.meta.url for __dirname.
+// We use Zod 4's native `toJSONSchema` rather than the deprecated `zod-to-json-schema` library.
 import { writeFileSync, mkdirSync } from "node:fs";
 import { dirname, resolve } from "node:path";
-import { zodToJsonSchema } from "zod-to-json-schema";
-import { cardSchema } from "../src/decks/schema";
+import { fileURLToPath } from "node:url";
+import { toJSONSchema } from "zod";
+import { cardPayloadSchema } from "../src/decks/schema";
 
+const __dirname = dirname(fileURLToPath(import.meta.url));
 const out = resolve(__dirname, "../supabase/schemas/card-payload.json");
-const schema = zodToJsonSchema(cardSchema, {
-  name: "CardPayload",
-  $refStrategy: "none",
-});
+const schema = toJSONSchema(cardPayloadSchema);
 
 mkdirSync(dirname(out), { recursive: true });
 writeFileSync(out, `${JSON.stringify(schema, null, 2)}\n`, "utf8");
@@ -375,13 +376,7 @@ export const cardPayloadSchema = z.discriminatedUnion("kind", [
 ]);
 ```
 
-Then update the codegen import to use `cardPayloadSchema` instead of `cardSchema`:
-
-```ts
-import { cardPayloadSchema } from "../src/decks/schema";
-// …
-const schema = zodToJsonSchema(cardPayloadSchema, { name: "CardPayload", $refStrategy: "none" });
-```
+The codegen script already imports `cardPayloadSchema` and calls `toJSONSchema(cardPayloadSchema)` — no further change needed once the new export exists.
 
 - [ ] **Step 3: Add the npm script**
 

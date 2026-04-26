@@ -37,14 +37,22 @@ alter table public.decks enable row level security;
 
 create policy decks_select_all   on public.decks for select using (true);
 create policy decks_insert_owner on public.decks for insert with check (owner_id = auth.uid());
-create policy decks_update_owner on public.decks for update using (owner_id = auth.uid());
+create policy decks_update_owner on public.decks for update
+  using      (owner_id = auth.uid())
+  with check (owner_id = auth.uid());
 create policy decks_delete_owner on public.decks for delete using (owner_id = auth.uid());
 
 -- RLS: cards
 alter table public.cards enable row level security;
 
-create policy cards_select_all   on public.cards for select using (true);
+create policy cards_select_all on public.cards for select using (true);
 
-create policy cards_write_owner on public.cards for all
+create policy cards_insert_owner on public.cards for insert
+  with check (exists (select 1 from public.decks d where d.id = cards.deck_id and d.owner_id = auth.uid()));
+
+create policy cards_update_owner on public.cards for update
   using      (exists (select 1 from public.decks d where d.id = cards.deck_id and d.owner_id = auth.uid()))
   with check (exists (select 1 from public.decks d where d.id = cards.deck_id and d.owner_id = auth.uid()));
+
+create policy cards_delete_owner on public.cards for delete
+  using (exists (select 1 from public.decks d where d.id = cards.deck_id and d.owner_id = auth.uid()));
