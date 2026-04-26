@@ -190,6 +190,18 @@ site_url = "http://localhost:5173"
 additional_redirect_urls = ["http://localhost:5173"]
 ```
 
+- [ ] **Step 3b: Enable email+password locally for the dev sign-in shortcut**
+
+In `[auth.email]` (still in `supabase/config.toml`):
+
+```toml
+[auth.email]
+enable_signup = true
+enable_confirmations = false
+```
+
+`enable_confirmations = false` skips the click-the-link step locally so signups establish a session immediately. This config block applies only to the local CLI stack — production Supabase keeps its dashboard settings, which we'll leave OAuth-only. The `LoginView` (Task 15) will gate the dev-only sign-in button behind `import.meta.env.DEV` so this email path never appears in production.
+
 - [ ] **Step 4: Create `supabase/.env.example`**
 
 ```
@@ -1637,6 +1649,39 @@ describe("LoginView", () => {
     await userEvent.click(screen.getByRole("button", { name: /sign in with github/i }));
     expect(spy).toHaveBeenCalledWith(expect.objectContaining({ provider: "github" }));
   });
+
+  it("shows a dev sign-in button in dev mode that signs in as the dev user", async () => {
+    vi.stubEnv("DEV", true as unknown as string);
+    const signInSpy = vi
+      .spyOn(supabase.auth, "signInWithPassword")
+      .mockResolvedValue({ data: { session: null, user: null }, error: null } as never);
+    render(<LoginView />);
+    await userEvent.click(screen.getByRole("button", { name: /sign in as dev user/i }));
+    expect(signInSpy).toHaveBeenCalledWith({ email: "dev@local", password: "devpass" });
+    vi.unstubAllEnvs();
+  });
+
+  it("falls back to signUp if the dev user doesn't exist yet", async () => {
+    vi.stubEnv("DEV", true as unknown as string);
+    vi.spyOn(supabase.auth, "signInWithPassword").mockResolvedValue({
+      data: { session: null, user: null },
+      error: { message: "Invalid login credentials" } as never,
+    } as never);
+    const signUpSpy = vi
+      .spyOn(supabase.auth, "signUp")
+      .mockResolvedValue({ data: { session: null, user: null }, error: null } as never);
+    render(<LoginView />);
+    await userEvent.click(screen.getByRole("button", { name: /sign in as dev user/i }));
+    expect(signUpSpy).toHaveBeenCalledWith({ email: "dev@local", password: "devpass" });
+    vi.unstubAllEnvs();
+  });
+
+  it("does NOT show the dev sign-in button outside dev mode", () => {
+    vi.stubEnv("DEV", false as unknown as string);
+    render(<LoginView />);
+    expect(screen.queryByRole("button", { name: /sign in as dev user/i })).not.toBeInTheDocument();
+    vi.unstubAllEnvs();
+  });
 });
 ```
 
@@ -1655,6 +1700,9 @@ Expected: FAIL — module not found.
 import { supabase } from "../api/supabase";
 import styles from "./LoginView.module.css";
 
+const DEV_EMAIL = "dev@local";
+const DEV_PASSWORD = "devpass";
+
 export function LoginView() {
   const signIn = (provider: "google" | "github") => {
     const next = new URLSearchParams(window.location.search).get("next") ?? "/";
@@ -1664,6 +1712,18 @@ export function LoginView() {
         redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`,
       },
     });
+  };
+
+  const devSignIn = async () => {
+    const { error } = await supabase.auth.signInWithPassword({
+      email: DEV_EMAIL,
+      password: DEV_PASSWORD,
+    });
+    if (error?.message === "Invalid login credentials") {
+      // First run on this local DB — create the user. With enable_confirmations=false
+      // (set in supabase/config.toml), signUp establishes a session immediately.
+      await supabase.auth.signUp({ email: DEV_EMAIL, password: DEV_PASSWORD });
+    }
   };
 
   return (
@@ -1677,9 +1737,23 @@ export function LoginView() {
         <button type="button" onClick={() => signIn("github")}>
           Sign in with GitHub
         </button>
+        {import.meta.env.DEV && (
+          <button type="button" className={styles.dev} onClick={devSignIn}>
+            Sign in as Dev User
+          </button>
+        )}
       </div>
     </section>
   );
+}
+```
+
+Append a small style for the dev button so it looks unmistakably-dev (e.g. dashed border):
+
+```css
+.dev {
+  border-style: dashed !important;
+  opacity: 0.85;
 }
 ```
 
