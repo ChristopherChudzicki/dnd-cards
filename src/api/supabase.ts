@@ -1,4 +1,6 @@
-// src/api/supabase.ts
+// NOTE: Throws at module-evaluation time when env vars are missing.
+// Tests must stub VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY (see
+// src/test/setup.ts) or mock this module entirely with vi.mock.
 import { createClient } from "@supabase/supabase-js";
 
 const url = import.meta.env.VITE_SUPABASE_URL;
