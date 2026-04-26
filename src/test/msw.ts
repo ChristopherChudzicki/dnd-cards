@@ -2,25 +2,21 @@ import { HttpResponse, http } from "msw";
 import { setupServer } from "msw/node";
 import type { MagicItemDetail, MagicItemIndex, Ruleset } from "../api/endpoints/magicItems";
 
-export const server = setupServer();
+// Single source of truth for the local Supabase URL — also used by setup.ts
+// to stub VITE_SUPABASE_URL so the supabase client uses the same origin
+// MSW intercepts on.
+export const SB_URL = "http://localhost:54321";
 
-export const magicItemIndexHandler = (ruleset: Ruleset, body: MagicItemIndex) =>
-  http.get(`https://www.dnd5eapi.co/api/${ruleset}/magic-items`, () => HttpResponse.json(body));
-
-export const magicItemDetailHandler = (ruleset: Ruleset, slug: string, body: MagicItemDetail) => {
-  const { ruleset: _ruleset, ...rest } = body as MagicItemDetail & { ruleset: Ruleset };
-  return http.get(`https://www.dnd5eapi.co/api/${ruleset}/magic-items/${slug}`, () =>
-    HttpResponse.json(rest),
-  );
+const TEST_USER_DEFAULT = {
+  id: "11111111-1111-1111-1111-111111111111",
+  email: "alice@test.invalid",
 };
 
-export const apiErrorHandler = (path: string, status: number) =>
-  http.get(`https://www.dnd5eapi.co${path}`, () => new HttpResponse(null, { status }));
-
-const SB_URL = "http://localhost:54321";
-
-// Default empty responses for the endpoints we rely on.
-// Tests can override with `server.use(...)` for specific cases.
+// Default empty/echo responses for Supabase endpoints we rely on.
+// Tests override with `server.use(...)` for specific assertions.
+// PATCH responses echo the request body — tests asserting on full-row
+// shape (timestamps, owner_id, etc.) should register a per-test override.
+// Auth /user is needed by signInTestUser → setSession → _getUser.
 export const supabaseDefaultHandlers = [
   http.get(`${SB_URL}/rest/v1/decks`, () => HttpResponse.json([])),
   http.get(`${SB_URL}/rest/v1/cards`, () => HttpResponse.json([])),
@@ -44,9 +40,35 @@ export const supabaseDefaultHandlers = [
   }),
   http.delete(`${SB_URL}/rest/v1/decks`, () => HttpResponse.json([])),
   http.delete(`${SB_URL}/rest/v1/cards`, () => HttpResponse.json([])),
+  http.get(`${SB_URL}/auth/v1/user`, () => {
+    const now = new Date().toISOString();
+    return HttpResponse.json({
+      id: TEST_USER_DEFAULT.id,
+      aud: "authenticated",
+      role: "authenticated",
+      email: TEST_USER_DEFAULT.email,
+      app_metadata: {},
+      user_metadata: {},
+      created_at: now,
+      updated_at: now,
+    });
+  }),
+  http.post(`${SB_URL}/auth/v1/logout`, () => new HttpResponse(null, { status: 204 })),
 ];
 
-// Register the default handlers on import. Per-test `server.use(...)`
-// overrides take precedence; `server.resetHandlers()` in afterEach
-// restores this baseline.
-server.use(...supabaseDefaultHandlers);
+// Pass the defaults to setupServer so they survive `server.resetHandlers()`
+// (which removes runtime handlers but keeps the initial set).
+export const server = setupServer(...supabaseDefaultHandlers);
+
+export const magicItemIndexHandler = (ruleset: Ruleset, body: MagicItemIndex) =>
+  http.get(`https://www.dnd5eapi.co/api/${ruleset}/magic-items`, () => HttpResponse.json(body));
+
+export const magicItemDetailHandler = (ruleset: Ruleset, slug: string, body: MagicItemDetail) => {
+  const { ruleset: _ruleset, ...rest } = body as MagicItemDetail & { ruleset: Ruleset };
+  return http.get(`https://www.dnd5eapi.co/api/${ruleset}/magic-items/${slug}`, () =>
+    HttpResponse.json(rest),
+  );
+};
+
+export const apiErrorHandler = (path: string, status: number) =>
+  http.get(`https://www.dnd5eapi.co${path}`, () => new HttpResponse(null, { status }));
