@@ -12,7 +12,8 @@
     "format": "biome format --write src",
     "test": "vitest run",
     "test:watch": "vitest",
-    "gen:schema": "tsx scripts/gen-card-schema.ts"
+    "gen:schema": "tsx scripts/gen-card-schema.ts",
+    "check:schema": "npm run gen:schema && git diff --exit-code supabase/schemas/card-payload.json"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.104.1",
