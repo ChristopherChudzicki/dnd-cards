@@ -25,22 +25,29 @@
 ### Task 1: Install dependencies and add env scaffolding
 
 **Files:**
-- Modify: `package.json`
 - Create: `.env.local.example`
 - Modify: `.gitignore` (verify `.env.local` is ignored)
 - Create: `src/vite-env.d.ts` (or modify existing) for typed env vars
+- Modify: `src/lib/id.ts`
+- Modify: `package.json` (uninstall `nanoid`)
 
-- [ ] **Step 1: Install runtime deps**
+> **Pre-installed by the controller:** `@supabase/supabase-js` (runtime), `zod-to-json-schema`, `tsx`, and the `supabase` CLI (dev). Steps 1 and 2 below are no-ops — verify with `grep supabase-js package.json` and proceed to Step 3. The eventual `npm uninstall nanoid` in Step 6 still needs to run.
 
-```bash
-npm install @supabase/supabase-js
-```
-
-- [ ] **Step 2: Install dev deps**
+- [ ] **Step 1: Verify supabase-js is present**
 
 ```bash
-npm install -D zod-to-json-schema tsx
+grep '"@supabase/supabase-js"' package.json
 ```
+
+Expected: a single match. (No-op — pre-installed.)
+
+- [ ] **Step 2: Verify dev deps are present**
+
+```bash
+grep -E '"(zod-to-json-schema|tsx|supabase)"' package.json
+```
+
+Expected: three matches. (No-op — pre-installed.)
 
 `tsx` is used to run the codegen TS script in Task 6.
 
