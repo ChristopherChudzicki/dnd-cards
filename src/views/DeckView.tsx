@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { type ChangeEvent, useRef, useState } from "react";
-import { parseDeckJson, serializeDeck } from "../deck/io";
-import { useDeckStore } from "../deck/store";
+import { parseDeckJson, serializeDeck } from "../decks/io";
+import { useDeckStore } from "../decks/store";
 import { downloadText } from "../lib/download";
 import { newId } from "../lib/id";
 import { nowIso } from "../lib/time";

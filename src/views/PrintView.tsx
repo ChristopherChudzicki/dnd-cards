@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { AutoFitCard } from "../cards/AutoFitCard";
 import type { ItemCard } from "../cards/types";
-import { useDeckStore } from "../deck/store";
+import { useDeckStore } from "../decks/store";
 import styles from "./PrintView.module.css";
 
 type PerPage = 2 | 4;

@@ -4,7 +4,7 @@ import userEvent from "@testing-library/user-event";
 import { type ReactNode, StrictMode } from "react";
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, test, vi } from "vitest";
 import { magicItemDetail2024Factory, magicItemIndexEntryFactory } from "../api/factories";
-import { useDeckStore } from "../deck/store";
+import { useDeckStore } from "../decks/store";
 import {
   apiErrorHandler,
   magicItemDetailHandler,

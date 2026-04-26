@@ -3,7 +3,7 @@ import { type MouseEvent, useEffect, useMemo, useState } from "react";
 import { fetchMagicItemDetail, type Ruleset } from "../api/endpoints/magicItems";
 import { useMagicItemIndex } from "../api/hooks";
 import { magicItemDetailToCard } from "../api/mappers/magicItems";
-import { useDeckStore } from "../deck/store";
+import { useDeckStore } from "../decks/store";
 import styles from "./BrowseApiModal.module.css";
 
 type Props = {

@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { AutoFitCard } from "../cards/AutoFitCard";
 import { ItemEditor } from "../cards/ItemEditor";
 import type { ItemCard } from "../cards/types";
-import { useDeckStore } from "../deck/store";
+import { useDeckStore } from "../decks/store";
 import styles from "./EditorView.module.css";
 
 type Props = {

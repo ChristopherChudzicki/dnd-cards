@@ -2,7 +2,7 @@ import { screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, test } from "vitest";
 import { itemCardFactory } from "../cards/factories";
-import { useDeckStore } from "../deck/store";
+import { useDeckStore } from "../decks/store";
 import { renderWithRouter } from "../test/renderWithRouter";
 import { EditorView } from "./EditorView";
 

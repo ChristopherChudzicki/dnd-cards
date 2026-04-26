@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { itemCardSchema } from "../deck/schema";
+import { itemCardSchema } from "../decks/schema";
 import { itemCardFactory } from "./factories";
 
 describe("itemCardFactory", () => {
