@@ -2,17 +2,13 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import type { ReactNode } from "react";
-import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, test } from "vitest";
+import { beforeEach, describe, expect, test } from "vitest";
 import { itemCardFactory } from "../cards/factories";
 import { deckFactory } from "../decks/factories";
 import { useDeckStore } from "../decks/store";
 import { magicItemIndexHandler, server } from "../test/msw";
 import { renderWithRouter } from "../test/renderWithRouter";
 import { DeckView } from "./DeckView";
-
-beforeAll(() => server.listen({ onUnhandledRequest: "bypass" }));
-afterEach(() => server.resetHandlers());
-afterAll(() => server.close());
 
 beforeEach(() => {
   useDeckStore.setState({ deck: deckFactory.build() });

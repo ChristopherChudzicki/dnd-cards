@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { renderHook, waitFor } from "@testing-library/react";
 import type { ReactNode } from "react";
-import { afterAll, afterEach, beforeAll, describe, expect, test } from "vitest";
+import { describe, expect, test } from "vitest";
 import { magicItemDetailHandler, magicItemIndexHandler, server } from "../test/msw";
 import {
   magicItemDetail2024Factory,
@@ -9,10 +9,6 @@ import {
   magicItemIndexFactory,
 } from "./factories";
 import { useMagicItemDetail, useMagicItemIndex } from "./hooks";
-
-beforeAll(() => server.listen({ onUnhandledRequest: "error" }));
-afterEach(() => server.resetHandlers());
-afterAll(() => server.close());
 
 const wrapper = ({ children }: { children: ReactNode }) => {
   const client = new QueryClient({

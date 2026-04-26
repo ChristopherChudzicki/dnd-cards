@@ -2,7 +2,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { type ReactNode, StrictMode } from "react";
-import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, test, vi } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 import { magicItemDetail2024Factory, magicItemIndexEntryFactory } from "../api/factories";
 import { useDeckStore } from "../decks/store";
 import {
@@ -12,10 +12,6 @@ import {
   server,
 } from "../test/msw";
 import { BrowseApiModal } from "./BrowseApiModal";
-
-beforeAll(() => server.listen({ onUnhandledRequest: "error" }));
-afterEach(() => server.resetHandlers());
-afterAll(() => server.close());
 
 beforeEach(() => {
   useDeckStore.setState({ deck: { version: 1, cards: [] } });
