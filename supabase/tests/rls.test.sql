@@ -25,21 +25,32 @@ select lives_ok(
 -- Switch to Bob.
 set local request.jwt.claim.sub to '22222222-2222-2222-2222-222222222222';
 
--- RLS silently no-ops UPDATE/DELETE for non-owners (returns 0 rows affected).
--- Assert that the deck name was NOT changed.
-do $$ begin update public.decks set name = 'hacked' where id = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'; end $$;
+-- RLS note: permissive UPDATE/DELETE policies silently FILTER non-matching
+-- rows rather than throwing 42501 — the SQL succeeds and returns 0 rows
+-- affected. (Restrictive policies do throw, but ours are permissive.) We
+-- use `with ... returning` to assert the row count directly, which fails
+-- if a future policy change inadvertently allows non-owner writes.
+
+with attempted as (
+  update public.decks set name = 'hacked'
+  where id = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'
+  returning 1
+)
 select is(
-  (select name from public.decks where id = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'),
-  'Alice deck',
-  'non-owner cannot update deck (RLS silently no-ops)'
+  (select count(*)::int from attempted),
+  0,
+  'non-owner UPDATE on a deck affects 0 rows'
 );
 
--- Assert that the deck still exists after Bob's delete attempt.
-do $$ begin delete from public.decks where id = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'; end $$;
+with attempted as (
+  delete from public.decks
+  where id = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'
+  returning 1
+)
 select is(
-  (select count(*)::int from public.decks where id = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'),
-  1,
-  'non-owner cannot delete deck (RLS silently no-ops)'
+  (select count(*)::int from attempted),
+  0,
+  'non-owner DELETE on a deck affects 0 rows'
 );
 
 -- Public read access works for any role.

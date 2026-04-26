@@ -525,18 +525,31 @@ select lives_ok(
 -- Switch to Bob.
 set local request.jwt.claim.sub to '22222222-2222-2222-2222-222222222222';
 
-select throws_ok(
-  $$update public.decks set name = 'hacked' where id = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'$$,
-  '42501',
-  null,
-  'non-owner cannot update deck (RLS denies)'
+-- IMPORTANT: permissive RLS UPDATE/DELETE policies silently filter
+-- non-matching rows rather than throwing 42501. Use a `with … returning`
+-- CTE to assert directly that the operation affected 0 rows. (Restrictive
+-- policies DO throw, but ours are permissive, which is the Supabase default.)
+
+with attempted as (
+  update public.decks set name = 'hacked'
+  where id = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'
+  returning 1
+)
+select is(
+  (select count(*)::int from attempted),
+  0,
+  'non-owner UPDATE on a deck affects 0 rows'
 );
 
-select throws_ok(
-  $$delete from public.decks where id = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'$$,
-  '42501',
-  null,
-  'non-owner cannot delete deck'
+with attempted as (
+  delete from public.decks
+  where id = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'
+  returning 1
+)
+select is(
+  (select count(*)::int from attempted),
+  0,
+  'non-owner DELETE on a deck affects 0 rows'
 );
 
 -- Public read access works for any role.
