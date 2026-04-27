@@ -19,7 +19,6 @@ export function RequireOwner({ deckId, children }: Props) {
 
     if (!userId) {
       const next = `${window.location.pathname}${window.location.search}`;
-      // @ts-expect-error -- /login and /deck/$deckId are registered in T18; remove this directive then.
       navigate({ to: "/login", search: { next } });
       return;
     }

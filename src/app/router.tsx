@@ -1,4 +1,6 @@
 import { createRootRoute, createRoute, createRouter, RouterProvider } from "@tanstack/react-router";
+import { AuthCallback } from "../auth/AuthCallback";
+import { LoginView } from "../auth/LoginView";
 import { DeckView } from "../views/DeckView";
 import { EditorView } from "../views/EditorView";
 import { PrintView } from "../views/PrintView";
@@ -24,7 +26,25 @@ const printRoute = createRoute({
   component: PrintView,
 });
 
-const routeTree = rootRoute.addChildren([deckRoute, editorRoute, printRoute]);
+const loginRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/login",
+  component: LoginView,
+});
+
+const authCallbackRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/auth/callback",
+  component: AuthCallback,
+});
+
+const routeTree = rootRoute.addChildren([
+  deckRoute,
+  editorRoute,
+  printRoute,
+  loginRoute,
+  authCallbackRoute,
+]);
 
 export const router = createRouter({ routeTree });
 
