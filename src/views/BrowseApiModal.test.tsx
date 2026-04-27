@@ -87,7 +87,7 @@ describe("<BrowseApiModal>", () => {
     await userEvent.click(await screen.findByText("Bag of Holding"));
 
     await waitFor(() => expect(onPost).toHaveBeenCalled());
-    expect(onSelected).toHaveBeenCalled();
+    expect(onSelected).toHaveBeenCalledWith(expect.any(String));
   });
 
   test("clicking the same row only POSTs once even under StrictMode double-render", async () => {
