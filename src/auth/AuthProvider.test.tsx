@@ -19,12 +19,15 @@ describe("AuthProvider", () => {
     await supabase.auth.signOut();
   });
 
-  it("starts in 'loading' and resolves to 'unauthenticated' when no session", async () => {
+  it("resolves to 'unauthenticated' when no session is present", async () => {
     render(
       <AuthProvider>
         <ShowSession />
       </AuthProvider>,
     );
+    // Synchronously: the provider initializes to "loading" before the
+    // listener fires INITIAL_SESSION.
+    expect(screen.getByTestId("status").textContent).toBe("loading");
     await waitFor(() => {
       expect(screen.getByTestId("status").textContent).toBe("unauthenticated");
     });

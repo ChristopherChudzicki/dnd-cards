@@ -11,16 +11,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     let cancelled = false;
-
-    supabase.auth.getSession().then(({ data }) => {
-      if (cancelled) return;
-      setState(
-        data.session
-          ? { status: "authenticated", user: data.session.user, session: data.session }
-          : { status: "unauthenticated", user: null, session: null },
-      );
-    });
-
+    // onAuthStateChange synthesizes an INITIAL_SESSION event on subscribe,
+    // so we don't need a separate getSession() call — the listener seeds
+    // initial state and tracks changes uniformly. (This matches the pattern
+    // Supabase recommends for React contexts.)
     const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
       if (cancelled) return;
       setState(
