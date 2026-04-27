@@ -1,7 +1,10 @@
 import { Link, useNavigate } from "@tanstack/react-router";
+import { type ChangeEvent, useRef } from "react";
 import { useSession } from "../auth/useSession";
-import { useCreateDeck, useDeleteDeck } from "../decks/mutations";
+import { parseDeckJson } from "../decks/io";
+import { useCreateDeck, useDeleteDeck, useSaveCard } from "../decks/mutations";
 import { useDecks } from "../decks/queries";
+import { newId } from "../lib/id";
 import styles from "./HomeView.module.css";
 
 export function HomeView() {
@@ -11,6 +14,8 @@ export function HomeView() {
   const decks = useDecks(ownerId);
   const createDeck = useCreateDeck();
   const deleteDeck = useDeleteDeck();
+  const saveCard = useSaveCard();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   if (session.status === "loading") return null;
 
@@ -25,6 +30,28 @@ export function HomeView() {
       </section>
     );
   }
+
+  const handleImport = async (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !ownerId) return;
+    const text = await file.text();
+    const result = parseDeckJson(text);
+    if (!result.ok) {
+      alert(`Import failed: ${result.error}`);
+      e.target.value = "";
+      return;
+    }
+    const name = file.name.replace(/\.json$/i, "") || "Imported deck";
+    const deck = await createDeck.mutateAsync({ name, ownerId });
+    // Insert each card with a fresh UUID. Re-using imported ids would
+    // PK-conflict on re-import.
+    for (const card of result.deck.cards) {
+      const fresh = { ...card, id: newId() };
+      await saveCard.mutateAsync({ card: fresh, deckId: deck.id, isNew: true });
+    }
+    navigate({ to: "/deck/$deckId", params: { deckId: deck.id } });
+    e.target.value = "";
+  };
 
   const handleCreate = async () => {
     if (!ownerId) return;
@@ -41,9 +68,22 @@ export function HomeView() {
     return (
       <section className={styles.empty}>
         <h2>No decks yet</h2>
-        <button type="button" onClick={handleCreate} disabled={createDeck.isPending}>
-          Create your first deck
-        </button>
+        <div className={styles.headerActions}>
+          <button type="button" onClick={() => fileInputRef.current?.click()}>
+            Import JSON
+          </button>
+          <button type="button" onClick={handleCreate} disabled={createDeck.isPending}>
+            Create your first deck
+          </button>
+        </div>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="application/json"
+          aria-label="Import JSON"
+          hidden
+          onChange={handleImport}
+        />
       </section>
     );
   }
@@ -52,9 +92,22 @@ export function HomeView() {
     <section>
       <header className={styles.header}>
         <h2>Your decks</h2>
-        <button type="button" onClick={handleCreate} disabled={createDeck.isPending}>
-          New deck
-        </button>
+        <div className={styles.headerActions}>
+          <button type="button" onClick={() => fileInputRef.current?.click()}>
+            Import JSON
+          </button>
+          <button type="button" onClick={handleCreate} disabled={createDeck.isPending}>
+            New deck
+          </button>
+        </div>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="application/json"
+          aria-label="Import JSON"
+          hidden
+          onChange={handleImport}
+        />
       </header>
       <ul className={styles.list}>
         {decks.data.map((d) => (

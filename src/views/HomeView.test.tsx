@@ -6,7 +6,7 @@ import type { ReactNode } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { supabase } from "../api/supabase";
 import { AuthProvider } from "../auth/AuthProvider";
-import { makeDeckRow } from "../test/factories";
+import { makeCardRow, makeDeckRow } from "../test/factories";
 import { server } from "../test/msw";
 import { signInTestUser } from "../test/signInTestUser";
 import { HomeView } from "./HomeView";
@@ -83,6 +83,55 @@ describe("HomeView", () => {
       expect(navigate).toHaveBeenCalledWith({
         to: "/deck/$deckId",
         params: { deckId: inserted.id },
+      }),
+    );
+  });
+
+  it("creates a new deck named after the file when JSON is imported", async () => {
+    await signInTestUser();
+    const created = makeDeckRow.build({ name: "my-deck" });
+    const insertedRows: unknown[] = [];
+    server.use(
+      http.get(`${SB}/rest/v1/decks`, () => HttpResponse.json([])),
+      http.post(`${SB}/rest/v1/decks`, () => HttpResponse.json([created], { status: 201 })),
+      http.post(`${SB}/rest/v1/cards`, async ({ request }) => {
+        insertedRows.push(await request.json());
+        return HttpResponse.json([makeCardRow.build()], { status: 201 });
+      }),
+    );
+
+    render(wrap(<HomeView />));
+
+    const file = new File(
+      [
+        JSON.stringify({
+          version: 1,
+          cards: [
+            {
+              id: "x",
+              kind: "item",
+              name: "Sword",
+              typeLine: "Weapon",
+              body: "",
+              source: "custom",
+              createdAt: "2026-04-26T00:00:00Z",
+              updatedAt: "2026-04-26T00:00:00Z",
+            },
+          ],
+        }),
+      ],
+      "my-deck.json",
+      { type: "application/json" },
+    );
+
+    const input = await screen.findByLabelText(/import json/i);
+    await userEvent.upload(input, file);
+
+    await waitFor(() => expect(insertedRows).toHaveLength(1));
+    await waitFor(() =>
+      expect(navigate).toHaveBeenCalledWith({
+        to: "/deck/$deckId",
+        params: { deckId: created.id },
       }),
     );
   });

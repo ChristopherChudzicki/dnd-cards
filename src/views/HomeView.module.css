@@ -40,3 +40,7 @@
   cursor: pointer;
   font-size: 0.85rem;
 }
+.headerActions {
+  display: flex;
+  gap: 0.5rem;
+}
