@@ -69,13 +69,23 @@ describe("useDeleteDeck", () => {
 });
 
 describe("useSaveCard", () => {
-  it("INSERTs a new card when isNew=true", async () => {
+  it("INSERTs a new card and forces the client-generated id in the request body", async () => {
     const row = makeCardRow.build();
-    server.use(http.post(`${SB}/rest/v1/cards`, () => HttpResponse.json([row], { status: 201 })));
+    const onPost = vi.fn();
+    server.use(
+      http.post(`${SB}/rest/v1/cards`, async ({ request }) => {
+        onPost(await request.json());
+        return HttpResponse.json([row], { status: 201 });
+      }),
+    );
     const { result } = renderHook(() => useSaveCard(), { wrapper: makeWrapper() });
     const card = { id: row.id, ...row.payload } as Card;
     const saved = await result.current.mutateAsync({ card, deckId: row.deck_id, isNew: true });
     expect(saved.id).toBe(row.id);
+    // Critical: the request body must carry the client-generated id so the
+    // editor URL stays stable across the round-trip. Without this, Postgres
+    // would mint a fresh UUID and the route would 404 right after save.
+    expect(onPost).toHaveBeenCalledWith(expect.objectContaining({ id: card.id }));
   });
 
   it("UPDATEs an existing card when isNew=false", async () => {
@@ -85,6 +95,18 @@ describe("useSaveCard", () => {
     const card = { id: row.id, ...row.payload } as Card;
     const saved = await result.current.mutateAsync({ card, deckId: row.deck_id, isNew: false });
     expect(saved.id).toBe(row.id);
+  });
+});
+
+describe("error propagation", () => {
+  it("rejects mutateAsync when Supabase returns an error", async () => {
+    server.use(
+      http.post(`${SB}/rest/v1/decks`, () =>
+        HttpResponse.json({ message: "denied" }, { status: 403 }),
+      ),
+    );
+    const { result } = renderHook(() => useCreateDeck(), { wrapper: makeWrapper() });
+    await expect(result.current.mutateAsync({ name: "x", ownerId: "y" })).rejects.toBeDefined();
   });
 });
 

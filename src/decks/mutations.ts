@@ -5,6 +5,12 @@ import { deckCardsKey, deckKey, decksKey } from "./queries";
 import { cardToInsertRow, cardToUpdatePayload, rowToCard } from "./rowMappers";
 import type { CardRow, DeckRow } from "./types";
 
+// Note on .maybeSingle(): we use it here (rather than .single()) for two
+// reasons. (1) .single() forces the Accept header to
+// `application/vnd.pgrst.object+json`, which our MSW handlers don't simulate.
+// (2) .maybeSingle() returns null on 0 rows instead of throwing, which lets
+// us throw a hook-named error so a stack trace is debuggable in production.
+
 export function useCreateDeck() {
   const qc = useQueryClient();
   return useMutation<DeckRow, Error, { name: string; ownerId: string }>({
@@ -12,11 +18,11 @@ export function useCreateDeck() {
       const { data, error } = await supabase
         .from("decks")
         .insert({ name, owner_id: ownerId })
-        .select();
+        .select()
+        .maybeSingle();
       if (error) throw error;
-      const row = (data as DeckRow[])[0];
-      if (!row) throw new Error("No row returned from insert");
-      return row;
+      if (!data) throw new Error("useCreateDeck: insert returned no row");
+      return data as DeckRow;
     },
     onSuccess: (_data, vars) => {
       qc.invalidateQueries({ queryKey: decksKey(vars.ownerId) });
@@ -32,11 +38,11 @@ export function useRenameDeck() {
         .from("decks")
         .update({ name })
         .eq("id", deckId)
-        .select();
+        .select()
+        .maybeSingle();
       if (error) throw error;
-      const row = (data as DeckRow[])[0];
-      if (!row) throw new Error("No row returned from update");
-      return row;
+      if (!data) throw new Error(`useRenameDeck: no row matched id=${deckId}`);
+      return data as DeckRow;
     },
     onSuccess: (data) => {
       qc.invalidateQueries({ queryKey: deckKey(data.id) });
@@ -69,26 +75,26 @@ export function useSaveCard() {
     mutationFn: async ({ card, deckId, isNew, position = 0 }) => {
       if (isNew) {
         const insert = cardToInsertRow(card, deckId, position);
-        // Force the row id to match the client-generated one if provided
-        // (so the editor URL stays stable across the round-trip).
+        // Force the row id to match the client-generated one so the editor
+        // URL stays stable across the save round-trip.
         const { data, error } = await supabase
           .from("cards")
           .insert({ ...insert, id: card.id })
-          .select();
+          .select()
+          .maybeSingle();
         if (error) throw error;
-        const row = (data as CardRow[])[0];
-        if (!row) throw new Error("No row returned from insert");
-        return rowToCard(row);
+        if (!data) throw new Error("useSaveCard: insert returned no row");
+        return rowToCard(data as CardRow);
       }
       const { data, error } = await supabase
         .from("cards")
         .update({ payload: cardToUpdatePayload(card) })
         .eq("id", card.id)
-        .select();
+        .select()
+        .maybeSingle();
       if (error) throw error;
-      const row = (data as CardRow[])[0];
-      if (!row) throw new Error("No row returned from update");
-      return rowToCard(row);
+      if (!data) throw new Error(`useSaveCard: no card matched id=${card.id}`);
+      return rowToCard(data as CardRow);
     },
     onSuccess: (_card, vars) => {
       qc.invalidateQueries({ queryKey: deckCardsKey(vars.deckId) });
