@@ -1,0 +1,19 @@
+.login {
+  max-width: 28rem;
+  margin: 4rem auto;
+  text-align: center;
+}
+.buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+.buttons button {
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+}
+.dev {
+  border-style: dashed;
+  opacity: 0.85;
+}
