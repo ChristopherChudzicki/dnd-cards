@@ -29,10 +29,10 @@ const editorRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/deck/$deckId/edit/$cardId",
   component: function EditorRoute() {
-    const { deckId } = editorRoute.useParams();
+    const { deckId, cardId } = editorRoute.useParams();
     return (
       <RequireOwner deckId={deckId}>
-        <EditorView />
+        <EditorView deckId={deckId} cardId={cardId} />
       </RequireOwner>
     );
   },
