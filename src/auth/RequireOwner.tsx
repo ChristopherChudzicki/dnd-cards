@@ -19,12 +19,13 @@ export function RequireOwner({ deckId, children }: Props) {
 
     if (!userId) {
       const next = `${window.location.pathname}${window.location.search}`;
-      // Routes /login and /deck/$deckId are added in T18; cast until then.
-      (navigate as (opts: unknown) => void)({ to: "/login", search: { next } });
+      // @ts-expect-error -- /login and /deck/$deckId are registered in T18; remove this directive then.
+      navigate({ to: "/login", search: { next } });
       return;
     }
     if (ownerId && ownerId !== userId) {
-      (navigate as (opts: unknown) => void)({ to: "/deck/$deckId", params: { deckId } });
+      // @ts-expect-error -- /login and /deck/$deckId are registered in T18; remove this directive then.
+      navigate({ to: "/deck/$deckId", params: { deckId } });
     }
   }, [sessionLoading, deckQuery.isLoading, userId, ownerId, deckId, navigate]);
 
