@@ -20,14 +20,18 @@ vi.mock("@tanstack/react-router", async () => {
     ...actual,
     Link: ({
       children,
-      to: _to,
+      to,
       params: _params,
       ...rest
     }: {
       children: ReactNode;
       to?: string;
       params?: Record<string, string>;
-    } & Record<string, unknown>) => <a {...rest}>{children}</a>,
+    } & Record<string, unknown>) => (
+      <a href={to} {...rest}>
+        {children}
+      </a>
+    ),
     useNavigate: () => vi.fn(),
   };
 });
@@ -55,7 +59,7 @@ describe("DeckView (logged-out)", () => {
     );
     render(wrap(<DeckView deckId={deck.id} />));
     await waitFor(() => expect(screen.getByText(card.payload.name)).toBeInTheDocument());
-    expect(screen.queryByRole("button", { name: /new card/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: /new card/i })).not.toBeInTheDocument();
     expect(
       screen.queryByRole("button", { name: `Delete ${card.payload.name}` }),
     ).not.toBeInTheDocument();
@@ -93,7 +97,7 @@ describe("DeckView (owner)", () => {
     const del = await screen.findByRole("button", { name: `Delete ${card.payload.name}` });
     await userEvent.click(del);
     await waitFor(() => expect(onDelete).toHaveBeenCalled());
-    expect(screen.getByRole("button", { name: /new card/i })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /new card/i })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /browse from api/i })).toBeInTheDocument();
   });
 });

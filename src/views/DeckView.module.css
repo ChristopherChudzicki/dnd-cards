@@ -95,13 +95,39 @@
   background: #fff0f0;
 }
 
-.titleButton {
-  background: none;
-  border: none;
-  padding: 0;
-  cursor: text;
+.titleRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.renameBtn {
   font: inherit;
-  text-align: left;
+  font-size: 0.85rem;
+  padding: 0.2rem 0.5rem;
+  border: 1px solid #bbb;
+  border-radius: 0.3rem;
+  background: #fff;
+  cursor: pointer;
+}
+
+.renameBtn:hover {
+  background: #f0f0f0;
+}
+
+.newCardLink {
+  font: inherit;
+  padding: 0.4rem 0.8rem;
+  border: 1px solid #bbb;
+  border-radius: 0.3rem;
+  background: #fff;
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.newCardLink:hover {
+  background: #f0f0f0;
 }
 
 .titleInput {

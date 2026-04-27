@@ -18,7 +18,7 @@ export function DeckView({ deckId }: Props) {
   const deleteCard = useDeleteCard();
   const [browseOpen, setBrowseOpen] = useState(false);
 
-  if (deckQuery.isLoading) return <p>Loading…</p>;
+  if (deckQuery.isLoading || cardsQuery.isLoading) return <p>Loading…</p>;
   if (!deckQuery.data) return <p>This deck no longer exists.</p>;
 
   const deck = deckQuery.data;
@@ -46,8 +46,12 @@ export function DeckView({ deckId }: Props) {
               <button type="button" onClick={() => setBrowseOpen(true)}>
                 Browse from API
               </button>
-              <Link to="/deck/$deckId/edit/$cardId" params={{ deckId, cardId: "new" }}>
-                <button type="button">New card</button>
+              <Link
+                to="/deck/$deckId/edit/$cardId"
+                params={{ deckId, cardId: "new" }}
+                className={styles.newCardLink}
+              >
+                New card
               </Link>
             </>
           )}
@@ -105,17 +109,23 @@ function DeckTitle({ name, onRename }: { name: string; onRename: (next: string) 
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(name);
   if (!editing) {
+    // The <h2> stays a heading (preserves landmark navigation) while the
+    // <button> sibling provides an explicit, focusable rename affordance.
     return (
-      <button
-        type="button"
-        className={styles.titleButton}
-        onClick={() => {
-          setDraft(name);
-          setEditing(true);
-        }}
-      >
+      <div className={styles.titleRow}>
         <h2 className={styles.title}>{name}</h2>
-      </button>
+        <button
+          type="button"
+          className={styles.renameBtn}
+          aria-label={`Rename deck ${name}`}
+          onClick={() => {
+            setDraft(name);
+            setEditing(true);
+          }}
+        >
+          Rename
+        </button>
+      </div>
     );
   }
   return (
@@ -127,6 +137,7 @@ function DeckTitle({ name, onRename }: { name: string; onRename: (next: string) 
         if (draft && draft !== name) onRename(draft);
         setEditing(false);
       }}
+      aria-label={`Rename deck (currently: ${name})`}
       // biome-ignore lint/a11y/noAutofocus: user just clicked to enter edit mode
       autoFocus
     />
