@@ -1,0 +1,107 @@
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { HttpResponse, http } from "msw";
+import type { ReactNode } from "react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { supabase } from "../api/supabase";
+import { AuthProvider } from "../auth/AuthProvider";
+import { makeDeckRow } from "../test/factories";
+import { server } from "../test/msw";
+import { signInTestUser } from "../test/signInTestUser";
+import { HomeView } from "./HomeView";
+
+const SB = "http://localhost:54321";
+const navigate = vi.fn();
+vi.mock("@tanstack/react-router", async () => {
+  const actual =
+    await vi.importActual<typeof import("@tanstack/react-router")>("@tanstack/react-router");
+  return {
+    ...actual,
+    useNavigate: () => navigate,
+    Link: ({
+      children,
+      to,
+      ...rest
+    }: { children: ReactNode; to?: string } & Record<string, unknown>) => (
+      <a href={to as string} {...rest}>
+        {children}
+      </a>
+    ),
+  };
+});
+
+function wrap(ui: ReactNode) {
+  const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  return (
+    <QueryClientProvider client={client}>
+      <AuthProvider>{ui}</AuthProvider>
+    </QueryClientProvider>
+  );
+}
+
+describe("HomeView", () => {
+  beforeEach(async () => {
+    await supabase.auth.signOut();
+    navigate.mockClear();
+  });
+
+  it("shows a sign-in CTA when unauthenticated", async () => {
+    render(wrap(<HomeView />));
+    await waitFor(() => expect(screen.getByRole("link", { name: /sign in/i })).toBeInTheDocument());
+  });
+
+  it("shows the user's decks when authenticated", async () => {
+    await signInTestUser();
+    const decks = [makeDeckRow.build(), makeDeckRow.build()];
+    server.use(http.get(`${SB}/rest/v1/decks`, () => HttpResponse.json(decks)));
+    render(wrap(<HomeView />));
+    for (const d of decks) {
+      await waitFor(() => expect(screen.getByText(d.name)).toBeInTheDocument());
+    }
+  });
+
+  it("shows an empty-state CTA when authenticated with no decks", async () => {
+    await signInTestUser();
+    server.use(http.get(`${SB}/rest/v1/decks`, () => HttpResponse.json([])));
+    render(wrap(<HomeView />));
+    await waitFor(() =>
+      expect(screen.getByRole("button", { name: /create your first deck/i })).toBeInTheDocument(),
+    );
+  });
+
+  it("creates a new deck when the CTA is clicked", async () => {
+    await signInTestUser();
+    const inserted = makeDeckRow.build({ name: "Untitled deck" });
+    server.use(
+      http.get(`${SB}/rest/v1/decks`, () => HttpResponse.json([])),
+      http.post(`${SB}/rest/v1/decks`, () => HttpResponse.json([inserted], { status: 201 })),
+    );
+    render(wrap(<HomeView />));
+    await userEvent.click(await screen.findByRole("button", { name: /create your first deck/i }));
+    await waitFor(() =>
+      expect(navigate).toHaveBeenCalledWith({
+        to: "/deck/$deckId",
+        params: { deckId: inserted.id },
+      }),
+    );
+  });
+
+  it("deletes a deck after confirmation", async () => {
+    await signInTestUser();
+    const deck = makeDeckRow.build();
+    const onDelete = vi.fn();
+    server.use(
+      http.get(`${SB}/rest/v1/decks`, () => HttpResponse.json([deck])),
+      http.delete(`${SB}/rest/v1/decks`, () => {
+        onDelete();
+        return HttpResponse.json([]);
+      }),
+    );
+    vi.spyOn(window, "confirm").mockReturnValue(true);
+    render(wrap(<HomeView />));
+    const del = await screen.findByRole("button", { name: new RegExp(`delete ${deck.name}`, "i") });
+    await userEvent.click(del);
+    await waitFor(() => expect(onDelete).toHaveBeenCalled());
+  });
+});

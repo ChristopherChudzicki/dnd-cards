@@ -1,0 +1,42 @@
+.splash,
+.empty {
+  text-align: center;
+  padding: 4rem 1rem;
+}
+.cta {
+  display: inline-block;
+  margin-top: 1rem;
+  padding: 0.75rem 1.5rem;
+  background: var(--color-accent, #5b8def);
+  color: white;
+  border-radius: 6px;
+  text-decoration: none;
+}
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+.list {
+  list-style: none;
+  padding: 0;
+}
+.row {
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--color-divider, #e0e0e0);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.deckLink {
+  flex: 1;
+}
+.deleteBtn {
+  background: none;
+  border: 1px solid currentColor;
+  border-radius: 4px;
+  padding: 0.25rem 0.5rem;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
