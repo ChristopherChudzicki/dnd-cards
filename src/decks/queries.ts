@@ -5,8 +5,8 @@ import { rowToCard } from "./rowMappers";
 import type { CardRow, DeckRow } from "./types";
 
 export const decksKey = (ownerId: string | undefined) => ["decks", ownerId] as const;
-export const deckKey = (deckId: string) => ["deck", deckId] as const;
-export const deckCardsKey = (deckId: string) => ["deck-cards", deckId] as const;
+export const deckKey = (deckId: string | undefined) => ["deck", deckId] as const;
+export const deckCardsKey = (deckId: string | undefined) => ["deck-cards", deckId] as const;
 
 export function useDecks(ownerId: string | undefined) {
   return useQuery<DeckRow[]>({
@@ -25,25 +25,31 @@ export function useDecks(ownerId: string | undefined) {
   });
 }
 
-export function useDeck(deckId: string) {
+export function useDeck(deckId: string | undefined) {
   return useQuery<DeckRow | null>({
     queryKey: deckKey(deckId),
+    enabled: Boolean(deckId),
     queryFn: async () => {
+      if (!deckId) return null;
       const { data, error } = await supabase
         .from("decks")
         .select("*")
         .eq("id", deckId)
         .maybeSingle();
       if (error) throw error;
+      // Return null (not undefined) on miss: TanStack Query v5 throws if a
+      // queryFn returns undefined.
       return data ?? null;
     },
   });
 }
 
-export function useDeckCards(deckId: string) {
+export function useDeckCards(deckId: string | undefined) {
   return useQuery<Card[]>({
     queryKey: deckCardsKey(deckId),
+    enabled: Boolean(deckId),
     queryFn: async () => {
+      if (!deckId) return [];
       const { data, error } = await supabase
         .from("cards")
         .select("*")

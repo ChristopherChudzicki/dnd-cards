@@ -17,12 +17,17 @@ function wrapper() {
 }
 
 describe("useDecks", () => {
-  it("returns the user's decks ordered by created_at desc", async () => {
+  it("returns the user's decks", async () => {
     const decks = [makeDeckRow.build(), makeDeckRow.build()];
     server.use(http.get(`${SB}/rest/v1/decks`, () => HttpResponse.json(decks)));
     const { result } = renderHook(() => useDecks("user-id"), { wrapper: wrapper() });
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(result.current.data).toEqual(decks);
+  });
+
+  it("is disabled when ownerId is undefined", async () => {
+    const { result } = renderHook(() => useDecks(undefined), { wrapper: wrapper() });
+    expect(result.current.fetchStatus).toBe("idle");
   });
 });
 
@@ -35,7 +40,7 @@ describe("useDeck", () => {
     expect(result.current.data).toEqual(deck);
   });
 
-  it("returns undefined when the deck doesn't exist", async () => {
+  it("returns null when the deck doesn't exist", async () => {
     server.use(http.get(`${SB}/rest/v1/decks`, () => HttpResponse.json([])));
     const { result } = renderHook(() => useDeck("missing"), { wrapper: wrapper() });
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
