@@ -3,12 +3,10 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { HttpResponse, http } from "msw";
 import type { ReactNode } from "react";
-import { describe, expect, it, vi } from "vitest";
-import { makeCardRow } from "../test/factories";
-import { server } from "../test/msw";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { makeCardRow, makeItemPayload } from "../test/factories";
+import { SB_URL as SB, server } from "../test/msw";
 import { EditorView } from "./EditorView";
-
-const SB = "http://localhost:54321";
 
 const navigate = vi.fn();
 vi.mock("@tanstack/react-router", async () => {
@@ -23,6 +21,10 @@ function wrap(ui: ReactNode) {
 }
 
 describe("EditorView", () => {
+  beforeEach(() => {
+    navigate.mockClear();
+  });
+
   it("renders 'Card not found' when cardId is missing from server", async () => {
     server.use(http.get(`${SB}/rest/v1/cards`, () => HttpResponse.json([])));
     render(wrap(<EditorView deckId="d1" cardId="missing" />));
@@ -56,5 +58,25 @@ describe("EditorView", () => {
     render(wrap(<EditorView deckId="d1" cardId="c1" />));
     await userEvent.click(await screen.findByRole("button", { name: /save/i }));
     await waitFor(() => expect(onPatch).toHaveBeenCalled());
+  });
+
+  it("shows the template-item notice for API-sourced cards with a generic body", async () => {
+    const templatePayload = {
+      ...makeItemPayload.build(),
+      source: "api" as const,
+      body: "Weapon (Any Melee Weapon). +1 to attack rolls.",
+    };
+    const card = makeCardRow.build({ id: "c1", deck_id: "d1", payload: templatePayload });
+    server.use(http.get(`${SB}/rest/v1/cards`, () => HttpResponse.json([card])));
+    render(wrap(<EditorView deckId="d1" cardId="c1" />));
+    expect(await screen.findByTestId("template-notice")).toBeInTheDocument();
+  });
+
+  it("does NOT show the template notice for custom items", async () => {
+    const card = makeCardRow.build({ id: "c1", deck_id: "d1" });
+    server.use(http.get(`${SB}/rest/v1/cards`, () => HttpResponse.json([card])));
+    render(wrap(<EditorView deckId="d1" cardId="c1" />));
+    await screen.findByRole("button", { name: /save/i }); // wait for render
+    expect(screen.queryByTestId("template-notice")).not.toBeInTheDocument();
   });
 });
