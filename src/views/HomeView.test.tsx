@@ -100,7 +100,9 @@ describe("HomeView", () => {
     );
     vi.spyOn(window, "confirm").mockReturnValue(true);
     render(wrap(<HomeView />));
-    const del = await screen.findByRole("button", { name: new RegExp(`delete ${deck.name}`, "i") });
+    // Match the aria-label as a literal string to avoid regex escaping —
+    // faker.lorem.words can produce names containing regex metacharacters.
+    const del = await screen.findByRole("button", { name: `Delete ${deck.name}` });
     await userEvent.click(del);
     await waitFor(() => expect(onDelete).toHaveBeenCalled());
   });
