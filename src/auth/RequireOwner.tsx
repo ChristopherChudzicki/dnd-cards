@@ -23,7 +23,6 @@ export function RequireOwner({ deckId, children }: Props) {
       return;
     }
     if (ownerId && ownerId !== userId) {
-      // @ts-expect-error -- /deck/$deckId is registered in T20; remove this directive then.
       navigate({ to: "/deck/$deckId", params: { deckId } });
     }
   }, [sessionLoading, deckQuery.isLoading, userId, ownerId, deckId, navigate]);

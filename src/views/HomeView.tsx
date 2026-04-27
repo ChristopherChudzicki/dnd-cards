@@ -29,7 +29,6 @@ export function HomeView() {
   const handleCreate = async () => {
     if (!ownerId) return;
     const deck = await createDeck.mutateAsync({ name: "Untitled deck", ownerId });
-    // @ts-expect-error -- /deck/$deckId registered in T20; remove this directive then.
     navigate({ to: "/deck/$deckId", params: { deckId: deck.id } });
   };
 
@@ -60,7 +59,6 @@ export function HomeView() {
       <ul className={styles.list}>
         {decks.data.map((d) => (
           <li key={d.id} className={styles.row}>
-            {/* @ts-expect-error -- /deck/$deckId registered in T20; remove this directive then. */}
             <Link to="/deck/$deckId" params={{ deckId: d.id }} className={styles.deckLink}>
               {d.name}
             </Link>

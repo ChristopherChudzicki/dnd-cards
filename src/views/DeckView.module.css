@@ -94,3 +94,21 @@
 .deleteBtn:hover {
   background: #fff0f0;
 }
+
+.titleButton {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: text;
+  font: inherit;
+  text-align: left;
+}
+
+.titleInput {
+  font: inherit;
+  font-size: 1.5rem;
+  font-weight: bold;
+  border: 1px solid #bbb;
+  border-radius: 0.3rem;
+  padding: 0.1rem 0.4rem;
+}

@@ -1,121 +1,134 @@
-import { Link, useNavigate } from "@tanstack/react-router";
-import { type ChangeEvent, useRef, useState } from "react";
-import { parseDeckJson, serializeDeck } from "../decks/io";
-import { useDeckStore } from "../decks/store";
+import { Link } from "@tanstack/react-router";
+import { useState } from "react";
+import { useSession } from "../auth/useSession";
+import { serializeDeck } from "../decks/io";
+import { useDeleteCard, useRenameDeck } from "../decks/mutations";
+import { useDeck, useDeckCards } from "../decks/queries";
 import { downloadText } from "../lib/download";
-import { newId } from "../lib/id";
-import { nowIso } from "../lib/time";
 import { BrowseApiModal } from "./BrowseApiModal";
 import styles from "./DeckView.module.css";
 
-export function DeckView() {
-  const deck = useDeckStore((s) => s.deck);
-  const upsertCard = useDeckStore((s) => s.upsertCard);
-  const removeCard = useDeckStore((s) => s.removeCard);
-  const replaceDeck = useDeckStore((s) => s.replaceDeck);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const navigate = useNavigate();
+type Props = { deckId: string };
+
+export function DeckView({ deckId }: Props) {
+  const session = useSession();
+  const deckQuery = useDeck(deckId);
+  const cardsQuery = useDeckCards(deckId);
+  const renameDeck = useRenameDeck();
+  const deleteCard = useDeleteCard();
   const [browseOpen, setBrowseOpen] = useState(false);
 
-  const handleNew = () => {
-    const id = newId();
-    const now = nowIso();
-    upsertCard({
-      id,
-      kind: "item",
-      name: "Untitled item",
-      typeLine: "",
-      body: "",
-      source: "custom",
-      createdAt: now,
-      updatedAt: now,
-    });
-    navigate({ to: "/editor/$id", params: { id } });
-  };
+  if (deckQuery.isLoading) return <p>Loading…</p>;
+  if (!deckQuery.data) return <p>This deck no longer exists.</p>;
+
+  const deck = deckQuery.data;
+  const cards = cardsQuery.data ?? [];
+  const isOwner = session.status === "authenticated" && session.user.id === deck.owner_id;
 
   const handleExport = () => {
-    downloadText("deck.json", serializeDeck(deck));
-  };
-
-  const handleImportClick = () => {
-    fileInputRef.current?.click();
-  };
-
-  const handleImport = async (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const text = await file.text();
-    const result = parseDeckJson(text);
-    if (result.ok) {
-      replaceDeck(result.deck);
-    } else {
-      alert(`Import failed: ${result.error}`);
-    }
-    e.target.value = "";
-  };
-
-  const handleApiSelected = (id: string) => {
-    setBrowseOpen(false);
-    navigate({ to: "/editor/$id", params: { id } });
+    downloadText(`${deck.name}.json`, serializeDeck({ version: 1, cards }));
   };
 
   return (
     <section>
       <header className={styles.header}>
-        <h2 className={styles.title}>Deck</h2>
+        {isOwner ? (
+          <DeckTitle name={deck.name} onRename={(n) => renameDeck.mutate({ deckId, name: n })} />
+        ) : (
+          <h2 className={styles.title}>{deck.name}</h2>
+        )}
         <div className={styles.actions}>
-          <button type="button" onClick={handleImportClick}>
-            Import JSON
-          </button>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="application/json"
-            hidden
-            onChange={handleImport}
-          />
-          <button type="button" onClick={handleExport} disabled={deck.cards.length === 0}>
+          <button type="button" onClick={handleExport} disabled={cards.length === 0}>
             Export JSON
           </button>
-          <button type="button" onClick={() => setBrowseOpen(true)}>
-            Browse from API
-          </button>
-          <button type="button" onClick={handleNew}>
-            New card
-          </button>
+          {isOwner && (
+            <>
+              <button type="button" onClick={() => setBrowseOpen(true)}>
+                Browse from API
+              </button>
+              <Link to="/deck/$deckId/edit/$cardId" params={{ deckId, cardId: "new" }}>
+                <button type="button">New card</button>
+              </Link>
+            </>
+          )}
         </div>
       </header>
 
-      {deck.cards.length === 0 ? (
-        <p className={styles.empty}>No cards yet. Create one or import JSON.</p>
+      {cards.length === 0 ? (
+        <p className={styles.empty}>No cards yet.</p>
       ) : (
         <ul className={styles.list}>
-          {deck.cards.map((card) => (
+          {cards.map((card) => (
             <li key={card.id} className={styles.row}>
               <div className={styles.rowMain}>
-                <Link to="/editor/$id" params={{ id: card.id }} className={styles.cardLink}>
+                {isOwner ? (
+                  <Link
+                    to="/deck/$deckId/edit/$cardId"
+                    params={{ deckId, cardId: card.id }}
+                    className={styles.cardLink}
+                  >
+                    <strong>{card.name}</strong>
+                  </Link>
+                ) : (
                   <strong>{card.name}</strong>
-                </Link>
+                )}
                 {card.kind === "item" && card.typeLine && (
                   <span className={styles.typeLine}>{card.typeLine}</span>
                 )}
               </div>
-              <button
-                type="button"
-                className={styles.deleteBtn}
-                aria-label={`Delete ${card.name}`}
-                onClick={() => removeCard(card.id)}
-              >
-                Delete
-              </button>
+              {isOwner && (
+                <button
+                  type="button"
+                  className={styles.deleteBtn}
+                  aria-label={`Delete ${card.name}`}
+                  onClick={() => deleteCard.mutate({ cardId: card.id, deckId })}
+                >
+                  Delete
+                </button>
+              )}
             </li>
           ))}
         </ul>
       )}
 
       {browseOpen && (
-        <BrowseApiModal onClose={() => setBrowseOpen(false)} onSelected={handleApiSelected} />
+        <BrowseApiModal
+          onClose={() => setBrowseOpen(false)}
+          onSelected={() => setBrowseOpen(false)}
+        />
       )}
     </section>
+  );
+}
+
+function DeckTitle({ name, onRename }: { name: string; onRename: (next: string) => void }) {
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState(name);
+  if (!editing) {
+    return (
+      <button
+        type="button"
+        className={styles.titleButton}
+        onClick={() => {
+          setDraft(name);
+          setEditing(true);
+        }}
+      >
+        <h2 className={styles.title}>{name}</h2>
+      </button>
+    );
+  }
+  return (
+    <input
+      className={styles.titleInput}
+      value={draft}
+      onChange={(e) => setDraft(e.target.value)}
+      onBlur={() => {
+        if (draft && draft !== name) onRename(draft);
+        setEditing(false);
+      }}
+      // biome-ignore lint/a11y/noAutofocus: user just clicked to enter edit mode
+      autoFocus
+    />
   );
 }

@@ -1,23 +1,41 @@
 import { createRootRoute, createRoute, createRouter, RouterProvider } from "@tanstack/react-router";
 import { AuthCallback } from "../auth/AuthCallback";
 import { LoginView } from "../auth/LoginView";
+import { RequireOwner } from "../auth/RequireOwner";
 import { DeckView } from "../views/DeckView";
 import { EditorView } from "../views/EditorView";
+import { HomeView } from "../views/HomeView";
 import { PrintView } from "../views/PrintView";
 import { Root } from "./Root";
 
 const rootRoute = createRootRoute({ component: Root });
 
-const deckRoute = createRoute({
+const homeRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/",
-  component: DeckView,
+  component: HomeView,
+});
+
+const deckViewRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/deck/$deckId",
+  component: function DeckViewRoute() {
+    const { deckId } = deckViewRoute.useParams();
+    return <DeckView deckId={deckId} />;
+  },
 });
 
 const editorRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: "/editor/$id",
-  component: () => <EditorView />,
+  path: "/deck/$deckId/edit/$cardId",
+  component: function EditorRoute() {
+    const { deckId } = editorRoute.useParams();
+    return (
+      <RequireOwner deckId={deckId}>
+        <EditorView />
+      </RequireOwner>
+    );
+  },
 });
 
 const printRoute = createRoute({
@@ -39,7 +57,8 @@ const authCallbackRoute = createRoute({
 });
 
 const routeTree = rootRoute.addChildren([
-  deckRoute,
+  homeRoute,
+  deckViewRoute,
   editorRoute,
   printRoute,
   loginRoute,
