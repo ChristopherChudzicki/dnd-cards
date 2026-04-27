@@ -1,5 +1,5 @@
 import { render, screen, waitFor } from "@testing-library/react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { supabase } from "../api/supabase";
 import { signInTestUser } from "../test/signInTestUser";
 import { AuthCallback } from "./AuthCallback";
@@ -13,9 +13,20 @@ vi.mock("@tanstack/react-router", async () => {
 });
 
 describe("AuthCallback", () => {
+  const originalLocation = window.location;
+
   beforeEach(async () => {
     await supabase.auth.signOut();
     navigate.mockClear();
+  });
+
+  afterEach(() => {
+    // Restore window.location after any test that mutated it.
+    Object.defineProperty(window, "location", {
+      value: originalLocation,
+      writable: true,
+      configurable: true,
+    });
   });
 
   it("renders a loading state while the SDK exchanges the code", () => {
@@ -25,8 +36,9 @@ describe("AuthCallback", () => {
 
   it("navigates to ?next= once a session is present", async () => {
     Object.defineProperty(window, "location", {
-      value: { ...window.location, search: "?next=%2Fdeck%2Fabc" },
+      value: { ...originalLocation, search: "?next=%2Fdeck%2Fabc" },
       writable: true,
+      configurable: true,
     });
 
     await signInTestUser();
