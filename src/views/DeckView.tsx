@@ -97,6 +97,7 @@ export function DeckView({ deckId }: Props) {
 
       {browseOpen && (
         <BrowseApiModal
+          deckId={deckId}
           onClose={() => setBrowseOpen(false)}
           onSelected={() => setBrowseOpen(false)}
         />

@@ -3,24 +3,25 @@ import { type MouseEvent, useEffect, useMemo, useState } from "react";
 import { fetchMagicItemDetail, type Ruleset } from "../api/endpoints/magicItems";
 import { useMagicItemIndex } from "../api/hooks";
 import { magicItemDetailToCard } from "../api/mappers/magicItems";
-import { useDeckStore } from "../decks/store";
+import { useSaveCard } from "../decks/mutations";
 import styles from "./BrowseApiModal.module.css";
 
 type Props = {
+  deckId: string;
   onClose: () => void;
   onSelected: (cardId: string) => void;
 };
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
-export function BrowseApiModal({ onClose, onSelected }: Props) {
+export function BrowseApiModal({ deckId, onClose, onSelected }: Props) {
   const [ruleset, setRuleset] = useState<Ruleset>("2024");
   const [query, setQuery] = useState("");
   const [pickingSlug, setPickingSlug] = useState<string | null>(null);
 
   const index = useMagicItemIndex(ruleset);
   const queryClient = useQueryClient();
-  const upsertCard = useDeckStore((s) => s.upsertCard);
+  const saveCard = useSaveCard();
 
   const filtered = useMemo(() => {
     const all = index.data?.results ?? [];
@@ -47,7 +48,7 @@ export function BrowseApiModal({ onClose, onSelected }: Props) {
         staleTime: DAY_MS,
       });
       const card = magicItemDetailToCard(detail);
-      upsertCard(card);
+      await saveCard.mutateAsync({ card, deckId, isNew: true });
       onSelected(card.id);
     } catch (err) {
       console.error("Failed to fetch magic-item detail", err);
