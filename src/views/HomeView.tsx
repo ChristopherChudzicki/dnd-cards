@@ -34,23 +34,36 @@ export function HomeView() {
   const handleImport = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !ownerId) return;
-    const text = await file.text();
-    const result = parseDeckJson(text);
-    if (!result.ok) {
-      alert(`Import failed: ${result.error}`);
+    try {
+      const text = await file.text();
+      const result = parseDeckJson(text);
+      if (!result.ok) {
+        alert(`Import failed: ${result.error}`);
+        return;
+      }
+      const name = file.name.replace(/\.json$/i, "") || "Imported deck";
+      const deck = await createDeck.mutateAsync({ name, ownerId });
+      try {
+        // Insert each card with a fresh UUID. Re-using imported ids would
+        // PK-conflict on re-import.
+        for (const card of result.deck.cards) {
+          const fresh = { ...card, id: newId() };
+          await saveCard.mutateAsync({ card: fresh, deckId: deck.id, isNew: true });
+        }
+      } catch (err) {
+        // A card insert failed mid-loop. Roll back by deleting the orphan
+        // deck (cascades to any cards that did insert) so the user isn't
+        // left with a partial deck silently sitting in their list.
+        await deleteDeck.mutateAsync(deck.id).catch(() => {});
+        alert(`Import failed mid-way: ${err instanceof Error ? err.message : "unknown error"}`);
+        return;
+      }
+      navigate({ to: "/deck/$deckId", params: { deckId: deck.id } });
+    } finally {
+      // Always clear the input so the user can re-select the same file
+      // after a failure (browsers skip the change event for identical paths).
       e.target.value = "";
-      return;
     }
-    const name = file.name.replace(/\.json$/i, "") || "Imported deck";
-    const deck = await createDeck.mutateAsync({ name, ownerId });
-    // Insert each card with a fresh UUID. Re-using imported ids would
-    // PK-conflict on re-import.
-    for (const card of result.deck.cards) {
-      const fresh = { ...card, id: newId() };
-      await saveCard.mutateAsync({ card: fresh, deckId: deck.id, isNew: true });
-    }
-    navigate({ to: "/deck/$deckId", params: { deckId: deck.id } });
-    e.target.value = "";
   };
 
   const handleCreate = async () => {
