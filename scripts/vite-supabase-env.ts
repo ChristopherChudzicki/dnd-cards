@@ -29,11 +29,13 @@ export function supabaseLocalEnv(): Plugin {
         raw = execSync("npx supabase status -o env", {
           encoding: "utf8",
           stdio: ["ignore", "pipe", "ignore"],
+          // 5s ceiling so a hung Docker can't block dev startup forever.
+          timeout: 5000,
         });
       } catch {
-        // Supabase isn't running, or the CLI errored. Let the regular
-        // env handling take over so the supabase client's missing-env
-        // throw is the message the developer sees.
+        // Supabase isn't running, or the CLI errored / timed out. Let the
+        // regular env handling take over so the supabase client's
+        // missing-env throw is the message the developer sees.
         return;
       }
 
