@@ -64,6 +64,8 @@ describe("DeckView (logged-out)", () => {
       screen.queryByRole("button", { name: `Delete ${card.payload.name}` }),
     ).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /browse from api/i })).not.toBeInTheDocument();
+    // Print is read-only and should be available to anyone viewing the deck.
+    expect(screen.getByRole("link", { name: /print/i })).toBeInTheDocument();
   });
 
   it("renders a not-found message when the deck doesn't exist", async () => {
