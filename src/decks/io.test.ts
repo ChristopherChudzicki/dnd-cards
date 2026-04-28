@@ -1,11 +1,10 @@
 import { describe, expect, test } from "vitest";
 import { itemCardFactory } from "../cards/factories";
-import { deckFactory } from "./factories";
 import { parseDeckJson, serializeDeck } from "./io";
 
 describe("deck io", () => {
   test("serialize then parse yields the same deck", () => {
-    const original = deckFactory.build({ cards: itemCardFactory.buildList(2) });
+    const original = { version: 1 as const, cards: itemCardFactory.buildList(2) };
     const serialized = serializeDeck(original);
     const parsed = parseDeckJson(serialized);
     expect(parsed.ok).toBe(true);

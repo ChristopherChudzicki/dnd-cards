@@ -14,9 +14,6 @@ export function Root() {
           <Link to="/" className={styles.link} activeProps={{ className: styles.active }}>
             Decks
           </Link>
-          <Link to="/print" className={styles.link} activeProps={{ className: styles.active }}>
-            Print
-          </Link>
           {session.status === "authenticated" ? (
             <>
               <span className={styles.user}>{session.user.email}</span>

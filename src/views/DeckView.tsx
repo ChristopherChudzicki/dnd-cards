@@ -41,6 +41,9 @@ export function DeckView({ deckId }: Props) {
           <button type="button" onClick={handleExport} disabled={cards.length === 0}>
             Export JSON
           </button>
+          <Link to="/deck/$deckId/print" params={{ deckId }} className={styles.printLink}>
+            Print
+          </Link>
           {isOwner && (
             <>
               <button type="button" onClick={() => setBrowseOpen(true)}>

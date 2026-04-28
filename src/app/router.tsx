@@ -40,8 +40,11 @@ const editorRoute = createRoute({
 
 const printRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: "/print",
-  component: PrintView,
+  path: "/deck/$deckId/print",
+  component: function PrintRoute() {
+    const { deckId } = printRoute.useParams();
+    return <PrintView deckId={deckId} />;
+  },
 });
 
 const loginRoute = createRoute({

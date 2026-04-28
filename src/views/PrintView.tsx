@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { AutoFitCard } from "../cards/AutoFitCard";
 import type { ItemCard } from "../cards/types";
-import { useDeckStore } from "../decks/store";
+import { useDeckCards } from "../decks/queries";
 import styles from "./PrintView.module.css";
 
 type PerPage = 2 | 4;
+type Props = { deckId: string };
 
 const chunk = <T,>(arr: T[], size: number): T[][] => {
   const out: T[][] = [];
@@ -12,10 +13,13 @@ const chunk = <T,>(arr: T[], size: number): T[][] => {
   return out;
 };
 
-export function PrintView() {
-  const cards = useDeckStore((s) => s.deck.cards);
+export function PrintView({ deckId }: Props) {
+  const cardsQuery = useDeckCards(deckId);
   const [perPage, setPerPage] = useState<PerPage>(4);
 
+  if (cardsQuery.isLoading) return <p>Loading…</p>;
+
+  const cards = cardsQuery.data ?? [];
   const items = cards.filter((c): c is ItemCard => c.kind === "item");
   const pages = items.length === 0 ? [] : chunk(items, perPage);
   const layout = perPage === 4 ? "4-up" : "2-up";
