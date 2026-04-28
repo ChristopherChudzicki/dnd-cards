@@ -37,6 +37,16 @@ export const cardSchema = z.discriminatedUnion("kind", [
   abilityCardSchema,
 ]);
 
+const itemPayloadSchema = itemCardSchema.omit({ id: true });
+const spellPayloadSchema = spellCardSchema.omit({ id: true });
+const abilityPayloadSchema = abilityCardSchema.omit({ id: true });
+
+export const cardPayloadSchema = z.discriminatedUnion("kind", [
+  itemPayloadSchema,
+  spellPayloadSchema,
+  abilityPayloadSchema,
+]);
+
 export const deckSchema = z.object({
   version: z.literal(1),
   cards: z.array(cardSchema),

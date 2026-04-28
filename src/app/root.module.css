@@ -47,6 +47,25 @@
   margin: 0 auto;
 }
 
+.user {
+  font-size: 0.85rem;
+  color: var(--color-muted, #666);
+  margin-left: auto;
+}
+
+.signOut {
+  background: none;
+  border: 1px solid currentColor;
+  border-radius: 4px;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.signOut:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
 @media print {
   .header {
     display: none;

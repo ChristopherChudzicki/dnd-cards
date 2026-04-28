@@ -94,3 +94,62 @@
 .deleteBtn:hover {
   background: #fff0f0;
 }
+
+.titleRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.renameBtn {
+  font: inherit;
+  font-size: 0.85rem;
+  padding: 0.2rem 0.5rem;
+  border: 1px solid #bbb;
+  border-radius: 0.3rem;
+  background: #fff;
+  cursor: pointer;
+}
+
+.renameBtn:hover {
+  background: #f0f0f0;
+}
+
+.newCardLink {
+  font: inherit;
+  padding: 0.4rem 0.8rem;
+  border: 1px solid #bbb;
+  border-radius: 0.3rem;
+  background: #fff;
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.newCardLink:hover {
+  background: #f0f0f0;
+}
+
+.printLink {
+  font: inherit;
+  padding: 0.4rem 0.8rem;
+  border: 1px solid #bbb;
+  border-radius: 0.3rem;
+  background: #fff;
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.printLink:hover {
+  background: #f0f0f0;
+}
+
+.titleInput {
+  font: inherit;
+  font-size: 1.5rem;
+  font-weight: bold;
+  border: 1px solid #bbb;
+  border-radius: 0.3rem;
+  padding: 0.1rem 0.4rem;
+}

@@ -1,30 +1,72 @@
 import { createRootRoute, createRoute, createRouter, RouterProvider } from "@tanstack/react-router";
+import { AuthCallback } from "../auth/AuthCallback";
+import { LoginView } from "../auth/LoginView";
+import { RequireOwner } from "../auth/RequireOwner";
 import { DeckView } from "../views/DeckView";
 import { EditorView } from "../views/EditorView";
+import { HomeView } from "../views/HomeView";
 import { PrintView } from "../views/PrintView";
 import { Root } from "./Root";
 
 const rootRoute = createRootRoute({ component: Root });
 
-const deckRoute = createRoute({
+const homeRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/",
-  component: DeckView,
+  component: HomeView,
+});
+
+const deckViewRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/deck/$deckId",
+  component: function DeckViewRoute() {
+    const { deckId } = deckViewRoute.useParams();
+    return <DeckView deckId={deckId} />;
+  },
 });
 
 const editorRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: "/editor/$id",
-  component: () => <EditorView />,
+  path: "/deck/$deckId/edit/$cardId",
+  component: function EditorRoute() {
+    const { deckId, cardId } = editorRoute.useParams();
+    return (
+      <RequireOwner deckId={deckId}>
+        <EditorView deckId={deckId} cardId={cardId} />
+      </RequireOwner>
+    );
+  },
 });
 
 const printRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: "/print",
-  component: PrintView,
+  path: "/deck/$deckId/print",
+  component: function PrintRoute() {
+    const { deckId } = printRoute.useParams();
+    return <PrintView deckId={deckId} />;
+  },
 });
 
-const routeTree = rootRoute.addChildren([deckRoute, editorRoute, printRoute]);
+const loginRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/login",
+  component: LoginView,
+});
+
+const authCallbackRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/auth/callback",
+  component: AuthCallback,
+});
+
+const routeTree = rootRoute.addChildren([
+  homeRoute,
+  deckViewRoute,
+  editorRoute,
+  printRoute,
+  loginRoute,
+  authCallbackRoute,
+]);
 
 export const router = createRouter({ routeTree });
 

@@ -7,3 +7,8 @@ dist-ssr
 .vite
 coverage
 *.tsbuildinfo
+
+# Supabase
+supabase/.env
+supabase/.branches/
+supabase/.temp/

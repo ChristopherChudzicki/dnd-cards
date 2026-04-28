@@ -1,37 +1,38 @@
-import { screen } from "@testing-library/react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { beforeEach, describe, expect, test } from "vitest";
-import { itemCardFactory } from "../cards/factories";
-import { useDeckStore } from "../deck/store";
-import { renderWithRouter } from "../test/renderWithRouter";
+import { HttpResponse, http } from "msw";
+import type { ReactNode } from "react";
+import { describe, expect, test } from "vitest";
+import { makeCardRow } from "../test/factories";
+import { SB_URL as SB, server } from "../test/msw";
 import { PrintView } from "./PrintView";
 
-beforeEach(() => {
-  useDeckStore.setState({ deck: { version: 1, cards: [] } });
-});
+function wrap(ui: ReactNode) {
+  const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  return <QueryClientProvider client={client}>{ui}</QueryClientProvider>;
+}
 
 describe("<PrintView>", () => {
   test("renders one page at 4-up for up to 4 cards", async () => {
-    useDeckStore.setState({
-      deck: { version: 1, cards: itemCardFactory.buildList(3) },
-    });
-    await renderWithRouter(<PrintView />);
-    expect(screen.getAllByTestId("page")).toHaveLength(1);
+    const cards = makeCardRow.buildList(3);
+    server.use(http.get(`${SB}/rest/v1/cards`, () => HttpResponse.json(cards)));
+    render(wrap(<PrintView deckId="d1" />));
+    await waitFor(() => expect(screen.getAllByTestId("page")).toHaveLength(1));
   });
 
   test("renders two pages when there are 5 cards at 4-up", async () => {
-    useDeckStore.setState({
-      deck: { version: 1, cards: itemCardFactory.buildList(5) },
-    });
-    await renderWithRouter(<PrintView />);
-    expect(screen.getAllByTestId("page")).toHaveLength(2);
+    const cards = makeCardRow.buildList(5);
+    server.use(http.get(`${SB}/rest/v1/cards`, () => HttpResponse.json(cards)));
+    render(wrap(<PrintView deckId="d1" />));
+    await waitFor(() => expect(screen.getAllByTestId("page")).toHaveLength(2));
   });
 
   test("switches to 2-up and repaginates accordingly", async () => {
-    useDeckStore.setState({
-      deck: { version: 1, cards: itemCardFactory.buildList(3) },
-    });
-    await renderWithRouter(<PrintView />);
+    const cards = makeCardRow.buildList(3);
+    server.use(http.get(`${SB}/rest/v1/cards`, () => HttpResponse.json(cards)));
+    render(wrap(<PrintView deckId="d1" />));
+    await waitFor(() => expect(screen.getAllByTestId("page")).toHaveLength(1));
     await userEvent.selectOptions(screen.getByLabelText(/cards per page/i), "2");
     expect(screen.getAllByTestId("page")).toHaveLength(2);
   });

@@ -1,14 +1,13 @@
-import { useNavigate, useParams } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useNavigate } from "@tanstack/react-router";
+import { useEffect, useMemo, useState } from "react";
 import { AutoFitCard } from "../cards/AutoFitCard";
 import { ItemEditor } from "../cards/ItemEditor";
 import type { ItemCard } from "../cards/types";
-import { useDeckStore } from "../deck/store";
+import { useDeleteCard, useSaveCard } from "../decks/mutations";
+import { useDeckCards } from "../decks/queries";
+import { newId } from "../lib/id";
+import { nowIso } from "../lib/time";
 import styles from "./EditorView.module.css";
-
-type Props = {
-  cardId?: string;
-};
 
 const isPristineNewCard = (card: ItemCard): boolean =>
   card.name === "Untitled item" &&
@@ -21,37 +20,63 @@ const isPristineNewCard = (card: ItemCard): boolean =>
 const isTemplateItem = (card: ItemCard): boolean =>
   card.source === "api" && /\(any /i.test(card.body);
 
-export function EditorView({ cardId: propId }: Props = {}) {
-  const params = useParams({ strict: false }) as { id?: string };
-  const id = propId ?? params.id;
-  const storeCard = useDeckStore((s) => s.deck.cards.find((c) => c.id === id));
-  const upsertCard = useDeckStore((s) => s.upsertCard);
-  const removeCard = useDeckStore((s) => s.removeCard);
+type Props = { deckId: string; cardId: string };
+
+export function EditorView({ deckId, cardId }: Props) {
+  const cardsQuery = useDeckCards(deckId);
+  const saveCard = useSaveCard();
+  const deleteCard = useDeleteCard();
   const navigate = useNavigate();
 
-  const [draft, setDraft] = useState<ItemCard | null>(() =>
-    storeCard && storeCard.kind === "item" ? storeCard : null,
+  const isNew = cardId === "new";
+
+  // For a brand-new card, generate a stub locally without inserting.
+  // The stub stays client-only until Save is clicked, so closing the
+  // tab mid-edit doesn't leave an orphan row.
+  const stub: ItemCard | null = useMemo(() => {
+    if (!isNew) return null;
+    const now = nowIso();
+    return {
+      id: newId(),
+      kind: "item",
+      name: "Untitled item",
+      typeLine: "",
+      body: "",
+      source: "custom",
+      createdAt: now,
+      updatedAt: now,
+    };
+  }, [isNew]);
+
+  const existing = cardsQuery.data?.find((c) => c.id === cardId) ?? null;
+  const initial = isNew ? stub : existing;
+
+  const [draft, setDraft] = useState<ItemCard | null>(
+    initial && initial.kind === "item" ? initial : null,
   );
 
   useEffect(() => {
-    if (storeCard && storeCard.kind === "item") setDraft(storeCard);
-  }, [storeCard]);
+    if (initial && initial.kind === "item") setDraft(initial);
+  }, [initial]);
 
-  if (!id) return <p>Card not found.</p>;
-  if (!storeCard) return <p>Card not found.</p>;
-  if (storeCard.kind !== "item") return <p>Only item cards are supported in v1.</p>;
+  if (cardsQuery.isLoading && !isNew) return <p>Loading…</p>;
+  if (!isNew && !existing) return <p>Card not found.</p>;
+  if (existing && existing.kind !== "item") return <p>Only item cards are supported in v1.</p>;
   if (!draft) return null;
 
-  const handleSave = () => {
-    upsertCard(draft);
-    navigate({ to: "/" });
+  const handleSave = async () => {
+    await saveCard.mutateAsync({ card: draft, deckId, isNew });
+    navigate({ to: "/deck/$deckId", params: { deckId } });
   };
 
-  const handleCancel = () => {
-    if (isPristineNewCard(storeCard)) {
-      removeCard(storeCard.id);
+  const handleCancel = async () => {
+    // Brand-new: stub was never persisted, just navigate away.
+    // Existing & pristine: delete the row before navigating (only happens
+    // if a server-side flow created a stub up front; not used in v1).
+    if (!isNew && existing && existing.kind === "item" && isPristineNewCard(existing)) {
+      await deleteCard.mutateAsync({ cardId: existing.id, deckId });
     }
-    navigate({ to: "/" });
+    navigate({ to: "/deck/$deckId", params: { deckId } });
   };
 
   return (
@@ -66,7 +91,12 @@ export function EditorView({ cardId: propId }: Props = {}) {
         )}
         <ItemEditor card={draft} onChange={setDraft} />
         <div className={styles.formActions}>
-          <button type="button" className={styles.primaryBtn} onClick={handleSave}>
+          <button
+            type="button"
+            className={styles.primaryBtn}
+            onClick={handleSave}
+            disabled={saveCard.isPending}
+          >
             Save
           </button>
           <button type="button" className={styles.secondaryBtn} onClick={handleCancel}>

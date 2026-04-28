@@ -7,21 +7,22 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
-    "lint": "biome check src",
-    "lint:fix": "biome check --write src",
-    "format": "biome format --write src",
+    "lint": "biome check src scripts",
+    "lint:fix": "biome check --write src scripts",
+    "format": "biome format --write src scripts",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "gen:schema": "tsx scripts/gen-card-schema.ts",
+    "check:schema": "tsx scripts/gen-card-schema.ts --check"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.104.1",
     "@tanstack/react-query": "^5.99.2",
     "@tanstack/react-router": "^1.168.23",
     "lucide-react": "^1.8.0",
-    "nanoid": "^5.1.9",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "zod": "^4.3.6",
-    "zustand": "^5.0.12"
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.12",
@@ -37,6 +38,8 @@
     "fishery": "^2.4.0",
     "jsdom": "^29.0.2",
     "msw": "^2.13.4",
+    "supabase": "^2.95.3",
+    "tsx": "^4.21.0",
     "typescript": "^5.7.2",
     "vite": "^6.0.5",
     "vitest": "^4.1.4"
