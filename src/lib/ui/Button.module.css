@@ -43,12 +43,14 @@
   border-color: var(--color-accent);
 }
 .btn[data-variant="primary"][data-hovered] {
-  filter: brightness(1.15);
-  box-shadow: var(--shadow-md);
+  background: var(--color-accent-hover);
+  border-color: var(--color-accent-hover);
+  box-shadow: var(--shadow-accent);
 }
 .btn[data-variant="primary"][data-pressed] {
-  filter: brightness(0.95);
-  box-shadow: var(--shadow-sm);
+  background: var(--color-accent-active);
+  border-color: var(--color-accent-active);
+  box-shadow: var(--shadow-accent-sm);
   transform: translateY(1px);
 }
 

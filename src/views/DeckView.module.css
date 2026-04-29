@@ -69,6 +69,10 @@
   font-weight: 600;
 }
 
+.cardLink strong {
+  font-weight: inherit;
+}
+
 .cardLink:hover {
   text-decoration: underline;
 }
@@ -104,21 +108,22 @@
   color: var(--color-accent-fg);
   border-color: var(--color-accent);
   transition:
-    filter 0.12s,
+    background 0.12s,
+    border-color 0.12s,
     box-shadow 0.12s,
     transform 0.05s;
 }
 
 .newCardLink:hover {
-  background: var(--color-accent);
-  filter: brightness(1.15);
-  box-shadow: var(--shadow-md);
+  background: var(--color-accent-hover);
+  border-color: var(--color-accent-hover);
+  box-shadow: var(--shadow-accent);
 }
 
 .newCardLink:active {
-  background: var(--color-accent);
-  filter: brightness(0.95);
-  box-shadow: var(--shadow-sm);
+  background: var(--color-accent-active);
+  border-color: var(--color-accent-active);
+  box-shadow: var(--shadow-accent-sm);
   transform: translateY(1px);
 }
 

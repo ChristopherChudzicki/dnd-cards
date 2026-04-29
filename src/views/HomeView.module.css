@@ -22,19 +22,19 @@
   text-decoration: none;
   font-weight: 600;
   transition:
-    filter 0.12s,
+    background 0.12s,
     box-shadow 0.12s,
     transform 0.05s;
 }
 
 .cta:hover {
-  filter: brightness(1.15);
-  box-shadow: var(--shadow-md);
+  background: var(--color-accent-hover);
+  box-shadow: var(--shadow-accent);
 }
 
 .cta:active {
-  filter: brightness(0.95);
-  box-shadow: var(--shadow-sm);
+  background: var(--color-accent-active);
+  box-shadow: var(--shadow-accent-sm);
   transform: translateY(1px);
 }
 
