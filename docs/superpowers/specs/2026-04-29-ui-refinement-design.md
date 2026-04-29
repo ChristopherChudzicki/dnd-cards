@@ -255,9 +255,10 @@ Preserved end-to-end. The existing dialog `pickError` state, the `index.refetch(
 ## Testing
 
 - Existing tests keep passing. Where labels change, tests update accordingly.
-- New test for `UserMenu`: renders Sign in link when unauthenticated; renders avatar button when authenticated; opening the menu reveals the email and a Sign out item; clicking Sign out invokes `supabase.auth.signOut()`.
-- New / updated test for `BrowseApiModal`: dialog renders with `role="dialog"`; Escape closes; ruleset toggle changes selected ruleset; search filters results; selecting a row calls `onSelected`. Use `userEvent` so React Aria's pointer/keyboard logic exercises correctly.
-- Test for `OAuthButton`: renders with the correct accessible name per provider; `onPress` fires.
+- **Prefer role-based selectors.** React Aria primitives expose accurate ARIA roles (`dialog`, `menu`, `menuitem`, `button`, `radio`, `searchbox`, etc.), so tests should reach for `getByRole(...)` over text or class selectors. Existing tests that already use role-based queries stay; tests that currently rely on tag/class/text selectors are upgraded to role-based queries when touched. New tests are role-based from the start.
+- New test for `UserMenu`: renders Sign in link when unauthenticated; renders the trigger as `getByRole('button', { name: /account menu/i })` when authenticated; opening reveals the email and a `getByRole('menuitem', { name: /sign out/i })`; activating that item invokes `supabase.auth.signOut()`.
+- New / updated test for `BrowseApiModal`: `getByRole('dialog', { name: /browse magic items/i })`; Escape closes; ruleset toggle uses `getByRole('radio', { name: '2024' })` (or whatever role React Aria's `ToggleButtonGroup` exposes — verify on first run); `getByRole('searchbox')` for the search input; `getByRole('button', { name: /wand of wonder/i })` for a result row; selecting a row calls `onSelected`. Use `userEvent` so React Aria's pointer/keyboard logic exercises correctly.
+- Test for `OAuthButton`: `getByRole('button', { name: 'Sign in with Google' })` etc.; `onPress` fires.
 - Visual regressions are not in scope (no snapshot tests).
 - Per project convention, factory-driven tests pass no unnecessary defaults.
 
