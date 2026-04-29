@@ -11,6 +11,7 @@ vi.mock("@tanstack/react-router", () => ({
 
 describe("LoginView", () => {
   it("calls signInWithOAuth with google when the Google button is clicked", async () => {
+    vi.stubEnv("VITE_AUTH_GOOGLE_ENABLED", "true");
     const spy = vi
       .spyOn(supabase.auth, "signInWithOAuth")
       .mockResolvedValue({ data: { provider: "google", url: "https://x" }, error: null });
@@ -19,15 +20,24 @@ describe("LoginView", () => {
     expect(spy).toHaveBeenCalledWith(
       expect.objectContaining({ provider: "google", options: expect.any(Object) }),
     );
+    vi.unstubAllEnvs();
   });
 
   it("calls signInWithOAuth with github when the GitHub button is clicked", async () => {
+    vi.stubEnv("VITE_AUTH_GITHUB_ENABLED", "true");
     const spy = vi
       .spyOn(supabase.auth, "signInWithOAuth")
       .mockResolvedValue({ data: { provider: "github", url: "https://x" }, error: null });
     render(<LoginView />);
     await userEvent.click(screen.getByRole("button", { name: /sign in with github/i }));
     expect(spy).toHaveBeenCalledWith(expect.objectContaining({ provider: "github" }));
+    vi.unstubAllEnvs();
+  });
+
+  it("hides Google and GitHub buttons when their env vars are unset", () => {
+    render(<LoginView />);
+    expect(screen.queryByRole("button", { name: /sign in with google/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /sign in with github/i })).not.toBeInTheDocument();
   });
 
   it("shows a dev sign-in button in dev mode that signs in as the dev user and navigates", async () => {
