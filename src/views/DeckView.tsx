@@ -5,6 +5,10 @@ import { serializeDeck } from "../decks/io";
 import { useDeleteCard, useRenameDeck } from "../decks/mutations";
 import { useDeck, useDeckCards } from "../decks/queries";
 import { downloadText } from "../lib/download";
+import { Button } from "../lib/ui/Button";
+import { IconButton } from "../lib/ui/IconButton";
+import { PencilIcon } from "../lib/ui/icons/PencilIcon";
+import { TrashIcon } from "../lib/ui/icons/TrashIcon";
 import { BrowseApiModal } from "./BrowseApiModal";
 import styles from "./DeckView.module.css";
 
@@ -37,18 +41,21 @@ export function DeckView({ deckId }: Props) {
         ) : (
           <h2 className={styles.title}>{deck.name}</h2>
         )}
+        <span className={styles.count}>
+          {cards.length} {cards.length === 1 ? "card" : "cards"}
+        </span>
         <div className={styles.actions}>
-          <button type="button" onClick={handleExport} disabled={cards.length === 0}>
+          <Button variant="secondary" onPress={handleExport} isDisabled={cards.length === 0}>
             Export JSON
-          </button>
+          </Button>
           <Link to="/deck/$deckId/print" params={{ deckId }} className={styles.printLink}>
             Print
           </Link>
           {isOwner && (
             <>
-              <button type="button" onClick={() => setBrowseOpen(true)}>
+              <Button variant="secondary" onPress={() => setBrowseOpen(true)}>
                 Browse from API
-              </button>
+              </Button>
               <Link
                 to="/deck/$deckId/edit/$cardId"
                 params={{ deckId, cardId: "new" }}
@@ -84,14 +91,13 @@ export function DeckView({ deckId }: Props) {
                 )}
               </div>
               {isOwner && (
-                <button
-                  type="button"
-                  className={styles.deleteBtn}
+                <IconButton
                   aria-label={`Delete ${card.name}`}
-                  onClick={() => deleteCard.mutate({ cardId: card.id, deckId })}
+                  variant="danger"
+                  onPress={() => deleteCard.mutate({ cardId: card.id, deckId })}
                 >
-                  Delete
-                </button>
+                  <TrashIcon />
+                </IconButton>
               )}
             </li>
           ))}
@@ -113,22 +119,18 @@ function DeckTitle({ name, onRename }: { name: string; onRename: (next: string) 
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(name);
   if (!editing) {
-    // The <h2> stays a heading (preserves landmark navigation) while the
-    // <button> sibling provides an explicit, focusable rename affordance.
     return (
       <div className={styles.titleRow}>
         <h2 className={styles.title}>{name}</h2>
-        <button
-          type="button"
-          className={styles.renameBtn}
+        <IconButton
           aria-label={`Rename deck ${name}`}
-          onClick={() => {
+          onPress={() => {
             setDraft(name);
             setEditing(true);
           }}
         >
-          Rename
-        </button>
+          <PencilIcon />
+        </IconButton>
       </div>
     );
   }
