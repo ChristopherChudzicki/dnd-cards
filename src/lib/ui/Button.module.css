@@ -12,7 +12,10 @@
   gap: var(--space-2);
   transition:
     background 0.12s,
-    border-color 0.12s;
+    border-color 0.12s,
+    filter 0.12s,
+    box-shadow 0.12s,
+    transform 0.05s;
 }
 
 .btn[data-size="sm"] {
@@ -40,7 +43,13 @@
   border-color: var(--color-accent);
 }
 .btn[data-variant="primary"][data-hovered] {
-  filter: brightness(0.92);
+  filter: brightness(1.15);
+  box-shadow: var(--shadow-md);
+}
+.btn[data-variant="primary"][data-pressed] {
+  filter: brightness(0.95);
+  box-shadow: var(--shadow-sm);
+  transform: translateY(1px);
 }
 
 .btn[data-variant="danger"] {

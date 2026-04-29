@@ -103,11 +103,23 @@
   background: var(--color-accent);
   color: var(--color-accent-fg);
   border-color: var(--color-accent);
+  transition:
+    filter 0.12s,
+    box-shadow 0.12s,
+    transform 0.05s;
 }
 
 .newCardLink:hover {
   background: var(--color-accent);
-  filter: brightness(0.92);
+  filter: brightness(1.15);
+  box-shadow: var(--shadow-md);
+}
+
+.newCardLink:active {
+  background: var(--color-accent);
+  filter: brightness(0.95);
+  box-shadow: var(--shadow-sm);
+  transform: translateY(1px);
 }
 
 .titleInput {

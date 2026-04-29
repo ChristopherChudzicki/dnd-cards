@@ -21,10 +21,21 @@
   border-radius: var(--radius-md);
   text-decoration: none;
   font-weight: 600;
+  transition:
+    filter 0.12s,
+    box-shadow 0.12s,
+    transform 0.05s;
 }
 
 .cta:hover {
-  filter: brightness(0.92);
+  filter: brightness(1.15);
+  box-shadow: var(--shadow-md);
+}
+
+.cta:active {
+  filter: brightness(0.95);
+  box-shadow: var(--shadow-sm);
+  transform: translateY(1px);
 }
 
 .empty {
