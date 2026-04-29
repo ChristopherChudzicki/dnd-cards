@@ -1,0 +1,64 @@
+.btn {
+  font: inherit;
+  font-family: var(--font-body);
+  font-weight: 500;
+  line-height: var(--lh-tight);
+  cursor: pointer;
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  transition:
+    background 0.12s,
+    border-color 0.12s;
+}
+
+.btn[data-size="sm"] {
+  padding: var(--space-1) var(--space-3);
+  font-size: var(--fs-sm);
+}
+
+.btn[data-size="md"] {
+  padding: var(--space-2) var(--space-4);
+  font-size: var(--fs-md);
+}
+
+.btn[data-variant="secondary"] {
+  background: var(--color-surface);
+  color: var(--color-text);
+  border-color: var(--color-border-strong);
+}
+.btn[data-variant="secondary"][data-hovered] {
+  background: var(--color-surface-2);
+}
+
+.btn[data-variant="primary"] {
+  background: var(--color-accent);
+  color: var(--color-accent-fg);
+  border-color: var(--color-accent);
+}
+.btn[data-variant="primary"][data-hovered] {
+  background: #61292a;
+  border-color: #61292a;
+}
+
+.btn[data-variant="danger"] {
+  background: var(--color-surface);
+  color: var(--color-danger);
+  border-color: var(--color-danger);
+}
+.btn[data-variant="danger"][data-hovered] {
+  background: #fff0f0;
+}
+
+.btn[data-disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn[data-focus-visible] {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
