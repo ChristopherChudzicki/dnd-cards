@@ -1,8 +1,13 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { supabase } from "../api/supabase";
 import { LoginView } from "./LoginView";
+
+const navigate = vi.fn();
+vi.mock("@tanstack/react-router", () => ({
+  useNavigate: () => navigate,
+}));
 
 describe("LoginView", () => {
   it("calls signInWithOAuth with google when the Google button is clicked", async () => {
@@ -25,14 +30,16 @@ describe("LoginView", () => {
     expect(spy).toHaveBeenCalledWith(expect.objectContaining({ provider: "github" }));
   });
 
-  it("shows a dev sign-in button in dev mode that signs in as the dev user", async () => {
+  it("shows a dev sign-in button in dev mode that signs in as the dev user and navigates", async () => {
     vi.stubEnv("DEV", true);
+    navigate.mockClear();
     const signInSpy = vi
       .spyOn(supabase.auth, "signInWithPassword")
       .mockResolvedValue({ data: { session: null, user: null }, error: null } as never);
     render(<LoginView />);
     await userEvent.click(screen.getByRole("button", { name: /sign in as dev user/i }));
     expect(signInSpy).toHaveBeenCalledWith({ email: "dev@local", password: "devpass" });
+    await waitFor(() => expect(navigate).toHaveBeenCalledWith({ to: "/" }));
     vi.unstubAllEnvs();
   });
 

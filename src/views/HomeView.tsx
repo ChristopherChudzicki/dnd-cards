@@ -73,6 +73,8 @@ export function HomeView() {
     deleteDeck.mutate(deckId);
   };
 
+  if (decks.isLoading) return <p>Loading…</p>;
+
   if (!decks.data || decks.data.length === 0) {
     return (
       <section className={styles.empty}>

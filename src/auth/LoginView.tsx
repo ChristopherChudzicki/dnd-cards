@@ -1,3 +1,4 @@
+import { useNavigate } from "@tanstack/react-router";
 import { supabase } from "../api/supabase";
 import { OAuthButton } from "../lib/ui/OAuthButton";
 import styles from "./LoginView.module.css";
@@ -6,6 +7,8 @@ const DEV_EMAIL = "dev@local";
 const DEV_PASSWORD = "devpass";
 
 export function LoginView() {
+  const navigate = useNavigate();
+
   const signIn = (provider: "google" | "github") => {
     const next = new URLSearchParams(window.location.search).get("next") ?? "/";
     supabase.auth.signInWithOAuth({
@@ -27,6 +30,10 @@ export function LoginView() {
       // signUp establishes a session immediately.
       await supabase.auth.signUp({ email: DEV_EMAIL, password: DEV_PASSWORD });
     }
+    // OAuth providers route back through /auth/callback which navigates;
+    // dev sign-in is direct, so navigate manually.
+    const next = new URLSearchParams(window.location.search).get("next") ?? "/";
+    navigate({ to: next });
   };
 
   return (
