@@ -1,0 +1,73 @@
+.signInLink {
+  margin-left: auto;
+  color: var(--color-text);
+  text-decoration: none;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+}
+
+.signInLink:hover {
+  background: var(--color-surface-2);
+}
+
+.trigger {
+  margin-left: auto;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  border: 1px solid var(--color-accent);
+  background: var(--color-accent);
+  color: var(--color-accent-fg);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: var(--fs-md);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.trigger[data-hovered] {
+  filter: brightness(0.92);
+}
+
+.trigger[data-focus-visible] {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+.popover {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  min-width: 14rem;
+  overflow: hidden;
+}
+
+.email {
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--fs-sm);
+  color: var(--color-text-muted);
+  border-bottom: 1px solid var(--color-border);
+  user-select: text;
+  word-break: break-all;
+}
+
+.menu {
+  outline: none;
+  padding: var(--space-1) 0;
+}
+
+.menuItem {
+  padding: var(--space-2) var(--space-4);
+  font-size: var(--fs-md);
+  color: var(--color-text);
+  cursor: pointer;
+  outline: none;
+}
+
+.menuItem[data-focused],
+.menuItem[data-hovered] {
+  background: var(--color-surface-2);
+}
