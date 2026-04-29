@@ -35,7 +35,8 @@ export function LoginView() {
       <p className={styles.copy}>
         Sign in to create and edit decks. Anyone can view shared decks via link.
       </p>
-      <ul className={styles.providers}>
+      {/* biome-ignore lint/a11y/noRedundantRoles: required because list-style:none strips the implicit list role in WebKit */}
+      <ul className={styles.providers} role="list">
         <li>
           <OAuthButton provider="google" onPress={() => signIn("google")} />
         </li>

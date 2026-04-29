@@ -40,8 +40,7 @@
   border-color: var(--color-accent);
 }
 .btn[data-variant="primary"][data-hovered] {
-  background: #61292a;
-  border-color: #61292a;
+  filter: brightness(0.92);
 }
 
 .btn[data-variant="danger"] {
@@ -50,7 +49,7 @@
   border-color: var(--color-danger);
 }
 .btn[data-variant="danger"][data-hovered] {
-  background: #fff0f0;
+  background: var(--color-danger-bg-hover);
 }
 
 .btn[data-disabled] {

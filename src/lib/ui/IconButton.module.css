@@ -24,7 +24,7 @@
   color: var(--color-text-muted);
 }
 .iconBtn[data-variant="danger"][data-hovered] {
-  background: #fff0f0;
+  background: var(--color-danger-bg-hover);
   color: var(--color-danger);
 }
 

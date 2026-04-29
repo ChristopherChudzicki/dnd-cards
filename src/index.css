@@ -29,6 +29,9 @@ body,
   --color-accent: #7a3530;
   --color-accent-fg: #ffffff;
   --color-danger: #8a3030;
+  --color-danger-bg-hover: #fff0f0;
+  --color-warning-bg: #fff8e1;
+  --color-warning-fg: #4a3c10;
   --color-focus-ring: #7a3530;
 
   /* Typography */
