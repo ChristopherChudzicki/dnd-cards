@@ -7,6 +7,7 @@ import { useDeleteCard, useSaveCard } from "../decks/mutations";
 import { useDeckCards } from "../decks/queries";
 import { newId } from "../lib/id";
 import { nowIso } from "../lib/time";
+import { Button } from "../lib/ui/Button";
 import styles from "./EditorView.module.css";
 
 const isPristineNewCard = (card: ItemCard): boolean =>
@@ -30,9 +31,6 @@ export function EditorView({ deckId, cardId }: Props) {
 
   const isNew = cardId === "new";
 
-  // For a brand-new card, generate a stub locally without inserting.
-  // The stub stays client-only until Save is clicked, so closing the
-  // tab mid-edit doesn't leave an orphan row.
   const stub: ItemCard | null = useMemo(() => {
     if (!isNew) return null;
     const now = nowIso();
@@ -70,9 +68,6 @@ export function EditorView({ deckId, cardId }: Props) {
   };
 
   const handleCancel = async () => {
-    // Brand-new: stub was never persisted, just navigate away.
-    // Existing & pristine: delete the row before navigating (only happens
-    // if a server-side flow created a stub up front; not used in v1).
     if (!isNew && existing && existing.kind === "item" && isPristineNewCard(existing)) {
       await deleteCard.mutateAsync({ cardId: existing.id, deckId });
     }
@@ -91,17 +86,12 @@ export function EditorView({ deckId, cardId }: Props) {
         )}
         <ItemEditor card={draft} onChange={setDraft} />
         <div className={styles.formActions}>
-          <button
-            type="button"
-            className={styles.primaryBtn}
-            onClick={handleSave}
-            disabled={saveCard.isPending}
-          >
+          <Button variant="primary" onPress={handleSave} isDisabled={saveCard.isPending}>
             Save
-          </button>
-          <button type="button" className={styles.secondaryBtn} onClick={handleCancel}>
+          </Button>
+          <Button variant="secondary" onPress={handleCancel}>
             Cancel
-          </button>
+          </Button>
         </div>
       </div>
       <div className={styles.preview}>

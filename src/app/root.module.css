@@ -6,64 +6,49 @@
 
 .header {
   display: flex;
-  gap: 1.5rem;
   align-items: center;
-  padding: 0.75rem 1.5rem;
-  background: #fff;
-  border-bottom: 1px solid #ddd;
+  gap: var(--space-5);
+  padding: var(--space-3) var(--space-5);
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
 }
 
 .brand {
-  font-weight: 700;
-  font-size: 1.1rem;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: var(--fs-lg);
+  color: var(--color-text);
+  text-decoration: none;
+  letter-spacing: 0.02em;
 }
 
 .nav {
   display: flex;
-  gap: 1rem;
+  gap: var(--space-3);
 }
 
 .link {
-  color: #333;
+  color: var(--color-text);
   text-decoration: none;
-  padding: 0.25rem 0.5rem;
-  border-radius: 0.25rem;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
 }
 
 .link:hover {
-  background: #eee;
+  background: var(--color-surface-2);
 }
 
 .active {
-  background: #e8e8e8;
+  background: var(--color-surface-2);
   font-weight: 600;
 }
 
 .main {
   flex: 1;
-  padding: 1.5rem;
+  padding: var(--space-5);
   max-width: 1200px;
   width: 100%;
   margin: 0 auto;
-}
-
-.user {
-  font-size: 0.85rem;
-  color: var(--color-muted, #666);
-  margin-left: auto;
-}
-
-.signOut {
-  background: none;
-  border: 1px solid currentColor;
-  border-radius: 4px;
-  padding: 0.25rem 0.5rem;
-  font-size: 0.85rem;
-  cursor: pointer;
-}
-
-.signOut:hover {
-  background: rgba(0, 0, 0, 0.04);
 }
 
 @media print {

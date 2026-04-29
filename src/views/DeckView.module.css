@@ -1,59 +1,55 @@
 .header {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
+  align-items: baseline;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
   flex-wrap: wrap;
-  gap: 0.75rem;
 }
 
 .title {
+  font-size: var(--fs-xl);
   margin: 0;
+}
+
+.titleRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.count {
+  color: var(--color-text-muted);
+  font-size: var(--fs-sm);
 }
 
 .actions {
   display: flex;
-  gap: 0.5rem;
+  gap: var(--space-2);
   flex-wrap: wrap;
-}
-
-.actions button {
-  font: inherit;
-  padding: 0.4rem 0.8rem;
-  border: 1px solid #bbb;
-  border-radius: 0.3rem;
-  background: #fff;
-  cursor: pointer;
-}
-
-.actions button:hover:not(:disabled) {
-  background: #f0f0f0;
-}
-
-.actions button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+  margin-left: auto;
 }
 
 .empty {
-  color: #666;
+  color: var(--color-text-muted);
 }
 
 .list {
   list-style: none;
   padding: 0;
   margin: 0;
-  border: 1px solid #ddd;
-  border-radius: 0.4rem;
-  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
 }
 
 .row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.75rem 1rem;
-  border-bottom: 1px solid #eee;
+  gap: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--color-border);
 }
 
 .row:last-child {
@@ -63,12 +59,18 @@
 .rowMain {
   display: flex;
   flex-direction: column;
-  gap: 0.15rem;
+  gap: var(--space-1);
+  min-width: 0;
 }
 
 .cardLink {
-  color: #111;
+  color: var(--color-text);
   text-decoration: none;
+  font-weight: 600;
+}
+
+.cardLink strong {
+  font-weight: inherit;
 }
 
 .cardLink:hover {
@@ -76,80 +78,61 @@
 }
 
 .typeLine {
-  font-size: 0.85rem;
-  color: #666;
+  font-size: var(--fs-sm);
+  color: var(--color-text-muted);
   font-style: italic;
 }
 
-.deleteBtn {
-  font: inherit;
-  padding: 0.3rem 0.6rem;
-  border: 1px solid #cc8888;
-  border-radius: 0.3rem;
-  background: #fff;
-  color: #8a3030;
-  cursor: pointer;
-}
-
-.deleteBtn:hover {
-  background: #fff0f0;
-}
-
-.titleRow {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.renameBtn {
-  font: inherit;
-  font-size: 0.85rem;
-  padding: 0.2rem 0.5rem;
-  border: 1px solid #bbb;
-  border-radius: 0.3rem;
-  background: #fff;
-  cursor: pointer;
-}
-
-.renameBtn:hover {
-  background: #f0f0f0;
-}
-
+.printLink,
 .newCardLink {
   font: inherit;
-  padding: 0.4rem 0.8rem;
-  border: 1px solid #bbb;
-  border-radius: 0.3rem;
-  background: #fff;
-  color: inherit;
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: var(--fs-md);
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text);
   text-decoration: none;
-  cursor: pointer;
-}
-
-.newCardLink:hover {
-  background: #f0f0f0;
-}
-
-.printLink {
-  font: inherit;
-  padding: 0.4rem 0.8rem;
-  border: 1px solid #bbb;
-  border-radius: 0.3rem;
-  background: #fff;
-  color: inherit;
-  text-decoration: none;
-  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
 }
 
 .printLink:hover {
-  background: #f0f0f0;
+  background: var(--color-surface-2);
+}
+
+.newCardLink {
+  background: var(--color-accent);
+  color: var(--color-accent-fg);
+  border-color: var(--color-accent);
+  transition:
+    background 0.12s,
+    border-color 0.12s,
+    box-shadow 0.12s,
+    transform 0.05s;
+}
+
+.newCardLink:hover {
+  background: var(--color-accent-hover);
+  border-color: var(--color-accent-hover);
+  box-shadow: var(--shadow-accent);
+}
+
+.newCardLink:active {
+  background: var(--color-accent-active);
+  border-color: var(--color-accent-active);
+  box-shadow: var(--shadow-accent-sm);
+  transform: translateY(1px);
 }
 
 .titleInput {
   font: inherit;
-  font-size: 1.5rem;
-  font-weight: bold;
-  border: 1px solid #bbb;
-  border-radius: 0.3rem;
-  padding: 0.1rem 0.4rem;
+  font-family: var(--font-display);
+  font-size: var(--fs-xl);
+  font-weight: 600;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  padding: var(--space-1) var(--space-3);
 }
