@@ -1,4 +1,5 @@
 import { supabase } from "../api/supabase";
+import { OAuthButton } from "../lib/ui/OAuthButton";
 import styles from "./LoginView.module.css";
 
 const DEV_EMAIL = "dev@local";
@@ -29,22 +30,24 @@ export function LoginView() {
   };
 
   return (
-    <section className={styles.login}>
-      <h2>Sign in</h2>
-      <p>Sign in to create and edit decks. Anyone can view shared decks without signing in.</p>
-      <div className={styles.buttons}>
-        <button type="button" onClick={() => signIn("google")}>
-          Sign in with Google
-        </button>
-        <button type="button" onClick={() => signIn("github")}>
-          Sign in with GitHub
-        </button>
+    <section className={styles.login} aria-labelledby="signin-heading">
+      <h1 id="signin-heading">Sign in</h1>
+      <p className={styles.copy}>
+        Sign in to create and edit decks. Anyone can view shared decks via link.
+      </p>
+      <ul className={styles.providers}>
+        <li>
+          <OAuthButton provider="google" onPress={() => signIn("google")} />
+        </li>
+        <li>
+          <OAuthButton provider="github" onPress={() => signIn("github")} />
+        </li>
         {import.meta.env.DEV && (
-          <button type="button" className={styles.dev} onClick={devSignIn}>
-            Sign in as Dev User
-          </button>
+          <li>
+            <OAuthButton provider="dev" onPress={() => void devSignIn()} />
+          </li>
         )}
-      </div>
+      </ul>
     </section>
   );
 }
