@@ -44,12 +44,16 @@ export function LoginView() {
       </p>
       {/* biome-ignore lint/a11y/noRedundantRoles: required because list-style:none strips the implicit list role in WebKit */}
       <ul className={styles.providers} role="list">
-        <li>
-          <OAuthButton provider="google" onPress={() => signIn("google")} />
-        </li>
-        <li>
-          <OAuthButton provider="github" onPress={() => signIn("github")} />
-        </li>
+        {import.meta.env.VITE_AUTH_GOOGLE_ENABLED === "true" && (
+          <li>
+            <OAuthButton provider="google" onPress={() => signIn("google")} />
+          </li>
+        )}
+        {import.meta.env.VITE_AUTH_GITHUB_ENABLED === "true" && (
+          <li>
+            <OAuthButton provider="github" onPress={() => signIn("github")} />
+          </li>
+        )}
         {import.meta.env.DEV && (
           <li>
             <OAuthButton provider="dev" onPress={() => void devSignIn()} />
