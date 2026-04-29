@@ -81,7 +81,6 @@
 }
 
 .deckLink {
-  font-family: var(--font-display);
   font-weight: 600;
   font-size: var(--fs-md);
   color: var(--color-text);
