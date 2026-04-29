@@ -28,8 +28,15 @@ describe("<BrowseApiModal>", () => {
 
     wrap(<BrowseApiModal deckId="d1" onClose={() => {}} onSelected={() => {}} />);
 
-    expect(await screen.findByText("Bag of Holding")).toBeInTheDocument();
-    expect(screen.getByText("Cloak of Protection")).toBeInTheDocument();
+    expect(await screen.findByRole("button", { name: "Bag of Holding" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Cloak of Protection" })).toBeInTheDocument();
+  });
+
+  test("the dialog renders with stable sizing applied", async () => {
+    server.use(magicItemIndexHandler("2024", { count: 0, results: [] }));
+    wrap(<BrowseApiModal deckId="d1" onClose={() => {}} onSelected={() => {}} />);
+    const dialog = await screen.findByRole("dialog", { name: /browse magic items/i });
+    expect(dialog).toHaveAttribute("data-stable-size", "true");
   });
 
   test("search filters the list", async () => {
@@ -39,11 +46,11 @@ describe("<BrowseApiModal>", () => {
 
     wrap(<BrowseApiModal deckId="d1" onClose={() => {}} onSelected={() => {}} />);
 
-    await screen.findByText("Bag of Holding");
-    await userEvent.type(screen.getByPlaceholderText(/search/i), "bag");
+    await screen.findByRole("button", { name: "Bag of Holding" });
+    await userEvent.type(screen.getByRole("searchbox"), "bag");
 
-    expect(screen.getByText("Bag of Holding")).toBeInTheDocument();
-    expect(screen.queryByText("Cloak of Protection")).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Bag of Holding" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Cloak of Protection" })).not.toBeInTheDocument();
   });
 
   test("switching ruleset loads a different list", async () => {
@@ -56,19 +63,16 @@ describe("<BrowseApiModal>", () => {
 
     wrap(<BrowseApiModal deckId="d1" onClose={() => {}} onSelected={() => {}} />);
 
-    await screen.findByText("Ring A");
-    await userEvent.click(screen.getByRole("button", { name: /2014/i }));
+    await screen.findByRole("button", { name: "Ring A" });
+    await userEvent.click(screen.getByRole("radio", { name: "2014" }));
 
-    await waitFor(() => expect(screen.getByText("Ring Z")).toBeInTheDocument());
-    expect(screen.queryByText("Ring A")).not.toBeInTheDocument();
+    await waitFor(() => expect(screen.getByRole("button", { name: "Ring Z" })).toBeInTheDocument());
+    expect(screen.queryByRole("button", { name: "Ring A" })).not.toBeInTheDocument();
   });
 
   test("clicking a row POSTs the card to the persistence layer and calls onSelected", async () => {
     const entry = magicItemIndexEntryFactory.build({ name: "Bag of Holding" });
-    const detail = magicItemDetail2024Factory.build({
-      index: entry.index,
-      name: entry.name,
-    });
+    const detail = magicItemDetail2024Factory.build({ index: entry.index, name: entry.name });
     server.use(
       magicItemIndexHandler("2024", { count: 1, results: [entry] }),
       magicItemDetailHandler("2024", entry.index, detail),
@@ -84,7 +88,7 @@ describe("<BrowseApiModal>", () => {
 
     wrap(<BrowseApiModal deckId="d1" onClose={() => {}} onSelected={onSelected} />);
 
-    await userEvent.click(await screen.findByText("Bag of Holding"));
+    await userEvent.click(await screen.findByRole("button", { name: "Bag of Holding" }));
 
     await waitFor(() => expect(onPost).toHaveBeenCalled());
     expect(onSelected).toHaveBeenCalledWith(expect.any(String));
@@ -92,10 +96,7 @@ describe("<BrowseApiModal>", () => {
 
   test("clicking the same row only POSTs once even under StrictMode double-render", async () => {
     const entry = magicItemIndexEntryFactory.build({ name: "Flame Tongue" });
-    const detail = magicItemDetail2024Factory.build({
-      index: entry.index,
-      name: entry.name,
-    });
+    const detail = magicItemDetail2024Factory.build({ index: entry.index, name: entry.name });
     server.use(
       magicItemIndexHandler("2024", { count: 1, results: [entry] }),
       magicItemDetailHandler("2024", entry.index, detail),
@@ -117,10 +118,9 @@ describe("<BrowseApiModal>", () => {
       </StrictMode>,
     );
 
-    await userEvent.click(await screen.findByText("Flame Tongue"));
+    await userEvent.click(await screen.findByRole("button", { name: "Flame Tongue" }));
 
     await waitFor(() => expect(onPost).toHaveBeenCalledTimes(1));
-    // Give any stray effects a chance to fire before asserting final count.
     await new Promise((r) => setTimeout(r, 50));
     expect(onPost).toHaveBeenCalledTimes(1);
   });

@@ -1,9 +1,20 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { type MouseEvent, useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
+import {
+  Dialog,
+  Input,
+  Modal,
+  ModalOverlay,
+  TextField,
+  ToggleButton,
+  ToggleButtonGroup,
+} from "react-aria-components";
 import { fetchMagicItemDetail, type Ruleset } from "../api/endpoints/magicItems";
 import { useMagicItemIndex } from "../api/hooks";
 import { magicItemDetailToCard } from "../api/mappers/magicItems";
 import { useSaveCard } from "../decks/mutations";
+import { Button } from "../lib/ui/Button";
+import { IconButton } from "../lib/ui/IconButton";
 import styles from "./BrowseApiModal.module.css";
 
 type Props = {
@@ -31,14 +42,6 @@ export function BrowseApiModal({ deckId, onClose, onSelected }: Props) {
     return all.filter((e) => e.name.toLowerCase().includes(q));
   }, [index.data, query]);
 
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [onClose]);
-
   const handlePick = async (slug: string) => {
     if (pickingSlug !== null) return;
     setPickingSlug(slug);
@@ -62,86 +65,90 @@ export function BrowseApiModal({ deckId, onClose, onSelected }: Props) {
     }
   };
 
-  const onBackdropClick = (e: MouseEvent<HTMLDivElement>) => {
-    if (e.target === e.currentTarget) onClose();
-  };
-
   return (
-    // biome-ignore lint/a11y/useKeyWithClickEvents: Escape key handler is wired via window listener
-    // biome-ignore lint/a11y/noStaticElementInteractions: backdrop is non-semantic dismissal; dialog content handles focus
-    <div className={styles.backdrop} onClick={onBackdropClick}>
-      <div className={styles.modal} role="dialog" aria-label="Browse magic items">
-        <header className={styles.header}>
-          <h2 className={styles.title}>Browse magic items</h2>
-          {/* biome-ignore lint/a11y/useSemanticElements: fieldset styling is more opinionated than this toggle needs */}
-          <div className={styles.rulesetToggle} role="group" aria-label="Ruleset">
-            <button
-              type="button"
-              className={`${styles.rulesetBtn} ${ruleset === "2014" ? styles.rulesetBtnActive : ""}`}
-              onClick={() => setRuleset("2014")}
+    <ModalOverlay
+      isOpen
+      isDismissable
+      onOpenChange={(open) => {
+        if (!open) onClose();
+      }}
+      className={styles.overlay}
+    >
+      <Modal className={styles.modal}>
+        <Dialog aria-label="Browse magic items" data-stable-size="true" className={styles.dialog}>
+          <header className={styles.header}>
+            <h2 className={styles.title}>Browse magic items</h2>
+            <ToggleButtonGroup
+              selectionMode="single"
+              disallowEmptySelection
+              selectedKeys={[ruleset]}
+              onSelectionChange={(keys) => {
+                const next = Array.from(keys)[0];
+                if (next === "2014" || next === "2024") setRuleset(next);
+              }}
+              className={styles.rulesetToggle}
             >
-              2014
-            </button>
-            <button
-              type="button"
-              className={`${styles.rulesetBtn} ${ruleset === "2024" ? styles.rulesetBtnActive : ""}`}
-              onClick={() => setRuleset("2024")}
-            >
-              2024
-            </button>
+              <ToggleButton id="2014" className={styles.rulesetBtn}>
+                2014
+              </ToggleButton>
+              <ToggleButton id="2024" className={styles.rulesetBtn}>
+                2024
+              </ToggleButton>
+            </ToggleButtonGroup>
+            <IconButton aria-label="Close" onPress={onClose} className={styles.closeBtn}>
+              <span aria-hidden="true">×</span>
+            </IconButton>
+          </header>
+
+          <div className={styles.searchRow}>
+            <TextField aria-label="Search magic items" className={styles.searchField}>
+              <Input
+                type="search"
+                placeholder="Search magic items…"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                className={styles.searchInput}
+                autoFocus
+              />
+            </TextField>
           </div>
-          <button type="button" className={styles.closeBtn} onClick={onClose} aria-label="Close">
-            ×
-          </button>
-        </header>
 
-        <div className={styles.searchRow}>
-          <input
-            className={styles.searchInput}
-            type="search"
-            placeholder="Search magic items…"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            // biome-ignore lint/a11y/noAutofocus: modal entry point
-            autoFocus
-          />
-        </div>
-
-        <div className={styles.results}>
-          {index.isLoading && <div className={styles.state}>Loading…</div>}
-          {index.isError && (
-            <div className={styles.state}>
-              Couldn't load the magic-items list.
-              <div className={styles.errorActions}>
-                <button type="button" onClick={() => index.refetch()}>
-                  Retry
-                </button>
+          <div className={styles.results}>
+            {index.isLoading && <div className={styles.state}>Loading…</div>}
+            {index.isError && (
+              <div className={styles.state}>
+                Couldn't load the magic-items list.
+                <div className={styles.errorActions}>
+                  <Button variant="secondary" size="sm" onPress={() => index.refetch()}>
+                    Retry
+                  </Button>
+                </div>
               </div>
-            </div>
-          )}
-          {index.isSuccess && filtered.length === 0 && (
-            <div className={styles.state}>No items match your search.</div>
-          )}
-          {pickError && (
-            <div className={styles.state} role="alert">
-              {pickError}
-            </div>
-          )}
-          {index.isSuccess &&
-            filtered.map((entry) => (
-              <button
-                key={entry.index}
-                type="button"
-                className={styles.row}
-                onClick={() => handlePick(entry.index)}
-                disabled={pickingSlug !== null}
-              >
-                <span className={styles.rowName}>{entry.name}</span>
-                {pickingSlug === entry.index && <span className={styles.rowMeta}>Loading…</span>}
-              </button>
-            ))}
-        </div>
-      </div>
-    </div>
+            )}
+            {index.isSuccess && filtered.length === 0 && (
+              <div className={styles.state}>No items match your search.</div>
+            )}
+            {pickError && (
+              <div className={styles.state} role="alert">
+                {pickError}
+              </div>
+            )}
+            {index.isSuccess &&
+              filtered.map((entry) => (
+                <button
+                  key={entry.index}
+                  type="button"
+                  className={styles.row}
+                  onClick={() => handlePick(entry.index)}
+                  disabled={pickingSlug !== null}
+                >
+                  <span className={styles.rowName}>{entry.name}</span>
+                  {pickingSlug === entry.index && <span className={styles.rowMeta}>Loading…</span>}
+                </button>
+              ))}
+          </div>
+        </Dialog>
+      </Modal>
+    </ModalOverlay>
   );
 }
