@@ -5,6 +5,9 @@ import { parseDeckJson } from "../decks/io";
 import { useCreateDeck, useDeleteDeck, useSaveCard } from "../decks/mutations";
 import { useDecks } from "../decks/queries";
 import { newId } from "../lib/id";
+import { Button } from "../lib/ui/Button";
+import { IconButton } from "../lib/ui/IconButton";
+import { TrashIcon } from "../lib/ui/icons/TrashIcon";
 import styles from "./HomeView.module.css";
 
 export function HomeView() {
@@ -44,24 +47,17 @@ export function HomeView() {
       const name = file.name.replace(/\.json$/i, "") || "Imported deck";
       const deck = await createDeck.mutateAsync({ name, ownerId });
       try {
-        // Insert each card with a fresh UUID. Re-using imported ids would
-        // PK-conflict on re-import.
         for (const card of result.deck.cards) {
           const fresh = { ...card, id: newId() };
           await saveCard.mutateAsync({ card: fresh, deckId: deck.id, isNew: true });
         }
       } catch (err) {
-        // A card insert failed mid-loop. Roll back by deleting the orphan
-        // deck (cascades to any cards that did insert) so the user isn't
-        // left with a partial deck silently sitting in their list.
         await deleteDeck.mutateAsync(deck.id).catch(() => {});
         alert(`Import failed mid-way: ${err instanceof Error ? err.message : "unknown error"}`);
         return;
       }
       navigate({ to: "/deck/$deckId", params: { deckId: deck.id } });
     } finally {
-      // Always clear the input so the user can re-select the same file
-      // after a failure (browsers skip the change event for identical paths).
       e.target.value = "";
     }
   };
@@ -82,12 +78,12 @@ export function HomeView() {
       <section className={styles.empty}>
         <h2>No decks yet</h2>
         <div className={styles.headerActions}>
-          <button type="button" onClick={() => fileInputRef.current?.click()}>
+          <Button variant="secondary" onPress={() => fileInputRef.current?.click()}>
             Import JSON
-          </button>
-          <button type="button" onClick={handleCreate} disabled={createDeck.isPending}>
+          </Button>
+          <Button variant="primary" onPress={handleCreate} isDisabled={createDeck.isPending}>
             Create your first deck
-          </button>
+          </Button>
         </div>
         <input
           ref={fileInputRef}
@@ -106,12 +102,12 @@ export function HomeView() {
       <header className={styles.header}>
         <h2>Your decks</h2>
         <div className={styles.headerActions}>
-          <button type="button" onClick={() => fileInputRef.current?.click()}>
+          <Button variant="secondary" onPress={() => fileInputRef.current?.click()}>
             Import JSON
-          </button>
-          <button type="button" onClick={handleCreate} disabled={createDeck.isPending}>
+          </Button>
+          <Button variant="primary" onPress={handleCreate} isDisabled={createDeck.isPending}>
             New deck
-          </button>
+          </Button>
         </div>
         <input
           ref={fileInputRef}
@@ -128,14 +124,13 @@ export function HomeView() {
             <Link to="/deck/$deckId" params={{ deckId: d.id }} className={styles.deckLink}>
               {d.name}
             </Link>
-            <button
-              type="button"
-              className={styles.deleteBtn}
+            <IconButton
               aria-label={`Delete ${d.name}`}
-              onClick={() => handleDelete(d.id, d.name)}
+              variant="danger"
+              onPress={() => handleDelete(d.id, d.name)}
             >
-              Delete
-            </button>
+              <TrashIcon />
+            </IconButton>
           </li>
         ))}
       </ul>
