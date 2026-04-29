@@ -12,16 +12,80 @@ body,
   min-height: 100%;
 }
 
+:root {
+  /* Color — surfaces */
+  --color-bg: #faf7f2;
+  --color-surface: #fffdf8;
+  --color-surface-2: #f3ece0;
+
+  /* Color — ink */
+  --color-text: #1a1410;
+  --color-text-muted: #6a5a45;
+  --color-text-faint: #8a7a65;
+
+  /* Color — borders & accent */
+  --color-border: #d9cfc1;
+  --color-border-strong: #b8a888;
+  --color-accent: #7a3530;
+  --color-accent-fg: #ffffff;
+  --color-danger: #8a3030;
+  --color-focus-ring: #7a3530;
+
+  /* Typography */
+  --font-display: "Cinzel", "EB Garamond", Georgia, serif;
+  --font-body: "Inter Variable", "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  --fs-xs: 0.8rem;
+  --fs-sm: 0.875rem;
+  --fs-md: 1rem;
+  --fs-lg: 1.125rem;
+  --fs-xl: 1.5rem;
+  --fs-2xl: 2rem;
+
+  --lh-tight: 1.2;
+  --lh-body: 1.5;
+
+  /* Space */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+
+  /* Radius */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.4rem;
+  --radius-lg: 0.75rem;
+
+  /* Shadow */
+  --shadow-sm: 0 1px 2px rgba(26, 20, 16, 0.06);
+  --shadow-md: 0 4px 16px rgba(26, 20, 16, 0.08);
+  --shadow-lg: 0 16px 40px rgba(26, 20, 16, 0.18);
+}
+
 body {
-  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
-  color: #111;
-  background: #f7f7f7;
-  line-height: 1.4;
+  font-family: var(--font-body);
+  color: var(--color-text);
+  background: var(--color-bg);
+  font-size: var(--fs-md);
+  line-height: var(--lh-body);
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  line-height: var(--lh-tight);
+  margin-top: 0;
 }
 
 @page {
   size: letter portrait;
-  margin: 0.5in;
+  margin-top: 0.5in;
+  margin-right: 0.5in;
+  margin-bottom: 0.5in;
+  margin-left: 0.5in;
 }
 
 @media print {
