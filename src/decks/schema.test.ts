@@ -51,6 +51,21 @@ describe("itemCardSchema", () => {
     expect(itemCardSchema.safeParse(card).success).toBe(true);
   });
 
+  test("accepts an item card with an iconKey", () => {
+    const card = {
+      id: "abc",
+      kind: "item" as const,
+      name: "Bag of Holding",
+      typeLine: "Wondrous item, uncommon",
+      body: "Big bag.",
+      source: "custom" as const,
+      iconKey: "trident",
+      createdAt: "2026-04-19T00:00:00.000Z",
+      updatedAt: "2026-04-19T00:00:00.000Z",
+    };
+    expect(itemCardSchema.safeParse(card).success).toBe(true);
+  });
+
   test("rejects an apiRef without a ruleset", () => {
     const card = {
       id: "abc",

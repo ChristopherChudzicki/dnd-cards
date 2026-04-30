@@ -9,6 +9,7 @@ export type BaseCard = {
   apiRef?: { system: "dnd5eapi"; slug: string; ruleset: "2014" | "2024" };
   createdAt: string;
   updatedAt: string;
+  iconKey?: string;
 };
 
 export type ItemCard = BaseCard & {
