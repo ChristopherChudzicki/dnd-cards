@@ -27,6 +27,26 @@ Then open http://localhost:5173.
 3. Choose 2 or 4 cards per page.
 4. Click **Print**. In the browser print dialog, set **Margins: None** and uncheck **Headers and footers** for a tight fit.
 
+## Design system
+
+UI styling is driven by CSS custom-property tokens defined in [`src/index.css`](src/index.css). Components reference tokens via `var(--name)`; **no hardcoded colors, font sizes, or spacing values** in component CSS modules. The card visual and print view are intentionally exempt — they target physical print dimensions in absolute units.
+
+**Stack**
+
+- [`react-aria-components`](https://react-spectrum.adobe.com/react-aria/) for accessible interactive primitives (Dialog, Menu, ToggleButtonGroup, etc.).
+- CSS modules. No styled-components, emotion, MUI, Tailwind, or shadcn.
+- Self-hosted Inter (body) and Cinzel (display headings) via fontsource.
+
+**Shared primitives** live in `src/lib/ui/`: `<Button>`, `<IconButton>`, `<OAuthButton>`, `<UserMenu>`. Button variants are set via `data-variant`; React Aria exposes interaction state via `[data-hovered]`, `[data-pressed]`, `[data-focus-visible]`.
+
+**Conventions**
+
+- Reach for tokens first; if one is missing, add it to `src/index.css` rather than inlining a hex.
+- React Aria buttons use `onPress` (not `onClick`) and `isDisabled` (not `disabled`).
+- Tests use `getByRole(...)` queries — React Aria primitives expose accurate ARIA roles.
+
+For rationale, see the [UI refinement spec](docs/superpowers/specs/2026-04-29-ui-refinement-design.md).
+
 ## Project docs
 
 - Design: [`docs/superpowers/specs/2026-04-19-dnd-cards-design.md`](docs/superpowers/specs/2026-04-19-dnd-cards-design.md)
