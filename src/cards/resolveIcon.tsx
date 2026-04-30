@@ -58,6 +58,7 @@ import iconMagnifyingGlass from "@iconify-icons/game-icons/magnifying-glass";
 import iconMeat from "@iconify-icons/game-icons/meat";
 import iconMoon from "@iconify-icons/game-icons/moon";
 import iconNecklace from "@iconify-icons/game-icons/necklace";
+import iconPerspectiveDiceSixFacesRandom from "@iconify-icons/game-icons/perspective-dice-six-faces-random";
 import iconPlainDagger from "@iconify-icons/game-icons/plain-dagger";
 import iconPotionBall from "@iconify-icons/game-icons/potion-ball";
 import iconRing from "@iconify-icons/game-icons/ring";
@@ -183,6 +184,7 @@ const CURATED: Record<string, IconifyIcon> = {
   "locked-chest": iconLockedChest,
   "bloody-stash": iconBloodyStash,
   "crystal-shrine": iconCrystalShrine,
+  "perspective-dice-six-faces-random": iconPerspectiveDiceSixFacesRandom,
 };
 
 let fullSetPromise: Promise<void> | null = null;

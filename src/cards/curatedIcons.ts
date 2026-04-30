@@ -97,6 +97,8 @@ export const CURATED_ICONS: readonly string[] = [
   "locked-chest",
   "bloody-stash",
   "crystal-shrine",
+  // Misc / fallback
+  "perspective-dice-six-faces-random",
 ] as const;
 
 export type CuratedIconKey = (typeof CURATED_ICONS)[number];
