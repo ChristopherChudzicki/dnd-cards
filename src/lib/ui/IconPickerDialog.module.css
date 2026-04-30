@@ -47,6 +47,7 @@
 
 .grid {
   height: 50vh;
+  overflow-x: hidden;
   overflow-y: auto;
   padding: var(--space-1);
 }
