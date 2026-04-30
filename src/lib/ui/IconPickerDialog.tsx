@@ -116,13 +116,15 @@ function PickerBody({ onChange, onCancel }: BodyProps) {
             <GridListItem
               id={item.id}
               textValue={item.label}
-              title={item.id === AUTO_ID ? undefined : item.label}
               className={`${styles.tile} ${item.id === AUTO_ID ? styles.autoTile : ""}`}
             >
               {item.id === AUTO_ID ? (
                 "Auto"
               ) : (
-                <IconPreview iconKey={item.id} label={item.label} size="lg" />
+                <>
+                  <IconPreview iconKey={item.id} label={item.label} size="lg" />
+                  <span className={styles.tooltip}>{item.label}</span>
+                </>
               )}
             </GridListItem>
           )}
