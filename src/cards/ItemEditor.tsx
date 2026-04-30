@@ -1,5 +1,8 @@
 import type { ChangeEvent } from "react";
 import { nowIso } from "../lib/time";
+import { IconPickerDialog } from "../lib/ui/IconPickerDialog";
+import { IconPreview } from "../lib/ui/IconPreview";
+import { FALLBACK_ICON_KEY, pickIconKey } from "./iconRules";
 import styles from "./ItemEditor.module.css";
 import type { ItemCard } from "./types";
 
@@ -16,6 +19,13 @@ export function ItemEditor({ card, onChange }: Props) {
       onChange({ ...card, [field]: e.target.value, updatedAt: nowIso() });
     };
 
+  const handleIconChange = (next: string | undefined) => {
+    onChange({ ...card, iconKey: next, updatedAt: nowIso() });
+  };
+
+  const resolvedKey = card.iconKey ?? pickIconKey(card);
+  const showHint = card.iconKey === undefined && resolvedKey !== FALLBACK_ICON_KEY;
+
   return (
     <form className={styles.form} onSubmit={(e) => e.preventDefault()}>
       <label className={styles.field}>
@@ -31,6 +41,14 @@ export function ItemEditor({ card, onChange }: Props) {
           placeholder="Wondrous item, uncommon"
         />
       </label>
+      <div className={styles.field}>
+        <span className={styles.label}>Icon (optional)</span>
+        <div className={styles.iconRow}>
+          <IconPreview iconKey={resolvedKey} label={resolvedKey} size="sm" />
+          <IconPickerDialog value={card.iconKey} onChange={handleIconChange} />
+        </div>
+        {showHint && <div className={styles.iconHint}>Currently auto-picking: {resolvedKey}</div>}
+      </div>
       <label className={styles.field}>
         <span className={styles.label}>Body</span>
         <textarea

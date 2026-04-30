@@ -55,4 +55,67 @@ describe("<ItemEditor>", () => {
     const lastCall = onEach.mock.lastCall?.[0];
     expect(lastCall?.updatedAt).not.toBe("2000-01-01T00:00:00.000Z");
   });
+
+  // Picker tile selector — react-aria GridListItem uses role="row".
+  const tile = (name: RegExp | string) => screen.getByRole("row", { name });
+
+  test("Icon row trigger shows 'Auto' when iconKey is unset", () => {
+    const card = itemCardFactory.build({ iconKey: undefined });
+    render(<Harness initial={card} />);
+    expect(screen.getByRole("button", { name: /pick icon.*auto/i })).toBeInTheDocument();
+  });
+
+  test("Icon row trigger shows the explicit key when iconKey is set", () => {
+    const card = itemCardFactory.build({ iconKey: "trident" });
+    render(<Harness initial={card} />);
+    expect(screen.getByRole("button", { name: /pick icon.*trident/i })).toBeInTheDocument();
+  });
+
+  test("Selecting an icon updates the card's iconKey", async () => {
+    const card = itemCardFactory.build({ iconKey: undefined });
+    const seen: ItemCard[] = [];
+    render(<Harness initial={card} onEach={(c) => seen.push(c)} />);
+
+    await userEvent.click(screen.getByRole("button", { name: /pick icon/i }));
+    await userEvent.click(tile("trident"));
+
+    expect(seen[seen.length - 1]?.iconKey).toBe("trident");
+  });
+
+  test("Selecting Auto clears the iconKey", async () => {
+    const card = itemCardFactory.build({ iconKey: "trident" });
+    const seen: ItemCard[] = [];
+    render(<Harness initial={card} onEach={(c) => seen.push(c)} />);
+
+    await userEvent.click(screen.getByRole("button", { name: /pick icon/i }));
+    await userEvent.click(tile(/auto/i));
+
+    expect(seen[seen.length - 1]?.iconKey).toBeUndefined();
+  });
+
+  test("Auto-pick hint shows the heuristic key when iconKey is unset and rule matches", () => {
+    const card = itemCardFactory.build({
+      name: "Trident of Fish Command",
+      typeLine: "Weapon, rare",
+      iconKey: undefined,
+    });
+    render(<Harness initial={card} />);
+    expect(screen.getByText(/auto-picking.*trident/i)).toBeInTheDocument();
+  });
+
+  test("Auto-pick hint hides when iconKey is set", () => {
+    const card = itemCardFactory.build({ iconKey: "broadsword" });
+    render(<Harness initial={card} />);
+    expect(screen.queryByText(/auto-picking/i)).not.toBeInTheDocument();
+  });
+
+  test("Auto-pick hint hides when the heuristic falls back (no meaningful match)", () => {
+    const card = itemCardFactory.build({
+      name: "Mystery Object",
+      typeLine: "Wondrous Items, uncommon",
+      iconKey: undefined,
+    });
+    render(<Harness initial={card} />);
+    expect(screen.queryByText(/auto-picking/i)).not.toBeInTheDocument();
+  });
 });
