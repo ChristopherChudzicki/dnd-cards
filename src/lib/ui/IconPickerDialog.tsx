@@ -1,5 +1,5 @@
 import { listIcons } from "@iconify/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Dialog,
   DialogTrigger,
@@ -20,6 +20,7 @@ import styles from "./IconPickerDialog.module.css";
 import { IconPreview } from "./IconPreview";
 
 const AUTO_ID = "__auto__";
+const RENDER_CAP = 200;
 
 type Props = {
   value: string | undefined;
@@ -60,29 +61,26 @@ type BodyProps = {
 function PickerBody({ onChange, onCancel }: BodyProps) {
   const [search, setSearch] = useState("");
   const [showAll, setShowAll] = useState(false);
-  const [loadingFull, setLoadingFull] = useState(false);
   const [fullSetKeys, setFullSetKeys] = useState<readonly string[] | null>(null);
+
+  useEffect(() => {
+    void ensureFullSet().then(() => {
+      const all = listIcons("", "game-icons").map((n) => n.replace("game-icons:", ""));
+      setFullSetKeys(all);
+    });
+  }, []);
 
   const dataset = showAll && fullSetKeys ? fullSetKeys : CURATED_ICONS;
   const filtered = search
     ? dataset.filter((k) => k.toLowerCase().includes(search.toLowerCase()))
     : dataset;
+  const capped = filtered.slice(0, RENDER_CAP);
+  const truncated = filtered.length - capped.length;
 
   const items: { id: string; label: string }[] = [
     { id: AUTO_ID, label: "Auto" },
-    ...filtered.map((k) => ({ id: k, label: k })),
+    ...capped.map((k) => ({ id: k, label: k })),
   ];
-
-  const handleSwitchChange = async (next: boolean) => {
-    setShowAll(next);
-    if (next && !fullSetKeys) {
-      setLoadingFull(true);
-      await ensureFullSet();
-      const all = listIcons("", "game-icons").map((n) => n.replace("game-icons:", ""));
-      setFullSetKeys(all);
-      setLoadingFull(false);
-    }
-  };
 
   return (
     <>
@@ -91,38 +89,39 @@ function PickerBody({ onChange, onCancel }: BodyProps) {
         <SearchField aria-label="Search icons" value={search} onChange={setSearch}>
           <Input className={styles.search} />
         </SearchField>
-        <Switch isSelected={showAll} onChange={handleSwitchChange} className={styles.switch}>
+        <Switch isSelected={showAll} onChange={setShowAll} className={styles.switch}>
           <div className={styles.switchIndicator} />
           Show all
         </Switch>
       </div>
-      {loadingFull ? (
-        <div className={styles.loading}>Loading…</div>
-      ) : (
-        <GridList
-          aria-label="Icons"
-          className={styles.grid}
-          items={items}
-          selectionMode="single"
-          onAction={(key) => {
-            const k = String(key);
-            onChange(k === AUTO_ID ? undefined : k);
-          }}
-        >
-          {(item) => (
-            <GridListItem
-              id={item.id}
-              textValue={item.label}
-              className={`${styles.tile} ${item.id === AUTO_ID ? styles.autoTile : ""}`}
-            >
-              {item.id === AUTO_ID ? (
-                "Auto"
-              ) : (
-                <IconPreview iconKey={item.id} label={item.label} size="lg" />
-              )}
-            </GridListItem>
-          )}
-        </GridList>
+      <GridList
+        aria-label="Icons"
+        className={styles.grid}
+        items={items}
+        selectionMode="single"
+        onAction={(key) => {
+          const k = String(key);
+          onChange(k === AUTO_ID ? undefined : k);
+        }}
+      >
+        {(item) => (
+          <GridListItem
+            id={item.id}
+            textValue={item.label}
+            className={`${styles.tile} ${item.id === AUTO_ID ? styles.autoTile : ""}`}
+          >
+            {item.id === AUTO_ID ? (
+              "Auto"
+            ) : (
+              <IconPreview iconKey={item.id} label={item.label} size="lg" />
+            )}
+          </GridListItem>
+        )}
+      </GridList>
+      {truncated > 0 && (
+        <div className={styles.truncatedNotice}>
+          Showing {capped.length} of {filtered.length} — refine search to see more.
+        </div>
       )}
       <div className={styles.actions}>
         <Button variant="secondary" onPress={onCancel}>
