@@ -286,7 +286,7 @@ Behavior:
 - The first tile is always the **Auto** sentinel — selecting it calls `onChange(undefined)` and closes the dialog.
 - Other tiles render via `<IconPreview iconKey={key} size="sm" />`. The kebab key is the tile's `aria-label` and tooltip (no visible text label — keeps the grid dense at 10 wide).
 - Search filter: case-insensitive substring match against the kebab key (`includes`). Empty search shows everything in the active dataset.
-- "Show all" switch in the header: default off (curated set, ~100 icons). When flipped on for the first time, calls `ensureFullSet()` and replaces the dataset with all ~4000 icon names from `@iconify-json/game-icons`. While loading, the grid shows a small "Loading…" placeholder.
+- "Show all" switch in the header: default off (curated set, ~100 icons). When flipped on for the first time, calls `ensureFullSet()`; once it resolves, the dataset is `listIcons("", "game-icons")` (Iconify's top-level export — returns every registered icon name as `"game-icons:trident"` strings, which the dialog strips to bare kebab keys). While loading, the grid shows a small "Loading…" placeholder.
 - Selecting a tile calls `onChange(key)` and closes the dialog. No "Confirm" button — single-click commits.
 - Keyboard: arrow keys navigate the grid in two dimensions (handled by react-aria's `GridList`). Enter selects. Escape closes. Tab cycles search → switch → grid → cancel.
 
@@ -409,7 +409,18 @@ The fallback chain when `card.iconKey === "removed-icon-name"`:
 2. Calls `ensureFullSet()` (idempotent), renders `<Icon icon="game-icons:removed-icon-name" />`.
 3. Iconify's `<Icon>` renders nothing if the named icon doesn't exist in the registered collection. No throw.
 
-In dev, log a warning once per bad `iconKey`. Implementation detail — Iconify's `<Icon>` exposes lifecycle props (e.g., `onLoad`) that can flag missing icons after the collection resolves; if those don't suit, a `MutationObserver` on the rendered `<svg>` or a thin wrapper that polls Iconify's iconExists checks will work. Pick during implementation; the only requirement is that bad keys log once and don't crash.
+In dev, log a warning once per bad `iconKey`. Iconify's top-level `iconLoaded(name): boolean` (exported from `@iconify/react`) returns `true` if the icon is registered. After `ensureFullSet()` resolves, `ResolvedIcon` checks `iconLoaded(`game-icons:${iconKey}`)` for non-curated keys; if `false`, log once via a module-level `Set<string>` to avoid log spam:
+
+```ts
+const warnedKeys = new Set<string>();
+// inside ResolvedIcon, after ensureFullSet resolves
+if (import.meta.env.DEV && !iconLoaded(`game-icons:${iconKey}`) && !warnedKeys.has(iconKey)) {
+  warnedKeys.add(iconKey);
+  console.warn(`[ResolvedIcon] Unknown iconKey "${iconKey}" — rendering nothing.`);
+}
+```
+
+Production builds skip the check entirely (gated on `import.meta.env.DEV`).
 
 The editor does not surface stale-key state to the user in v1. Deferred: a small "?" indicator in the form row chip when the stored override doesn't resolve, so users know their pick was orphaned.
 
