@@ -5,6 +5,7 @@ import { RequireOwner } from "../auth/RequireOwner";
 import { DeckView } from "../views/DeckView";
 import { EditorView } from "../views/EditorView";
 import { HomeView } from "../views/HomeView";
+import { IconDebugView } from "../views/IconDebugView";
 import { PrintView } from "../views/PrintView";
 import { Root } from "./Root";
 
@@ -59,6 +60,12 @@ const authCallbackRoute = createRoute({
   component: AuthCallback,
 });
 
+const iconDebugRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/debug/icons",
+  component: IconDebugView,
+});
+
 const routeTree = rootRoute.addChildren([
   homeRoute,
   deckViewRoute,
@@ -66,6 +73,7 @@ const routeTree = rootRoute.addChildren([
   printRoute,
   loginRoute,
   authCallbackRoute,
+  iconDebugRoute,
 ]);
 
 export const router = createRouter({ routeTree });
