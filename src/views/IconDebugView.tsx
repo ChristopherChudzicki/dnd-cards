@@ -5,10 +5,12 @@ import styles from "./IconDebugView.module.css";
 
 function pickRule(name: string, typeLine: string) {
   const haystack = `${name} ${typeLine}`;
-  for (let i = 0; i < ICON_RULES.length; i++) {
-    if (ICON_RULES[i].pattern.test(haystack)) {
-      return { rule: ICON_RULES[i], index: i };
+  let index = 0;
+  for (const rule of ICON_RULES) {
+    if (rule.pattern.test(haystack)) {
+      return { rule, index };
     }
+    index++;
   }
   return null;
 }
