@@ -1,7 +1,7 @@
 import { ResolvedIcon } from "../../cards/resolveIcon";
 import styles from "./IconPreview.module.css";
 
-export type IconPreviewSize = "sm" | "md";
+export type IconPreviewSize = "sm" | "md" | "lg";
 
 type Props = {
   iconKey: string;
@@ -10,7 +10,7 @@ type Props = {
 };
 
 export function IconPreview({ iconKey, label, size = "sm" }: Props) {
-  const sizeClass = size === "sm" ? styles.sm : styles.md;
+  const sizeClass = size === "sm" ? styles.sm : size === "lg" ? styles.lg : styles.md;
   return (
     <span className={`${styles.preview} ${sizeClass}`} role="img" aria-label={label}>
       <ResolvedIcon iconKey={iconKey} />

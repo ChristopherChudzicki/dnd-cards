@@ -15,6 +15,7 @@ import {
 } from "react-aria-components";
 import { CURATED_ICONS } from "../../cards/curatedIcons";
 import { ensureFullSet } from "../../cards/resolveIcon";
+import { Button } from "./Button";
 import styles from "./IconPickerDialog.module.css";
 import { IconPreview } from "./IconPreview";
 
@@ -90,7 +91,8 @@ function PickerBody({ onChange, onCancel }: BodyProps) {
         <SearchField aria-label="Search icons" value={search} onChange={setSearch}>
           <Input className={styles.search} />
         </SearchField>
-        <Switch isSelected={showAll} onChange={handleSwitchChange}>
+        <Switch isSelected={showAll} onChange={handleSwitchChange} className={styles.switch}>
+          <div className={styles.switchIndicator} />
           Show all
         </Switch>
       </div>
@@ -116,14 +118,16 @@ function PickerBody({ onChange, onCancel }: BodyProps) {
               {item.id === AUTO_ID ? (
                 "Auto"
               ) : (
-                <IconPreview iconKey={item.id} label={item.label} size="sm" />
+                <IconPreview iconKey={item.id} label={item.label} size="lg" />
               )}
             </GridListItem>
           )}
         </GridList>
       )}
       <div className={styles.actions}>
-        <RACButton onPress={onCancel}>Cancel</RACButton>
+        <Button variant="secondary" onPress={onCancel}>
+          Cancel
+        </Button>
       </div>
     </>
   );

@@ -18,7 +18,12 @@
   height: 2.5rem;
 }
 
+.lg {
+  width: 3rem;
+  height: 3rem;
+}
+
 .preview svg {
-  width: 80%;
-  height: 80%;
+  width: 100%;
+  height: 100%;
 }
