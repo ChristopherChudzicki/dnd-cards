@@ -24,9 +24,7 @@ describe("pickIconKey", () => {
     expect(pickIconKey(itemCardFactory.build({ name: "Warhammer of Thunder", typeLine: "" }))).toBe(
       "warhammer",
     );
-    expect(pickIconKey(itemCardFactory.build({ name: "Maul +1", typeLine: "" }))).toBe(
-      "warhammer",
-    );
+    expect(pickIconKey(itemCardFactory.build({ name: "Maul +1", typeLine: "" }))).toBe("warhammer");
   });
 
   test("Bow variants pick 'bow-arrow' (not the broadsword catch-all)", () => {

@@ -2,8 +2,8 @@ import type { ChangeEvent } from "react";
 import { nowIso } from "../lib/time";
 import { IconPickerDialog } from "../lib/ui/IconPickerDialog";
 import { IconPreview } from "../lib/ui/IconPreview";
-import { FALLBACK_ICON_KEY, pickIconKey } from "./iconRules";
 import styles from "./ItemEditor.module.css";
+import { FALLBACK_ICON_KEY, pickIconKey } from "./iconRules";
 import type { ItemCard } from "./types";
 
 type Props = {
