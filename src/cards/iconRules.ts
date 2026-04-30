@@ -14,7 +14,7 @@ export const ICON_RULES: readonly IconRule[] = [
   },
   {
     pattern: /\b(?:war ?hammer|maul|sledgehammer)\b/i,
-    iconKey: "war-hammer",
+    iconKey: "warhammer",
     description: "hammer / maul",
   },
   {

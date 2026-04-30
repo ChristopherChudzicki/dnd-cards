@@ -20,12 +20,12 @@ describe("pickIconKey", () => {
     );
   });
 
-  test("Hammer variants pick 'war-hammer'", () => {
+  test("Hammer variants pick 'warhammer'", () => {
     expect(pickIconKey(itemCardFactory.build({ name: "Warhammer of Thunder", typeLine: "" }))).toBe(
-      "war-hammer",
+      "warhammer",
     );
     expect(pickIconKey(itemCardFactory.build({ name: "Maul +1", typeLine: "" }))).toBe(
-      "war-hammer",
+      "warhammer",
     );
   });
 
