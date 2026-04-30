@@ -116,6 +116,10 @@
   gap: var(--space-2);
 }
 
+.tooltipDelegationWrapper {
+  display: contents;
+}
+
 .tooltip {
   position: fixed;
   transform: translate(-50%, calc(-100% - 6px));

@@ -113,8 +113,9 @@ function PickerBody({ onChange, onCancel }: BodyProps) {
           Show all
         </Switch>
       </div>
-      {/* biome-ignore lint/a11y/noStaticElementInteractions: Mouse + focus delegation for tile tooltip; the wrapper is non-interactive on its own. */}
+      {/* biome-ignore lint/a11y/noStaticElementInteractions: Event delegation for tile tooltip; display:contents removes the wrapper from layout entirely. */}
       <div
+        className={styles.tooltipDelegationWrapper}
         onMouseOver={handleTileActivate}
         onMouseLeave={handleGridLeave}
         onFocus={handleTileActivate}
