@@ -170,9 +170,9 @@ Expected: both packages added to `dependencies` in `package.json`. `node_modules
 
 Quickly verify the imports work (Read tool, no command). Ask:
 ```
-node --input-type=module -e "import('@iconify-json/game-icons').then(m => console.log(Object.keys(m.default).slice(0,3), 'icon count:', Object.keys(m.default.icons).length))"
+node --input-type=module -e "import('@iconify-json/game-icons/icons.json', { with: { type: 'json' } }).then(m => console.log(Object.keys(m.default).slice(0,3), 'icon count:', Object.keys(m.default.icons).length))"
 ```
-Expected: prints `[ 'prefix', 'info', 'lastModified' ] icon count: <a number around 4000>`. Confirms the JSON collection loads cleanly and contains the icons map under `default.icons`.
+Expected: prints `[ 'prefix', 'icons', 'aliases' ]` (or similar) and an icon count near 4000. Confirms the JSON file imports as a default with `prefix` and `icons` map. (The package's *named* top-level exports also expose these, but we use the JSON entry point for consumer code because it's the IconifyJSON shape.)
 
 - [ ] **Step 3: Commit**
 
@@ -314,7 +314,7 @@ export function isCurated(key: string): key is CuratedIconKey {
 Create `src/cards/curatedIcons.test.ts`:
 
 ```ts
-import gameIcons from "@iconify-json/game-icons";
+import gameIcons from "@iconify-json/game-icons/icons.json";
 import { describe, expect, test } from "vitest";
 import { CURATED_ICONS } from "./curatedIcons";
 
@@ -326,6 +326,8 @@ describe("CURATED_ICONS", () => {
   });
 });
 ```
+
+> Note on the import path: `@iconify-json/game-icons` v1.2+ no longer has a default export at the package root — top-level is named exports only. We use the package's JSON entry point (`/icons.json`), which gives us the IconifyJSON shape directly (`{ prefix, icons, aliases? }`). Vite handles JSON imports natively, and `tsconfig.app.json` has `resolveJsonModule: true`.
 
 - [ ] **Step 3: Run the test; fix any missing keys**
 
@@ -457,7 +459,7 @@ describe("<ResolvedIcon>", () => {
 Create `src/cards/resolveIcon.tsx`:
 
 ```tsx
-import gameIcons from "@iconify-json/game-icons";
+import gameIcons from "@iconify-json/game-icons/icons.json";
 import { addCollection, Icon, iconLoaded } from "@iconify/react";
 import type { IconifyJSON } from "@iconify/types";
 import { CURATED_ICONS, isCurated } from "./curatedIcons";
@@ -472,8 +474,8 @@ addCollection(curatedCollection);
 
 let fullSetPromise: Promise<void> | null = null;
 export function ensureFullSet(): Promise<void> {
-  fullSetPromise ??= import("@iconify-json/game-icons").then((m) => {
-    addCollection(m.default);
+  fullSetPromise ??= import("@iconify-json/game-icons/icons.json").then((m) => {
+    addCollection(m.default as IconifyJSON);
   });
   return fullSetPromise;
 }
@@ -497,6 +499,8 @@ export function ResolvedIcon({ iconKey, "data-testid": testId }: Props) {
   return <Icon icon={`${CURATED_PREFIX}:${iconKey}`} data-testid={testId} />;
 }
 ```
+
+> Note: the dynamic import for the full set also points at `/icons.json` rather than the package root, for the same reason described in the curatedIcons test note. The `as IconifyJSON` cast on the dynamic-import path papers over a slight TS-side type widening from JSON imports — runtime shape is correct.
 
 - [ ] **Step 9: Run tests; verify they pass**
 
