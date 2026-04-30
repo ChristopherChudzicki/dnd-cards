@@ -117,6 +117,8 @@
 }
 
 .tooltip {
+  position: fixed;
+  transform: translate(-50%, calc(-100% - 6px));
   background: var(--color-text);
   color: var(--color-surface);
   padding: var(--space-1) var(--space-2);
@@ -124,4 +126,5 @@
   font-size: var(--fs-xs);
   white-space: nowrap;
   pointer-events: none;
+  z-index: 1100;
 }

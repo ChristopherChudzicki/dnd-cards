@@ -59,4 +59,20 @@ describe("<IconPickerDialog>", () => {
     render(<Harness initial={undefined} />);
     expect(screen.getByRole("button", { name: /pick icon.*auto/i })).toBeInTheDocument();
   });
+
+  test("hovering a curated tile shows a tooltip with the kebab key", async () => {
+    render(<Harness initial={undefined} />);
+    await userEvent.click(screen.getByRole("button", { name: /pick icon/i }));
+    await userEvent.hover(tile("trident"));
+    expect(await screen.findByRole("tooltip")).toHaveTextContent("trident");
+  });
+
+  test("leaving the tile hides the tooltip", async () => {
+    render(<Harness initial={undefined} />);
+    await userEvent.click(screen.getByRole("button", { name: /pick icon/i }));
+    await userEvent.hover(tile("trident"));
+    await screen.findByRole("tooltip");
+    await userEvent.unhover(tile("trident"));
+    expect(screen.queryByRole("tooltip")).not.toBeInTheDocument();
+  });
 });

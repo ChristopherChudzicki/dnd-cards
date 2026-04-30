@@ -14,8 +14,6 @@ import {
   SearchField,
   Size,
   Switch,
-  Tooltip,
-  TooltipTrigger,
   Virtualizer,
 } from "react-aria-components";
 import { CURATED_ICONS } from "../../cards/curatedIcons";
@@ -62,10 +60,29 @@ type BodyProps = {
   onCancel: () => void;
 };
 
+type Hovered = { label: string; top: number; left: number };
+
 function PickerBody({ onChange, onCancel }: BodyProps) {
   const [search, setSearch] = useState("");
   const [showAll, setShowAll] = useState(false);
   const [fullSetKeys, setFullSetKeys] = useState<readonly string[] | null>(null);
+  const [hovered, setHovered] = useState<Hovered | null>(null);
+
+  // Event delegation: RAC's GridListItem doesn't forward onMouseEnter, so a
+  // single handler on the wrapper walks up to find the tile via RAC's own
+  // data-key attribute. Same handler runs for mouse hover and keyboard focus.
+  const handleTileActivate = (e: { target: EventTarget | null }) => {
+    const tile = (e.target as HTMLElement).closest?.<HTMLElement>("[data-key]");
+    if (!tile) return;
+    const label = tile.getAttribute("data-key");
+    if (!label || label === AUTO_ID) {
+      setHovered(null);
+      return;
+    }
+    const rect = tile.getBoundingClientRect();
+    setHovered({ label, top: rect.top, left: rect.left + rect.width / 2 });
+  };
+  const handleGridLeave = () => setHovered(null);
 
   useEffect(() => {
     void ensureFullSet().then(() => {
@@ -96,53 +113,61 @@ function PickerBody({ onChange, onCancel }: BodyProps) {
           Show all
         </Switch>
       </div>
-      <Virtualizer
-        layout={GridLayout}
-        layoutOptions={{
-          minItemSize: new Size(60, 60),
-          minSpace: new Size(8, 8),
-          preserveAspectRatio: true,
-        }}
+      {/* biome-ignore lint/a11y/noStaticElementInteractions: Mouse + focus delegation for tile tooltip; the wrapper is non-interactive on its own. */}
+      <div
+        onMouseOver={handleTileActivate}
+        onMouseLeave={handleGridLeave}
+        onFocus={handleTileActivate}
+        onBlur={handleGridLeave}
       >
-        <GridList
-          aria-label="Icons"
-          className={styles.grid}
-          items={items}
-          selectionMode="single"
-          onAction={(key) => {
-            const k = String(key);
-            onChange(k === AUTO_ID ? undefined : k);
+        <Virtualizer
+          layout={GridLayout}
+          layoutOptions={{
+            minItemSize: new Size(60, 60),
+            minSpace: new Size(8, 8),
+            preserveAspectRatio: true,
           }}
         >
-          {(item) =>
-            item.id === AUTO_ID ? (
+          <GridList
+            aria-label="Icons"
+            className={styles.grid}
+            items={items}
+            selectionMode="single"
+            onAction={(key) => {
+              const k = String(key);
+              onChange(k === AUTO_ID ? undefined : k);
+            }}
+          >
+            {(item) => (
               <GridListItem
                 id={item.id}
                 textValue={item.label}
-                className={`${styles.tile} ${styles.autoTile}`}
+                className={`${styles.tile} ${item.id === AUTO_ID ? styles.autoTile : ""}`}
               >
-                Auto
-              </GridListItem>
-            ) : (
-              <TooltipTrigger delay={300}>
-                <GridListItem
-                  id={item.id}
-                  textValue={item.label}
-                  className={styles.tile}
-                >
+                {item.id === AUTO_ID ? (
+                  "Auto"
+                ) : (
                   <IconPreview iconKey={item.id} label={item.label} size="lg" />
-                </GridListItem>
-                <Tooltip className={styles.tooltip}>{item.label}</Tooltip>
-              </TooltipTrigger>
-            )
-          }
-        </GridList>
-      </Virtualizer>
+                )}
+              </GridListItem>
+            )}
+          </GridList>
+        </Virtualizer>
+      </div>
       <div className={styles.actions}>
         <Button variant="secondary" onPress={onCancel}>
           Cancel
         </Button>
       </div>
+      {hovered && (
+        <div
+          role="tooltip"
+          className={styles.tooltip}
+          style={{ top: hovered.top, left: hovered.left }}
+        >
+          {hovered.label}
+        </div>
+      )}
     </>
   );
 }
