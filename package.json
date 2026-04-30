@@ -18,6 +18,8 @@
   "dependencies": {
     "@fontsource-variable/inter": "^5.2.8",
     "@fontsource/cinzel": "^5.2.8",
+    "@iconify-json/game-icons": "^1.2.4",
+    "@iconify/react": "^6.0.2",
     "@supabase/supabase-js": "^2.104.1",
     "@tanstack/react-query": "^5.99.2",
     "@tanstack/react-router": "^1.168.23",
