@@ -14,6 +14,8 @@ import {
   SearchField,
   Size,
   Switch,
+  Tooltip,
+  TooltipTrigger,
   Virtualizer,
 } from "react-aria-components";
 import { CURATED_ICONS } from "../../cards/curatedIcons";
@@ -112,22 +114,28 @@ function PickerBody({ onChange, onCancel }: BodyProps) {
             onChange(k === AUTO_ID ? undefined : k);
           }}
         >
-          {(item) => (
-            <GridListItem
-              id={item.id}
-              textValue={item.label}
-              className={`${styles.tile} ${item.id === AUTO_ID ? styles.autoTile : ""}`}
-            >
-              {item.id === AUTO_ID ? (
-                "Auto"
-              ) : (
-                <>
+          {(item) =>
+            item.id === AUTO_ID ? (
+              <GridListItem
+                id={item.id}
+                textValue={item.label}
+                className={`${styles.tile} ${styles.autoTile}`}
+              >
+                Auto
+              </GridListItem>
+            ) : (
+              <TooltipTrigger delay={300}>
+                <GridListItem
+                  id={item.id}
+                  textValue={item.label}
+                  className={styles.tile}
+                >
                   <IconPreview iconKey={item.id} label={item.label} size="lg" />
-                  <span className={styles.tooltip}>{item.label}</span>
-                </>
-              )}
-            </GridListItem>
-          )}
+                </GridListItem>
+                <Tooltip className={styles.tooltip}>{item.label}</Tooltip>
+              </TooltipTrigger>
+            )
+          }
         </GridList>
       </Virtualizer>
       <div className={styles.actions}>
