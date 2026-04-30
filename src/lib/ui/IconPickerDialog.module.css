@@ -1,11 +1,11 @@
 .trigger {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.4rem 0.7rem;
-  background: #fff;
-  border: 1px solid #bbb;
-  border-radius: 0.3rem;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
   font: inherit;
   cursor: pointer;
 }
@@ -21,36 +21,36 @@
 }
 
 .dialog {
-  background: #fff;
-  border-radius: 0.5rem;
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
   width: min(720px, 92vw);
   max-height: 80vh;
   display: flex;
   flex-direction: column;
-  padding: 1rem;
-  gap: 0.75rem;
+  padding: var(--space-4);
+  gap: var(--space-3);
 }
 
 .header {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: var(--space-3);
 }
 
 .search {
   flex: 1;
   font: inherit;
-  padding: 0.4rem 0.6rem;
-  border: 1px solid #bbb;
-  border-radius: 0.3rem;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
 }
 
 .grid {
   display: grid;
   grid-template-columns: repeat(10, 1fr);
-  gap: 0.4rem;
+  gap: var(--space-2);
   overflow-y: auto;
-  padding: 0.25rem;
+  padding: var(--space-1);
 }
 
 .tile {
@@ -58,31 +58,31 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid #ddd;
-  border-radius: 0.25rem;
-  background: #fff;
-  color: #111;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-text);
   cursor: pointer;
 }
 
 .tile[data-focused="true"],
 .tile:hover {
-  border-color: #444;
+  border-color: var(--color-border-strong);
 }
 
 .autoTile {
-  font-size: 0.75rem;
+  font-size: var(--fs-xs);
   font-weight: 600;
 }
 
 .actions {
   display: flex;
   justify-content: flex-end;
-  gap: 0.5rem;
+  gap: var(--space-2);
 }
 
 .loading {
-  padding: 1rem;
+  padding: var(--space-4);
   text-align: center;
-  color: #666;
+  color: var(--color-text-muted);
 }

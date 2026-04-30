@@ -37,7 +37,7 @@
 }
 
 .iconHint {
-  font-size: 0.85rem;
-  color: #555;
-  margin-top: 0.25rem;
+  font-size: var(--fs-sm);
+  color: var(--color-text-muted);
+  margin-top: var(--space-1);
 }
