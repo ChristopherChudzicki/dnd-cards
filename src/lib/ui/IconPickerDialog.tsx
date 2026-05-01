@@ -27,13 +27,18 @@ const AUTO_ID = "__auto__";
 type Props = {
   value: string | undefined;
   onChange: (next: string | undefined) => void;
+  id?: string;
 };
 
-export function IconPickerDialog({ value, onChange }: Props) {
+export function IconPickerDialog({ value, onChange, id }: Props) {
   const triggerLabel = value ?? "Auto";
   return (
     <DialogTrigger>
-      <RACButton className={styles.trigger} aria-label={`Pick icon (currently ${triggerLabel})`}>
+      <RACButton
+        id={id}
+        className={styles.trigger}
+        aria-label={`Pick icon (currently ${triggerLabel})`}
+      >
         {triggerLabel} ▾
       </RACButton>
       <ModalOverlay className={styles.modalOverlay} isDismissable>
@@ -69,9 +74,17 @@ function PickerBody({ onChange, onCancel }: BodyProps) {
   const [hovered, setHovered] = useState<Hovered | null>(null);
   const gridRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
+  const resetScroll = () => {
     if (gridRef.current) gridRef.current.scrollTop = 0;
-  }, [search, showAll]);
+  };
+  const handleSearchChange = (next: string) => {
+    setSearch(next);
+    resetScroll();
+  };
+  const handleShowAllChange = (next: boolean) => {
+    setShowAll(next);
+    resetScroll();
+  };
 
   // Event delegation: RAC's GridListItem doesn't forward onMouseEnter, so a
   // single handler on the wrapper walks up to find the tile via RAC's own
@@ -131,10 +144,10 @@ function PickerBody({ onChange, onCancel }: BodyProps) {
     <>
       <Heading slot="title">Pick an icon</Heading>
       <div className={styles.header}>
-        <SearchField aria-label="Search icons" value={search} onChange={setSearch}>
+        <SearchField aria-label="Search icons" value={search} onChange={handleSearchChange}>
           <Input className={styles.search} />
         </SearchField>
-        <Switch isSelected={showAll} onChange={setShowAll} className={styles.switch}>
+        <Switch isSelected={showAll} onChange={handleShowAllChange} className={styles.switch}>
           <div className={styles.switchIndicator} />
           Show all
         </Switch>
