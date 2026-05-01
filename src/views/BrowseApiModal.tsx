@@ -2,7 +2,6 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import {
   Dialog,
-  Input,
   Modal,
   ModalOverlay,
   TextField,
@@ -15,6 +14,7 @@ import { magicItemDetailToCard } from "../api/mappers/magicItems";
 import { useSaveCard } from "../decks/mutations";
 import { Button } from "../lib/ui/Button";
 import { IconButton } from "../lib/ui/IconButton";
+import { Input } from "../lib/ui/Input";
 import styles from "./BrowseApiModal.module.css";
 
 type Props = {
@@ -107,7 +107,6 @@ export function BrowseApiModal({ deckId, onClose, onSelected }: Props) {
                 placeholder="Search magic items…"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                className={styles.searchInput}
                 autoFocus
               />
             </TextField>
