@@ -145,7 +145,7 @@ function PickerBody({ onChange, onCancel }: BodyProps) {
       <Heading slot="title">Pick an icon</Heading>
       <div className={styles.header}>
         <SearchField aria-label="Search icons" value={search} onChange={handleSearchChange}>
-          <Input aria-label="Search icons" className={styles.searchSlot} />
+          <Input className={styles.searchSlot} />
         </SearchField>
         <Switch isSelected={showAll} onChange={handleShowAllChange} className={styles.switch}>
           <div className={styles.switchIndicator} />
