@@ -41,14 +41,14 @@ export function ItemEditor({ card, onChange }: Props) {
           placeholder="Wondrous item, uncommon"
         />
       </label>
-      <div className={styles.field}>
+      <label className={styles.field}>
         <span className={styles.label}>Icon (optional)</span>
         <div className={styles.iconRow}>
           <IconPreview iconKey={resolvedKey} label={resolvedKey} size="md" />
           <IconPickerDialog value={card.iconKey} onChange={handleIconChange} />
         </div>
         {showHint && <div className={styles.iconHint}>Currently auto-picking: {resolvedKey}</div>}
-      </div>
+      </label>
       <label className={styles.field}>
         <span className={styles.label}>Body</span>
         <textarea

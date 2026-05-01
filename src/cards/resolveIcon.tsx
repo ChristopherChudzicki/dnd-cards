@@ -202,6 +202,14 @@ type Props = {
 };
 
 export function ResolvedIcon({ iconKey }: Props) {
+  // Two guards, distinct purposes:
+  //   1. CURATED[iconKey] hit → render synchronously via the per-icon
+  //      import object; never load the full-set chunk.
+  //   2. !isCurated(iconKey) → fall through to the lazy full-set load.
+  //      The negation is the guard: if a key is in CURATED_ICONS but
+  //      missing from the CURATED record (a developer forgot the import),
+  //      we deliberately do NOT paper over it with a full-set load —
+  //      that would silently defeat the curated-set perf optimization.
   const curated = CURATED[iconKey];
   if (curated) {
     return <Icon icon={curated} />;

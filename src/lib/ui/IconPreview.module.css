@@ -1,11 +1,13 @@
+/* #fff/#111 are intentional literals (per icon-picker spec): icons must
+   render black-on-white regardless of theme so card art matches print. */
 .preview {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   background: #fff;
   color: #111;
-  border: 1px solid #ddd;
-  border-radius: 0.25rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
 }
 
 .sm {
