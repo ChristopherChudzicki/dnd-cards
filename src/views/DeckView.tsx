@@ -7,6 +7,7 @@ import { useDeck, useDeckCards } from "../decks/queries";
 import { downloadText } from "../lib/download";
 import { Button } from "../lib/ui/Button";
 import { IconButton } from "../lib/ui/IconButton";
+import { Input } from "../lib/ui/Input";
 import { PencilIcon } from "../lib/ui/icons/PencilIcon";
 import { TrashIcon } from "../lib/ui/icons/TrashIcon";
 import { BrowseApiModal } from "./BrowseApiModal";
@@ -135,7 +136,7 @@ function DeckTitle({ name, onRename }: { name: string; onRename: (next: string) 
     );
   }
   return (
-    <input
+    <Input
       className={styles.titleInput}
       value={draft}
       onChange={(e) => setDraft(e.target.value)}
@@ -144,7 +145,6 @@ function DeckTitle({ name, onRename }: { name: string; onRename: (next: string) 
         setEditing(false);
       }}
       aria-label={`Rename deck (currently: ${name})`}
-      // biome-ignore lint/a11y/noAutofocus: user just clicked to enter edit mode
       autoFocus
     />
   );

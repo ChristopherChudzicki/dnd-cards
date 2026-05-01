@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useId, useState } from "react";
 import { FALLBACK_ICON_KEY, ICON_RULES } from "../cards/iconRules";
 import { IconPreview } from "../lib/ui/IconPreview";
+import { Input } from "../lib/ui/Input";
 import styles from "./IconDebugView.module.css";
 
 function pickRule(name: string, typeLine: string) {
@@ -19,6 +20,11 @@ export function IconDebugView() {
   const [name, setName] = useState("");
   const [typeLine, setTypeLine] = useState("");
   const matched = pickRule(name, typeLine);
+  const idBase = useId();
+  const ids = {
+    name: `${idBase}-name`,
+    typeLine: `${idBase}-typeLine`,
+  };
 
   return (
     <div className={styles.page}>
@@ -26,17 +32,13 @@ export function IconDebugView() {
 
       <section className={styles.simulator}>
         <h2>Simulator</h2>
-        <label className={styles.row}>
+        <label className={styles.row} htmlFor={ids.name}>
           <span>Name</span>
-          <input className={styles.input} value={name} onChange={(e) => setName(e.target.value)} />
+          <Input id={ids.name} value={name} onChange={(e) => setName(e.target.value)} />
         </label>
-        <label className={styles.row}>
+        <label className={styles.row} htmlFor={ids.typeLine}>
           <span>Type line</span>
-          <input
-            className={styles.input}
-            value={typeLine}
-            onChange={(e) => setTypeLine(e.target.value)}
-          />
+          <Input id={ids.typeLine} value={typeLine} onChange={(e) => setTypeLine(e.target.value)} />
         </label>
         <div className={styles.result} data-testid="simulator-result">
           {matched ? (
