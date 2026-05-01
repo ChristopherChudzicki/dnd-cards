@@ -2,6 +2,8 @@ import { useState } from "react";
 import { AutoFitCard } from "../cards/AutoFitCard";
 import type { ItemCard } from "../cards/types";
 import { useDeckCards } from "../decks/queries";
+import { Button } from "../lib/ui/Button";
+import { LoadingState } from "../lib/ui/LoadingState";
 import styles from "./PrintView.module.css";
 
 type PerPage = 2 | 4;
@@ -17,7 +19,7 @@ export function PrintView({ deckId }: Props) {
   const cardsQuery = useDeckCards(deckId);
   const [perPage, setPerPage] = useState<PerPage>(4);
 
-  if (cardsQuery.isLoading) return <p>Loading…</p>;
+  if (cardsQuery.isLoading) return <LoadingState />;
 
   const cards = cardsQuery.data ?? [];
   const items = cards.filter((c): c is ItemCard => c.kind === "item");
@@ -34,9 +36,9 @@ export function PrintView({ deckId }: Props) {
             <option value={2}>2</option>
           </select>
         </label>
-        <button type="button" onClick={() => window.print()} disabled={items.length === 0}>
+        <Button variant="primary" onPress={() => window.print()} isDisabled={items.length === 0}>
           Print
-        </button>
+        </Button>
         <span className={styles.tip}>
           Tip: in the print dialog, choose <em>Margins: None</em> and uncheck{" "}
           <em>Headers and footers</em> for best results.

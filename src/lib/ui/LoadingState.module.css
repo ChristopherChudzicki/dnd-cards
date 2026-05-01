@@ -1,0 +1,5 @@
+.root {
+  text-align: center;
+  color: var(--color-text-muted);
+  padding: var(--space-6) var(--space-4);
+}

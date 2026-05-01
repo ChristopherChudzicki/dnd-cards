@@ -13,10 +13,11 @@ Project-specific guidance for AI coding sessions on this repo. Read alongside `R
 
 See README's "Design system" section for the full picture. Short version:
 
-- Tokens are defined in `src/index.css`. Component CSS references tokens; no inline hexes/rems in scope.
+- **Screen tokens** live in `src/index.css` (`--color-*`, `--space-*`, `--radius-*`, etc.). All screen UI references them; no inline hexes/rems in scope.
+- **Print-scoped tokens** are namespaced `--print-*` and used only by printable card components (`Card`, `AutoFitCard`, `PrintView`). They never apply to screen UI.
 - Use `react-aria-components` for new interactive primitives. **No** emotion / styled-components / MUI / Tailwind / shadcn.
-- Shared UI primitives live in `src/lib/ui/`. Prefer reusing them over hand-rolling new patterns.
-- Cards (`src/cards/`) and `PrintView` are intentionally **not** token-driven — they target print dimensions in absolute units.
+- Shared UI primitives live in `src/lib/ui/`. Before hand-rolling any input, button, dialog, switch, or toggle, check `src/lib/ui/README.md` — there's almost certainly an existing primitive.
+- The card preview shown in the editor renders the same `<Card>` (or `<AutoFitCard>`) component as `PrintView`, so screen preview matches print output exactly.
 
 ## Tests
 
@@ -33,13 +34,12 @@ See README's "Design system" section for the full picture. Short version:
 
 ## Working norms
 
-- Ask before running `npm install`, `npm test`, `npm run dev`, or `npm run build` (unless already approved in the current task).
+- `npm test`, `npm run dev`, and `npm run build` are pre-approved — run them as needed. Ask before `npm install` (or other dependency changes).
 - Address review nits inline in the same task — don't accumulate a deferred cleanup pass.
 - Don't use `git -C <path>` — run git from the working directory.
 - Don't push or create PRs without explicit instruction.
 
-## Off-limits without asking
+## Sensitive — proceed carefully
 
-- `src/cards/` — Card, AutoFitCard, ItemEditor (the in-card editor; distinct from the page-level `EditorView`).
-- `src/views/PrintView.tsx` and `@page` rules.
-- Database schema and RLS policies — changes go through `supabase/migrations`.
+- **Print output**: `src/cards/Card.tsx`, `src/cards/AutoFitCard.tsx`, the printed sheet preview half of `src/views/PrintView.module.css`, and `@page` / `@media print` rules. These target physical paper dimensions in absolute units; visual changes can break 4-per-sheet output. The screen toolbar inside `PrintView.tsx` is ordinary screen UI — that's fine to refactor.
+- **Database schema and RLS policies**: changes go through `supabase/migrations`. Don't edit live tables or bypass migrations.

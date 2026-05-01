@@ -8,6 +8,7 @@ import { useDeckCards } from "../decks/queries";
 import { newId } from "../lib/id";
 import { nowIso } from "../lib/time";
 import { Button } from "../lib/ui/Button";
+import { LoadingState } from "../lib/ui/LoadingState";
 import styles from "./EditorView.module.css";
 
 const isPristineNewCard = (card: ItemCard): boolean =>
@@ -57,7 +58,7 @@ export function EditorView({ deckId, cardId }: Props) {
     if (initial && initial.kind === "item") setDraft(initial);
   }, [initial]);
 
-  if (cardsQuery.isLoading && !isNew) return <p>Loading…</p>;
+  if (cardsQuery.isLoading && !isNew) return <LoadingState />;
   if (!isNew && !existing) return <p>Card not found.</p>;
   if (existing && existing.kind !== "item") return <p>Only item cards are supported in v1.</p>;
   if (!draft) return null;

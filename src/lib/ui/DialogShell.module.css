@@ -1,0 +1,43 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--color-overlay);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  outline: none;
+}
+
+.modal[data-size="md"] {
+  width: min(640px, 92vw);
+}
+
+.modal[data-size="lg"] {
+  width: min(720px, 92vw);
+}
+
+.modal[data-height="fit"] {
+  max-height: 80vh;
+}
+
+.dialog {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  outline: none;
+  padding: var(--space-4);
+  gap: var(--space-3);
+}
+
+.dialog[data-bleed] {
+  padding: 0;
+  gap: 0;
+}

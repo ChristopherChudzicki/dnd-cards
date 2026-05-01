@@ -6,8 +6,10 @@ import { useCreateDeck, useDeleteDeck, useSaveCard } from "../decks/mutations";
 import { useDecks } from "../decks/queries";
 import { newId } from "../lib/id";
 import { Button } from "../lib/ui/Button";
+import { EmptyHero } from "../lib/ui/EmptyHero";
 import { IconButton } from "../lib/ui/IconButton";
 import { TrashIcon } from "../lib/ui/icons/TrashIcon";
+import { LoadingState } from "../lib/ui/LoadingState";
 import styles from "./HomeView.module.css";
 
 export function HomeView() {
@@ -73,20 +75,24 @@ export function HomeView() {
     deleteDeck.mutate(deckId);
   };
 
-  if (decks.isLoading) return <p>Loading…</p>;
+  if (decks.isLoading) return <LoadingState />;
 
   if (!decks.data || decks.data.length === 0) {
     return (
-      <section className={styles.empty}>
-        <h2>No decks yet</h2>
-        <div className={styles.headerActions}>
-          <Button variant="secondary" onPress={() => fileInputRef.current?.click()}>
-            Import JSON
-          </Button>
-          <Button variant="primary" onPress={handleCreate} isDisabled={createDeck.isPending}>
-            Create your first deck
-          </Button>
-        </div>
+      <>
+        <EmptyHero
+          title="No decks yet"
+          actions={
+            <>
+              <Button variant="secondary" onPress={() => fileInputRef.current?.click()}>
+                Import JSON
+              </Button>
+              <Button variant="primary" onPress={handleCreate} isDisabled={createDeck.isPending}>
+                Create your first deck
+              </Button>
+            </>
+          }
+        />
         <input
           ref={fileInputRef}
           type="file"
@@ -95,7 +101,7 @@ export function HomeView() {
           hidden
           onChange={handleImport}
         />
-      </section>
+      </>
     );
   }
 

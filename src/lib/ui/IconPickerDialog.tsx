@@ -1,26 +1,23 @@
 import { listIcons } from "@iconify/react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
-  Dialog,
   DialogTrigger,
   GridLayout,
   GridList,
   GridListItem,
-  Heading,
-  Input,
-  Modal,
-  ModalOverlay,
-  Button as RACButton,
   SearchField,
   Size,
-  Switch,
   Virtualizer,
 } from "react-aria-components";
 import { CURATED_ICONS } from "../../cards/curatedIcons";
 import { ensureFullSet } from "../../cards/resolveIcon";
 import { Button } from "./Button";
+import { DialogHeader } from "./DialogHeader";
+import { DialogShell } from "./DialogShell";
 import styles from "./IconPickerDialog.module.css";
 import { IconPreview } from "./IconPreview";
+import { Input } from "./Input";
+import { Switch } from "./Switch";
 
 const AUTO_ID = "__auto__";
 
@@ -34,28 +31,25 @@ export function IconPickerDialog({ value, onChange, id }: Props) {
   const triggerLabel = value ?? "Auto";
   return (
     <DialogTrigger>
-      <RACButton
+      <Button
         id={id}
-        className={styles.trigger}
+        variant="secondary"
+        size="sm"
         aria-label={`Pick icon (currently ${triggerLabel})`}
       >
         {triggerLabel} ▾
-      </RACButton>
-      <ModalOverlay className={styles.modalOverlay} isDismissable>
-        <Modal>
-          <Dialog className={styles.dialog}>
-            {({ close }) => (
-              <PickerBody
-                onChange={(next) => {
-                  onChange(next);
-                  close();
-                }}
-                onCancel={close}
-              />
-            )}
-          </Dialog>
-        </Modal>
-      </ModalOverlay>
+      </Button>
+      <DialogShell aria-label="Pick an icon" size="lg" bleed>
+        {({ close }) => (
+          <PickerBody
+            onChange={(next) => {
+              onChange(next);
+              close();
+            }}
+            onCancel={close}
+          />
+        )}
+      </DialogShell>
     </DialogTrigger>
   );
 }
@@ -142,13 +136,12 @@ function PickerBody({ onChange, onCancel }: BodyProps) {
 
   return (
     <>
-      <Heading slot="title">Pick an icon</Heading>
-      <div className={styles.header}>
+      <DialogHeader title="Pick an icon" onClose={onCancel} />
+      <div className={styles.controls}>
         <SearchField aria-label="Search icons" value={search} onChange={handleSearchChange}>
-          <Input className={styles.search} />
+          <Input className={styles.searchSlot} />
         </SearchField>
-        <Switch isSelected={showAll} onChange={handleShowAllChange} className={styles.switch}>
-          <div className={styles.switchIndicator} />
+        <Switch isSelected={showAll} onChange={handleShowAllChange}>
           Show all
         </Switch>
       </div>
@@ -185,11 +178,6 @@ function PickerBody({ onChange, onCancel }: BodyProps) {
             )}
           </GridList>
         </Virtualizer>
-      </div>
-      <div className={styles.actions}>
-        <Button variant="secondary" onPress={onCancel}>
-          Cancel
-        </Button>
       </div>
       {hovered && (
         <div
