@@ -2,6 +2,8 @@ import type { ChangeEvent } from "react";
 import { nowIso } from "../lib/time";
 import { IconPickerDialog } from "../lib/ui/IconPickerDialog";
 import { IconPreview } from "../lib/ui/IconPreview";
+import { Input } from "../lib/ui/Input";
+import { Textarea } from "../lib/ui/Textarea";
 import styles from "./ItemEditor.module.css";
 import { FALLBACK_ICON_KEY, pickIconKey } from "./iconRules";
 import type { ItemCard } from "./types";
@@ -30,16 +32,11 @@ export function ItemEditor({ card, onChange }: Props) {
     <form className={styles.form} onSubmit={(e) => e.preventDefault()}>
       <label className={styles.field}>
         <span className={styles.label}>Name</span>
-        <input className={styles.input} value={card.name} onChange={handle("name")} />
+        <Input value={card.name} onChange={handle("name")} />
       </label>
       <label className={styles.field}>
         <span className={styles.label}>Type line</span>
-        <input
-          className={styles.input}
-          value={card.typeLine}
-          onChange={handle("typeLine")}
-          placeholder="Wondrous item, uncommon"
-        />
+        <Input value={card.typeLine} onChange={handle("typeLine")} placeholder="Wondrous item, uncommon" />
       </label>
       <label className={styles.field} htmlFor="icon-picker-trigger">
         <span className={styles.label}>Icon (optional)</span>
@@ -55,30 +52,15 @@ export function ItemEditor({ card, onChange }: Props) {
       </label>
       <label className={styles.field}>
         <span className={styles.label}>Body</span>
-        <textarea
-          className={styles.textarea}
-          value={card.body}
-          onChange={handle("body")}
-          rows={8}
-        />
+        <Textarea value={card.body} onChange={handle("body")} rows={8} />
       </label>
       <label className={styles.field}>
         <span className={styles.label}>Cost / weight (optional)</span>
-        <input
-          className={styles.input}
-          value={card.costWeight ?? ""}
-          onChange={handle("costWeight")}
-          placeholder="500 gp · 15 lb"
-        />
+        <Input value={card.costWeight ?? ""} onChange={handle("costWeight")} placeholder="500 gp · 15 lb" />
       </label>
       <label className={styles.field}>
         <span className={styles.label}>Image URL (optional)</span>
-        <input
-          className={styles.input}
-          value={card.imageUrl ?? ""}
-          onChange={handle("imageUrl")}
-          placeholder="https://…"
-        />
+        <Input value={card.imageUrl ?? ""} onChange={handle("imageUrl")} placeholder="https://…" />
       </label>
     </form>
   );
