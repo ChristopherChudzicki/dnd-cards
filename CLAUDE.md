@@ -13,10 +13,11 @@ Project-specific guidance for AI coding sessions on this repo. Read alongside `R
 
 See README's "Design system" section for the full picture. Short version:
 
-- Tokens are defined in `src/index.css`. Component CSS references tokens; no inline hexes/rems in scope.
+- **Screen tokens** live in `src/index.css` (`--color-*`, `--space-*`, `--radius-*`, etc.). All screen UI references them; no inline hexes/rems in scope.
+- **Print-scoped tokens** are namespaced `--print-*` and used only by printable card components (`Card`, `AutoFitCard`, `PrintView`). They never apply to screen UI.
 - Use `react-aria-components` for new interactive primitives. **No** emotion / styled-components / MUI / Tailwind / shadcn.
 - Shared UI primitives live in `src/lib/ui/`. Prefer reusing them over hand-rolling new patterns.
-- Cards (`src/cards/`) and `PrintView` are intentionally **not** token-driven — they target print dimensions in absolute units.
+- The card preview shown in the editor renders the same `<Card>` (or `<AutoFitCard>`) component as `PrintView`, so screen preview matches print output exactly.
 
 ## Tests
 
@@ -40,6 +41,6 @@ See README's "Design system" section for the full picture. Short version:
 
 ## Off-limits without asking
 
-- `src/cards/` — Card, AutoFitCard, ItemEditor (the in-card editor; distinct from the page-level `EditorView`).
-- `src/views/PrintView.tsx` and `@page` rules.
+- **Print-scoped components**: `src/cards/Card.tsx`, `src/cards/AutoFitCard.tsx`, `src/views/PrintView.tsx`, and `@page` rules. These target print dimensions in absolute units; changes risk breaking 4-per-sheet output.
+- `src/cards/ItemEditor.tsx` is **not** off-limits — it's a screen form that uses the design system like any other view.
 - Database schema and RLS policies — changes go through `supabase/migrations`.
