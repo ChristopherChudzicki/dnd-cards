@@ -1,5 +1,5 @@
 import { listIcons } from "@iconify/react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   Dialog,
   DialogTrigger,
@@ -67,6 +67,11 @@ function PickerBody({ onChange, onCancel }: BodyProps) {
   const [showAll, setShowAll] = useState(false);
   const [fullSetKeys, setFullSetKeys] = useState<readonly string[] | null>(null);
   const [hovered, setHovered] = useState<Hovered | null>(null);
+  const gridRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (gridRef.current) gridRef.current.scrollTop = 0;
+  }, [search, showAll]);
 
   // Event delegation: RAC's GridListItem doesn't forward onMouseEnter, so a
   // single handler on the wrapper walks up to find the tile via RAC's own
@@ -91,15 +96,36 @@ function PickerBody({ onChange, onCancel }: BodyProps) {
     });
   }, []);
 
-  const dataset = showAll && fullSetKeys ? fullSetKeys : CURATED_ICONS;
-  const filtered = search
-    ? dataset.filter((k) => k.toLowerCase().includes(search.toLowerCase()))
-    : dataset;
+  const dataset = useMemo(
+    () => (showAll && fullSetKeys ? fullSetKeys : CURATED_ICONS),
+    [showAll, fullSetKeys],
+  );
+  const filtered = useMemo(() => {
+    if (!search) return dataset;
+    const q = search.toLowerCase();
+    return dataset.filter((k) => k.toLowerCase().includes(q));
+  }, [dataset, search]);
+  const items = useMemo<{ id: string; label: string }[]>(
+    () => [{ id: AUTO_ID, label: "Auto" }, ...filtered.map((k) => ({ id: k, label: k }))],
+    [filtered],
+  );
 
-  const items: { id: string; label: string }[] = [
-    { id: AUTO_ID, label: "Auto" },
-    ...filtered.map((k) => ({ id: k, label: k })),
-  ];
+  const layoutOptions = useMemo(
+    () => ({
+      minItemSize: new Size(60, 60),
+      minSpace: new Size(8, 8),
+      preserveAspectRatio: true,
+    }),
+    [],
+  );
+
+  const handleAction = useCallback(
+    (key: React.Key) => {
+      const k = String(key);
+      onChange(k === AUTO_ID ? undefined : k);
+    },
+    [onChange],
+  );
 
   return (
     <>
@@ -121,23 +147,15 @@ function PickerBody({ onChange, onCancel }: BodyProps) {
         onFocus={handleTileActivate}
         onBlur={handleGridLeave}
       >
-        <Virtualizer
-          layout={GridLayout}
-          layoutOptions={{
-            minItemSize: new Size(60, 60),
-            minSpace: new Size(8, 8),
-            preserveAspectRatio: true,
-          }}
-        >
+        <Virtualizer layout={GridLayout} layoutOptions={layoutOptions}>
           <GridList
+            ref={gridRef}
             aria-label="Icons"
             className={styles.grid}
             items={items}
+            layout="grid"
             selectionMode="single"
-            onAction={(key) => {
-              const k = String(key);
-              onChange(k === AUTO_ID ? undefined : k);
-            }}
+            onAction={handleAction}
           >
             {(item) => (
               <GridListItem
