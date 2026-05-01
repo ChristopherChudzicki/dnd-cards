@@ -1,3 +1,5 @@
+/* === Screen-only UI (hidden in @media print) === */
+
 .controls {
   display: flex;
   gap: var(--space-4);
@@ -26,21 +28,23 @@
   color: var(--color-text-faint);
 }
 
+/* === Sheet preview (on-screen) + print output === */
+
 .sheet {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: var(--space-4);
   align-items: center;
 }
 
 .page {
   width: 8.5in;
   height: 11in;
-  background: #fff;
+  background: var(--print-color-paper);
   padding: 0.5in;
   box-sizing: border-box;
   display: grid;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--print-shadow-page);
   page-break-after: always;
   break-after: page;
 }
