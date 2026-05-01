@@ -6,8 +6,8 @@ import { useMagicItemIndex } from "../api/hooks";
 import { magicItemDetailToCard } from "../api/mappers/magicItems";
 import { useSaveCard } from "../decks/mutations";
 import { Button } from "../lib/ui/Button";
+import { DialogHeader } from "../lib/ui/DialogHeader";
 import { DialogShell } from "../lib/ui/DialogShell";
-import { IconButton } from "../lib/ui/IconButton";
 import { Input } from "../lib/ui/Input";
 import { ToggleButton } from "../lib/ui/ToggleButton";
 import { ToggleButtonGroup } from "../lib/ui/ToggleButtonGroup";
@@ -74,8 +74,7 @@ export function BrowseApiModal({ deckId, onClose, onSelected }: Props) {
     >
       {() => (
         <>
-          <header className={styles.header}>
-            <h2 className={styles.title}>Browse magic items</h2>
+          <DialogHeader title="Browse magic items" onClose={onClose}>
             <ToggleButtonGroup
               aria-label="Magic items ruleset"
               selectionMode="single"
@@ -89,10 +88,7 @@ export function BrowseApiModal({ deckId, onClose, onSelected }: Props) {
               <ToggleButton id="2014">2014</ToggleButton>
               <ToggleButton id="2024">2024</ToggleButton>
             </ToggleButtonGroup>
-            <IconButton aria-label="Close" onPress={onClose} className={styles.closeBtn}>
-              <span aria-hidden="true">×</span>
-            </IconButton>
-          </header>
+          </DialogHeader>
 
           <div className={styles.searchRow}>
             <TextField aria-label="Search magic items" className={styles.searchField}>
