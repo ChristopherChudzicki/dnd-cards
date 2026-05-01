@@ -6,7 +6,6 @@ import {
   GridList,
   GridListItem,
   Heading,
-  Button as RACButton,
   SearchField,
   Size,
   Switch,
@@ -32,13 +31,14 @@ export function IconPickerDialog({ value, onChange, id }: Props) {
   const triggerLabel = value ?? "Auto";
   return (
     <DialogTrigger>
-      <RACButton
+      <Button
         id={id}
-        className={styles.trigger}
+        variant="secondary"
+        size="sm"
         aria-label={`Pick icon (currently ${triggerLabel})`}
       >
         {triggerLabel} ▾
-      </RACButton>
+      </Button>
       <DialogShell aria-label="Pick an icon" size="lg">
         {({ close }) => (
           <PickerBody
