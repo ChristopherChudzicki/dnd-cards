@@ -6,7 +6,5 @@ export type TextareaProps = Omit<TextareaHTMLAttributes<HTMLTextAreaElement>, "c
 };
 
 export function Textarea({ className, ...rest }: TextareaProps) {
-  return (
-    <textarea {...rest} className={[styles.textarea, className].filter(Boolean).join(" ")} />
-  );
+  return <textarea {...rest} className={[styles.textarea, className].filter(Boolean).join(" ")} />;
 }
