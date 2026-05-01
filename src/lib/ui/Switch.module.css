@@ -1,0 +1,42 @@
+.switch {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  cursor: pointer;
+  font: inherit;
+}
+
+.indicator {
+  width: 2.25rem;
+  height: 1.25rem;
+  background: var(--color-border);
+  border-radius: 999px;
+  position: relative;
+  transition: background 0.15s;
+  flex-shrink: 0;
+}
+
+.indicator::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 1rem;
+  height: 1rem;
+  background: var(--color-surface);
+  border-radius: 50%;
+  transition: transform 0.15s;
+}
+
+.switch[data-selected] .indicator {
+  background: var(--color-text);
+}
+
+.switch[data-selected] .indicator::after {
+  transform: translateX(1rem);
+}
+
+.switch[data-focus-visible] .indicator {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}

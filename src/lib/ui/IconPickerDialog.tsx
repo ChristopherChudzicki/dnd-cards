@@ -8,16 +8,16 @@ import {
   Heading,
   SearchField,
   Size,
-  Switch,
   Virtualizer,
 } from "react-aria-components";
-import { Input } from "./Input";
 import { CURATED_ICONS } from "../../cards/curatedIcons";
 import { ensureFullSet } from "../../cards/resolveIcon";
 import { Button } from "./Button";
 import { DialogShell } from "./DialogShell";
 import styles from "./IconPickerDialog.module.css";
 import { IconPreview } from "./IconPreview";
+import { Input } from "./Input";
+import { Switch } from "./Switch";
 
 const AUTO_ID = "__auto__";
 
@@ -141,8 +141,7 @@ function PickerBody({ onChange, onCancel }: BodyProps) {
         <SearchField aria-label="Search icons" value={search} onChange={handleSearchChange}>
           <Input className={styles.searchSlot} />
         </SearchField>
-        <Switch isSelected={showAll} onChange={handleShowAllChange} className={styles.switch}>
-          <div className={styles.switchIndicator} />
+        <Switch isSelected={showAll} onChange={handleShowAllChange}>
           Show all
         </Switch>
       </div>
