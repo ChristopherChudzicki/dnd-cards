@@ -5,6 +5,7 @@ import {
   GridLayout,
   GridList,
   GridListItem,
+  Heading,
   Button as RACButton,
   SearchField,
   Size,
@@ -135,6 +136,7 @@ function PickerBody({ onChange, onCancel }: BodyProps) {
 
   return (
     <>
+      <Heading slot="title">Pick an icon</Heading>
       <div className={styles.header}>
         <SearchField aria-label="Search icons" value={search} onChange={handleSearchChange}>
           <Input className={styles.searchSlot} />
