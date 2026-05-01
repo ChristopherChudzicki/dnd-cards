@@ -26,10 +26,7 @@ describe("<ToggleButton>", () => {
         B
       </ToggleButton>,
     );
-    expect(screen.getByRole("button", { name: "Bold" })).toHaveAttribute(
-      "aria-pressed",
-      "true",
-    );
+    expect(screen.getByRole("button", { name: "Bold" })).toHaveAttribute("aria-pressed", "true");
   });
 
   it("does not call onChange when disabled", async () => {

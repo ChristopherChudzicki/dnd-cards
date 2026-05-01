@@ -10,9 +10,6 @@ export type ToggleButtonProps = Omit<RACToggleButtonProps, "className"> & {
 
 export function ToggleButton({ className, ...rest }: ToggleButtonProps) {
   return (
-    <RACToggleButton
-      {...rest}
-      className={[styles.btn, className].filter(Boolean).join(" ")}
-    />
+    <RACToggleButton {...rest} className={[styles.btn, className].filter(Boolean).join(" ")} />
   );
 }

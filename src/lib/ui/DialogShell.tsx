@@ -38,11 +38,7 @@ export function DialogShell({
         data-height={isFit ? "fit" : undefined}
         style={modalStyle}
       >
-        <Dialog
-          aria-label={ariaLabel}
-          className={styles.dialog}
-          data-bleed={bleed || undefined}
-        >
+        <Dialog aria-label={ariaLabel} className={styles.dialog} data-bleed={bleed || undefined}>
           {children}
         </Dialog>
       </Modal>
