@@ -1,6 +1,6 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { TextField, ToggleButton, ToggleButtonGroup } from "react-aria-components";
+import { TextField } from "react-aria-components";
 import { fetchMagicItemDetail, type Ruleset } from "../api/endpoints/magicItems";
 import { useMagicItemIndex } from "../api/hooks";
 import { magicItemDetailToCard } from "../api/mappers/magicItems";
@@ -9,6 +9,8 @@ import { Button } from "../lib/ui/Button";
 import { DialogShell } from "../lib/ui/DialogShell";
 import { IconButton } from "../lib/ui/IconButton";
 import { Input } from "../lib/ui/Input";
+import { ToggleButton } from "../lib/ui/ToggleButton";
+import { ToggleButtonGroup } from "../lib/ui/ToggleButtonGroup";
 import styles from "./BrowseApiModal.module.css";
 
 type Props = {
@@ -75,6 +77,7 @@ export function BrowseApiModal({ deckId, onClose, onSelected }: Props) {
           <header className={styles.header}>
             <h2 className={styles.title}>Browse magic items</h2>
             <ToggleButtonGroup
+              aria-label="Magic items ruleset"
               selectionMode="single"
               disallowEmptySelection
               selectedKeys={[ruleset]}
@@ -82,14 +85,9 @@ export function BrowseApiModal({ deckId, onClose, onSelected }: Props) {
                 const next = Array.from(keys)[0];
                 if (next === "2014" || next === "2024") setRuleset(next);
               }}
-              className={styles.rulesetToggle}
             >
-              <ToggleButton id="2014" className={styles.rulesetBtn}>
-                2014
-              </ToggleButton>
-              <ToggleButton id="2024" className={styles.rulesetBtn}>
-                2024
-              </ToggleButton>
+              <ToggleButton id="2014">2014</ToggleButton>
+              <ToggleButton id="2024">2024</ToggleButton>
             </ToggleButtonGroup>
             <IconButton aria-label="Close" onPress={onClose} className={styles.closeBtn}>
               <span aria-hidden="true">×</span>
