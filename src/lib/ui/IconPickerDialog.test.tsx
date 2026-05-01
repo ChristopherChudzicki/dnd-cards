@@ -26,6 +26,14 @@ describe("<IconPickerDialog>", () => {
     expect(screen.getByRole("dialog", { name: "Pick an icon" })).toBeInTheDocument();
   });
 
+  test("close button dismisses without changing value", async () => {
+    render(<Harness initial="trident" />);
+    await userEvent.click(screen.getByRole("button", { name: /pick icon/i }));
+    await userEvent.click(screen.getByRole("button", { name: "Close" }));
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    expect(screen.getByTestId("value")).toHaveTextContent("trident");
+  });
+
   test("selecting the Auto tile sets value to undefined and closes", async () => {
     render(<Harness initial="trident" />);
     await userEvent.click(screen.getByRole("button", { name: /pick icon/i }));
