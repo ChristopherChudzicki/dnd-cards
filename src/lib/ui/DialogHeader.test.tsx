@@ -25,5 +25,4 @@ describe("<DialogHeader>", () => {
     );
     expect(screen.getByText("middle content")).toBeInTheDocument();
   });
-
 });

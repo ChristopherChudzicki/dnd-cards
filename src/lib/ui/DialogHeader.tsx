@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
-import { IconButton } from "./IconButton";
 import styles from "./DialogHeader.module.css";
+import { IconButton } from "./IconButton";
 
 export type DialogHeaderProps = {
   title: string;
