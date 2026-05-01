@@ -1,3 +1,19 @@
+-- 20260430081056_add_iconkey_to_cards.sql
+-- Re-issue cards_payload_valid with iconKey allowed on every card variant.
+--
+-- The embedded JSON Schema below is generated from src/decks/schema.ts via
+-- `npm run gen:schema`. To update it, regenerate the JSON file and write a
+-- NEW migration that follows the same drop-then-add pattern below — never
+-- edit this file in place.
+
+create extension if not exists pg_jsonschema;
+
+alter table public.cards drop constraint if exists cards_payload_valid;
+
+alter table public.cards
+  add constraint cards_payload_valid
+  check (jsonb_matches_schema(
+    $cardpayload$
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "oneOf": [
@@ -214,3 +230,9 @@
     }
   ]
 }
+    $cardpayload$::json,
+    payload
+  ));
+
+comment on constraint cards_payload_valid on public.cards is
+  'JSON Schema validation generated from src/decks/schema.ts via npm run gen:schema. Regen requires a new migration that drops + re-adds this constraint.';

@@ -53,4 +53,38 @@ describe("<Card>", () => {
     expect(screen.queryByTestId("card-image")).not.toBeInTheDocument();
     expect(screen.getByTestId("card-fallback-icon")).toBeInTheDocument();
   });
+
+  test("renders the heuristic-picked icon when iconKey is unset", () => {
+    const card = itemCardFactory.build({
+      name: "Flame Tongue Trident",
+      typeLine: "Weapon, rare",
+      imageUrl: undefined,
+      iconKey: undefined,
+    });
+    render(<Card card={card} layout="4-up" />);
+    const slot = screen.getByTestId("card-fallback-icon");
+    expect(slot.querySelector("svg")).not.toBeNull();
+  });
+
+  test("renders the explicit override icon when iconKey is set", () => {
+    const card = itemCardFactory.build({
+      name: "Anything",
+      typeLine: "",
+      imageUrl: undefined,
+      iconKey: "trident",
+    });
+    render(<Card card={card} layout="4-up" />);
+    const slot = screen.getByTestId("card-fallback-icon");
+    expect(slot.querySelector("svg")).not.toBeNull();
+  });
+
+  test("does not crash for a stale or unknown iconKey", () => {
+    const card = itemCardFactory.build({
+      name: "X",
+      typeLine: "",
+      imageUrl: undefined,
+      iconKey: "definitely-removed-icon",
+    });
+    expect(() => render(<Card card={card} layout="4-up" />)).not.toThrow();
+  });
 });

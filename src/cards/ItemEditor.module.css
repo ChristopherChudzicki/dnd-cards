@@ -29,3 +29,15 @@
   resize: vertical;
   min-height: 6rem;
 }
+
+.iconRow {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.iconHint {
+  font-size: var(--fs-sm);
+  color: var(--color-text-muted);
+  margin-top: var(--space-1);
+}

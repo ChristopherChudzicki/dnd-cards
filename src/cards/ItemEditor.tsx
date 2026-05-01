@@ -1,6 +1,9 @@
 import type { ChangeEvent } from "react";
 import { nowIso } from "../lib/time";
+import { IconPickerDialog } from "../lib/ui/IconPickerDialog";
+import { IconPreview } from "../lib/ui/IconPreview";
 import styles from "./ItemEditor.module.css";
+import { FALLBACK_ICON_KEY, pickIconKey } from "./iconRules";
 import type { ItemCard } from "./types";
 
 type Props = {
@@ -16,6 +19,13 @@ export function ItemEditor({ card, onChange }: Props) {
       onChange({ ...card, [field]: e.target.value, updatedAt: nowIso() });
     };
 
+  const handleIconChange = (next: string | undefined) => {
+    onChange({ ...card, iconKey: next, updatedAt: nowIso() });
+  };
+
+  const resolvedKey = card.iconKey ?? pickIconKey(card);
+  const showHint = card.iconKey === undefined && resolvedKey !== FALLBACK_ICON_KEY;
+
   return (
     <form className={styles.form} onSubmit={(e) => e.preventDefault()}>
       <label className={styles.field}>
@@ -30,6 +40,18 @@ export function ItemEditor({ card, onChange }: Props) {
           onChange={handle("typeLine")}
           placeholder="Wondrous item, uncommon"
         />
+      </label>
+      <label className={styles.field} htmlFor="icon-picker-trigger">
+        <span className={styles.label}>Icon (optional)</span>
+        <div className={styles.iconRow}>
+          <IconPreview iconKey={resolvedKey} label={resolvedKey} size="md" />
+          <IconPickerDialog
+            id="icon-picker-trigger"
+            value={card.iconKey}
+            onChange={handleIconChange}
+          />
+        </div>
+        {showHint && <div className={styles.iconHint}>Currently auto-picking: {resolvedKey}</div>}
       </label>
       <label className={styles.field}>
         <span className={styles.label}>Body</span>

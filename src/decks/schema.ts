@@ -15,6 +15,7 @@ const baseCardSchema = z.object({
   apiRef: apiRefSchema.optional(),
   createdAt: z.string(),
   updatedAt: z.string(),
+  iconKey: z.string().optional(),
 });
 
 export const itemCardSchema = baseCardSchema.extend({

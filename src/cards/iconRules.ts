@@ -1,75 +1,81 @@
-import {
-  Crosshair,
-  FlaskRound,
-  Gem,
-  type LucideIcon,
-  ScrollText,
-  Shield,
-  Sparkles,
-  Sword,
-  Wand2,
-} from "lucide-react";
 import type { ItemCard } from "./types";
 
-/**
- * Ordered list of icon-picking rules. The first rule whose pattern matches
- * the concatenated `name + " " + typeLine` wins. Order matters: more specific
- * weapon terms must come before armor patterns, etc.
- *
- * Extend by adding a new entry here — keep overlapping concerns adjacent and
- * document what a rule is for in `description`.
- */
 export type IconRule = {
   pattern: RegExp;
-  icon: LucideIcon;
+  iconKey: string;
   description: string;
 };
 
 export const ICON_RULES: readonly IconRule[] = [
   {
-    pattern:
-      /\bweapons?\b|sword|blade|dagger|axe|\bbow\b|crossbow|spear|mace|hammer|trident|flail|pick|lance|glaive|halberd|scimitar|rapier|greataxe|greatsword|longsword|shortsword/i,
-    icon: Sword,
-    description: "weapon / blade / ranged weapon",
+    pattern: /\b(?:axe|battleaxe|greataxe|handaxe|tomahawk|hatchet)\b/i,
+    iconKey: "battle-axe",
+    description: "axe variants",
   },
   {
-    pattern: /\barmor\b|\bshield\b|\bplate\b|chainmail|\bmail\b|\bhelm\b|cuirass|gauntlet|bracers/i,
-    icon: Shield,
+    pattern: /\b(?:war ?hammer|maul|sledgehammer)\b/i,
+    iconKey: "warhammer",
+    description: "hammer / maul",
+  },
+  {
+    pattern: /\bcrossbow\b/i,
+    iconKey: "crossbow",
+    description: "crossbow",
+  },
+  {
+    pattern: /\b(?:bow|longbow|shortbow)\b/i,
+    iconKey: "bow-arrow",
+    description: "bow",
+  },
+  {
+    pattern: /\b(?:trident|spear|polearm|halberd|glaive|pike|lance)\b/i,
+    iconKey: "trident",
+    description: "polearm / spear",
+  },
+  {
+    pattern:
+      /\b(?:weapons?|sword|blade|dagger|mace|flail|scimitar|rapier|greatsword|longsword|shortsword)\b/i,
+    iconKey: "broadsword",
+    description: "generic weapon / sword",
+  },
+  {
+    pattern: /\b(?:armor|shield|plate|chainmail|mail|helm|cuirass|gauntlet|bracers)\b/i,
+    iconKey: "shield",
     description: "armor / shield / helmet",
   },
   {
     pattern: /\brings?\b/i,
-    icon: Gem,
+    iconKey: "ring",
     description: "ring",
   },
   {
-    pattern: /\bpotions?\b|elixir|philter|oil\b/i,
-    icon: FlaskRound,
+    pattern: /\b(?:potions?|elixir|philter|oil)\b/i,
+    iconKey: "potion-ball",
     description: "potion / elixir",
   },
   {
     pattern: /\bscrolls?\b/i,
-    icon: ScrollText,
+    iconKey: "scroll-unfurled",
     description: "scroll",
   },
   {
-    pattern: /\brods?\b|\bwands?\b|\bstaff\b|staves/i,
-    icon: Wand2,
+    pattern: /\b(?:rods?|wands?|staff|staves)\b/i,
+    iconKey: "wizard-staff",
     description: "rod / wand / staff",
   },
   {
-    pattern: /ammunition|arrows?|bolts?|bullets?|darts?/i,
-    icon: Crosshair,
+    pattern: /\b(?:ammunition|arrows?|bolts?|bullets?|darts?)\b/i,
+    iconKey: "arrow-cluster",
     description: "ammunition",
   },
 ];
 
-export const FALLBACK_ICON: LucideIcon = Sparkles;
+export const FALLBACK_ICON_KEY = "perspective-dice-six-faces-random";
 
-export function pickIcon(card: ItemCard): LucideIcon {
+export function pickIconKey(card: ItemCard): string {
   const haystack = `${card.name} ${card.typeLine}`;
   for (const rule of ICON_RULES) {
-    if (rule.pattern.test(haystack)) return rule.icon;
+    if (rule.pattern.test(haystack)) return rule.iconKey;
   }
-  return FALLBACK_ICON;
+  return FALLBACK_ICON_KEY;
 }

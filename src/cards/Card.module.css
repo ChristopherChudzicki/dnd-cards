@@ -52,13 +52,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #666;
+  background: #fff;
+  color: #111;
 }
 
 .fallbackIcon svg {
   width: 85%;
   height: 85%;
-  stroke-width: 1.5;
 }
 
 .header {

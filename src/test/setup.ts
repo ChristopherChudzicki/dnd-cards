@@ -9,6 +9,33 @@ vi.stubEnv(
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.test-anon-key.signature",
 );
 
+// react-aria-components' Virtualizer reads container size via clientWidth /
+// clientHeight + a ResizeObserver. jsdom doesn't implement ResizeObserver and
+// returns 0 for clientWidth/clientHeight; without these stubs the Virtualizer
+// either falls back to Infinity (NaN math in GridLayout) or sees a 0x0
+// container and renders no items.
+class ResizeObserverMock {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+}
+globalThis.ResizeObserver ??= ResizeObserverMock as unknown as typeof ResizeObserver;
+
+// Hard-coded dimensions are large enough for ~150 60px tiles to land in the
+// initial visible window — the actual layout in browsers is responsive.
+Object.defineProperty(HTMLElement.prototype, "clientWidth", {
+  configurable: true,
+  get() {
+    return 1200;
+  },
+});
+Object.defineProperty(HTMLElement.prototype, "clientHeight", {
+  configurable: true,
+  get() {
+    return 900;
+  },
+});
+
 beforeAll(() => server.listen({ onUnhandledRequest: "error" }));
 afterEach(() => {
   cleanup();
