@@ -33,7 +33,7 @@ export function DialogShell({
       <Modal
         className={styles.modal}
         data-size={size}
-        data-height={isFit ? "fit" : "fixed"}
+        data-height={isFit ? "fit" : undefined}
         style={modalStyle}
       >
         <Dialog aria-label={ariaLabel} className={styles.dialog}>

@@ -35,6 +35,7 @@ body,
   --color-warning-bg: #fff8e1;
   --color-warning-fg: #4a3c10;
   --color-focus-ring: #7a3530;
+  --color-overlay: rgba(26, 20, 16, 0.4);
 
   /* Typography */
   --font-display: "Cinzel", "EB Garamond", Georgia, serif;
