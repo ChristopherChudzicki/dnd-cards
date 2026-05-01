@@ -1,14 +1,10 @@
 import { listIcons } from "@iconify/react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
-  Dialog,
   DialogTrigger,
   GridLayout,
   GridList,
   GridListItem,
-  Heading,
-  Modal,
-  ModalOverlay,
   Button as RACButton,
   SearchField,
   Size,
@@ -19,6 +15,7 @@ import { Input } from "./Input";
 import { CURATED_ICONS } from "../../cards/curatedIcons";
 import { ensureFullSet } from "../../cards/resolveIcon";
 import { Button } from "./Button";
+import { DialogShell } from "./DialogShell";
 import styles from "./IconPickerDialog.module.css";
 import { IconPreview } from "./IconPreview";
 
@@ -41,21 +38,17 @@ export function IconPickerDialog({ value, onChange, id }: Props) {
       >
         {triggerLabel} ▾
       </RACButton>
-      <ModalOverlay className={styles.modalOverlay} isDismissable>
-        <Modal>
-          <Dialog className={styles.dialog}>
-            {({ close }) => (
-              <PickerBody
-                onChange={(next) => {
-                  onChange(next);
-                  close();
-                }}
-                onCancel={close}
-              />
-            )}
-          </Dialog>
-        </Modal>
-      </ModalOverlay>
+      <DialogShell aria-label="Pick an icon" size="lg">
+        {({ close }) => (
+          <PickerBody
+            onChange={(next) => {
+              onChange(next);
+              close();
+            }}
+            onCancel={close}
+          />
+        )}
+      </DialogShell>
     </DialogTrigger>
   );
 }
@@ -142,7 +135,6 @@ function PickerBody({ onChange, onCancel }: BodyProps) {
 
   return (
     <>
-      <Heading slot="title">Pick an icon</Heading>
       <div className={styles.header}>
         <SearchField aria-label="Search icons" value={search} onChange={handleSearchChange}>
           <Input className={styles.searchSlot} />
