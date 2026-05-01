@@ -33,7 +33,7 @@ See README's "Design system" section for the full picture. Short version:
 
 ## Working norms
 
-- Ask before running `npm install`, `npm test`, `npm run dev`, or `npm run build` (unless already approved in the current task).
+- `npm test`, `npm run dev`, and `npm run build` are pre-approved — run them as needed. Ask before `npm install` (or other dependency changes).
 - Address review nits inline in the same task — don't accumulate a deferred cleanup pass.
 - Don't use `git -C <path>` — run git from the working directory.
 - Don't push or create PRs without explicit instruction.
