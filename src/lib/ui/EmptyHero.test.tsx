@@ -14,9 +14,7 @@ describe("<EmptyHero>", () => {
   });
 
   it("renders actions in the actions slot", () => {
-    render(
-      <EmptyHero title="No decks yet" actions={<button type="button">Create deck</button>} />,
-    );
+    render(<EmptyHero title="No decks yet" actions={<button type="button">Create deck</button>} />);
     expect(screen.getByRole("button", { name: "Create deck" })).toBeInTheDocument();
   });
 });

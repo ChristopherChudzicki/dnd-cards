@@ -10,6 +10,7 @@ import { IconButton } from "../lib/ui/IconButton";
 import { Input } from "../lib/ui/Input";
 import { PencilIcon } from "../lib/ui/icons/PencilIcon";
 import { TrashIcon } from "../lib/ui/icons/TrashIcon";
+import { LoadingState } from "../lib/ui/LoadingState";
 import { BrowseApiModal } from "./BrowseApiModal";
 import styles from "./DeckView.module.css";
 
@@ -23,7 +24,7 @@ export function DeckView({ deckId }: Props) {
   const deleteCard = useDeleteCard();
   const [browseOpen, setBrowseOpen] = useState(false);
 
-  if (deckQuery.isLoading || cardsQuery.isLoading) return <p>Loading…</p>;
+  if (deckQuery.isLoading || cardsQuery.isLoading) return <LoadingState />;
   if (!deckQuery.data) return <p>This deck no longer exists.</p>;
 
   const deck = deckQuery.data;

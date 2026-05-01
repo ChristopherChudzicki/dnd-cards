@@ -3,6 +3,7 @@ import { AutoFitCard } from "../cards/AutoFitCard";
 import type { ItemCard } from "../cards/types";
 import { useDeckCards } from "../decks/queries";
 import { Button } from "../lib/ui/Button";
+import { LoadingState } from "../lib/ui/LoadingState";
 import styles from "./PrintView.module.css";
 
 type PerPage = 2 | 4;
@@ -18,7 +19,7 @@ export function PrintView({ deckId }: Props) {
   const cardsQuery = useDeckCards(deckId);
   const [perPage, setPerPage] = useState<PerPage>(4);
 
-  if (cardsQuery.isLoading) return <p>Loading…</p>;
+  if (cardsQuery.isLoading) return <LoadingState />;
 
   const cards = cardsQuery.data ?? [];
   const items = cards.filter((c): c is ItemCard => c.kind === "item");

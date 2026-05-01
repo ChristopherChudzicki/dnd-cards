@@ -9,6 +9,7 @@ import { Button } from "../lib/ui/Button";
 import { DialogHeader } from "../lib/ui/DialogHeader";
 import { DialogShell } from "../lib/ui/DialogShell";
 import { Input } from "../lib/ui/Input";
+import { LoadingState } from "../lib/ui/LoadingState";
 import { ToggleButton } from "../lib/ui/ToggleButton";
 import { ToggleButtonGroup } from "../lib/ui/ToggleButtonGroup";
 import styles from "./BrowseApiModal.module.css";
@@ -103,7 +104,7 @@ export function BrowseApiModal({ deckId, onClose, onSelected }: Props) {
           </div>
 
           <div className={styles.results}>
-            {index.isLoading && <div className={styles.state}>Loading…</div>}
+            {index.isLoading && <LoadingState />}
             {index.isError && (
               <div className={styles.state}>
                 Couldn't load the magic-items list.
