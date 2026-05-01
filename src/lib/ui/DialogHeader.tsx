@@ -6,20 +6,14 @@ export type DialogHeaderProps = {
   title: string;
   onClose: () => void;
   children?: ReactNode;
-  closeLabel?: string;
 };
 
-export function DialogHeader({
-  title,
-  onClose,
-  children,
-  closeLabel = "Close",
-}: DialogHeaderProps) {
+export function DialogHeader({ title, onClose, children }: DialogHeaderProps) {
   return (
     <header className={styles.header}>
       <h2 className={styles.title}>{title}</h2>
-      {children}
-      <IconButton aria-label={closeLabel} onPress={onClose} className={styles.closeBtn}>
+      {children !== undefined && <div className={styles.slot}>{children}</div>}
+      <IconButton aria-label="Close" onPress={onClose} className={styles.closeBtn}>
         <span aria-hidden="true">×</span>
       </IconButton>
     </header>

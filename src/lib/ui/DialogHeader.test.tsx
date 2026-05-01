@@ -26,8 +26,4 @@ describe("<DialogHeader>", () => {
     expect(screen.getByText("middle content")).toBeInTheDocument();
   });
 
-  it("supports a custom closeLabel", () => {
-    render(<DialogHeader title="My dialog" onClose={() => {}} closeLabel="Dismiss" />);
-    expect(screen.getByRole("button", { name: "Dismiss" })).toBeInTheDocument();
-  });
 });
