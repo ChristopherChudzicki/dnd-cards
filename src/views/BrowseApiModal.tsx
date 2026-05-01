@@ -68,7 +68,7 @@ export function BrowseApiModal({ deckId, onClose, onSelected }: Props) {
       aria-label="Browse magic items"
       size="md"
       height={{ fixed: "min(70vh, 640px)" }}
-      padding="none"
+      bleed
     >
       {() => (
         <>

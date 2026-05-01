@@ -40,12 +40,12 @@ describe("<DialogShell>", () => {
     expect(onOpenChange).toHaveBeenCalledWith(false);
   });
 
-  it("supports padding='none' for full-bleed layouts", () => {
+  it("supports bleed for full-bleed layouts", () => {
     render(
-      <DialogShell isOpen aria-label="Bare" onOpenChange={() => {}} padding="none">
+      <DialogShell isOpen aria-label="Bare" onOpenChange={() => {}} bleed>
         {() => <p>Body</p>}
       </DialogShell>,
     );
-    expect(screen.getByRole("dialog", { name: "Bare" })).toHaveAttribute("data-padding", "none");
+    expect(screen.getByRole("dialog", { name: "Bare" })).toHaveAttribute("data-bleed");
   });
 });

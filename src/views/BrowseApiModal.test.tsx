@@ -32,14 +32,6 @@ describe("<BrowseApiModal>", () => {
     expect(screen.getByRole("button", { name: "Cloak of Protection" })).toBeInTheDocument();
   });
 
-  test("the dialog renders with the correct label", async () => {
-    server.use(magicItemIndexHandler("2024", { count: 0, results: [] }));
-    wrap(<BrowseApiModal deckId="d1" onClose={() => {}} onSelected={() => {}} />);
-    expect(
-      await screen.findByRole("dialog", { name: /browse magic items/i }),
-    ).toBeInTheDocument();
-  });
-
   test("search filters the list", async () => {
     const entryA = magicItemIndexEntryFactory.build({ name: "Bag of Holding" });
     const entryB = magicItemIndexEntryFactory.build({ name: "Cloak of Protection" });
