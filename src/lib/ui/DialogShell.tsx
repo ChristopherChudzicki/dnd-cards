@@ -6,6 +6,7 @@ export type DialogShellProps = {
   "aria-label": string;
   size?: "md" | "lg";
   height?: "fit" | { fixed: string };
+  padding?: "default" | "none";
   isDismissable?: boolean;
   isOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
@@ -15,6 +16,7 @@ export type DialogShellProps = {
 export function DialogShell({
   size = "md",
   height = "fit",
+  padding = "default",
   isDismissable = true,
   isOpen,
   onOpenChange,
@@ -36,7 +38,7 @@ export function DialogShell({
         data-height={isFit ? "fit" : undefined}
         style={modalStyle}
       >
-        <Dialog aria-label={ariaLabel} className={styles.dialog}>
+        <Dialog aria-label={ariaLabel} className={styles.dialog} data-padding={padding}>
           {children}
         </Dialog>
       </Modal>

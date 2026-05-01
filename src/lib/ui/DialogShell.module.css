@@ -33,6 +33,9 @@
   display: flex;
   flex-direction: column;
   outline: none;
+}
+
+.dialog[data-padding="default"] {
   padding: var(--space-4);
   gap: var(--space-3);
 }

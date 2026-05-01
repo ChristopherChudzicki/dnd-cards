@@ -1,18 +1,12 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import {
-  Dialog,
-  Modal,
-  ModalOverlay,
-  TextField,
-  ToggleButton,
-  ToggleButtonGroup,
-} from "react-aria-components";
+import { TextField, ToggleButton, ToggleButtonGroup } from "react-aria-components";
 import { fetchMagicItemDetail, type Ruleset } from "../api/endpoints/magicItems";
 import { useMagicItemIndex } from "../api/hooks";
 import { magicItemDetailToCard } from "../api/mappers/magicItems";
 import { useSaveCard } from "../decks/mutations";
 import { Button } from "../lib/ui/Button";
+import { DialogShell } from "../lib/ui/DialogShell";
 import { IconButton } from "../lib/ui/IconButton";
 import { Input } from "../lib/ui/Input";
 import styles from "./BrowseApiModal.module.css";
@@ -66,16 +60,18 @@ export function BrowseApiModal({ deckId, onClose, onSelected }: Props) {
   };
 
   return (
-    <ModalOverlay
+    <DialogShell
       isOpen
-      isDismissable
       onOpenChange={(open) => {
         if (!open) onClose();
       }}
-      className={styles.overlay}
+      aria-label="Browse magic items"
+      size="md"
+      height={{ fixed: "min(70vh, 640px)" }}
+      padding="none"
     >
-      <Modal className={styles.modal}>
-        <Dialog aria-label="Browse magic items" data-stable-size="true" className={styles.dialog}>
+      {() => (
+        <>
           <header className={styles.header}>
             <h2 className={styles.title}>Browse magic items</h2>
             <ToggleButtonGroup
@@ -146,8 +142,8 @@ export function BrowseApiModal({ deckId, onClose, onSelected }: Props) {
                 </button>
               ))}
           </div>
-        </Dialog>
-      </Modal>
-    </ModalOverlay>
+        </>
+      )}
+    </DialogShell>
   );
 }

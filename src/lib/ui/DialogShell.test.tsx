@@ -39,4 +39,13 @@ describe("<DialogShell>", () => {
     await userEvent.click(screen.getByRole("button", { name: "Close me" }));
     expect(onOpenChange).toHaveBeenCalledWith(false);
   });
+
+  it("supports padding='none' for full-bleed layouts", () => {
+    render(
+      <DialogShell isOpen aria-label="Bare" onOpenChange={() => {}} padding="none">
+        {() => <p>Body</p>}
+      </DialogShell>,
+    );
+    expect(screen.getByRole("dialog", { name: "Bare" })).toHaveAttribute("data-padding", "none");
+  });
 });

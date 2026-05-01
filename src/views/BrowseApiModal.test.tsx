@@ -32,11 +32,12 @@ describe("<BrowseApiModal>", () => {
     expect(screen.getByRole("button", { name: "Cloak of Protection" })).toBeInTheDocument();
   });
 
-  test("the dialog renders with stable sizing applied", async () => {
+  test("the dialog renders with the correct label", async () => {
     server.use(magicItemIndexHandler("2024", { count: 0, results: [] }));
     wrap(<BrowseApiModal deckId="d1" onClose={() => {}} onSelected={() => {}} />);
-    const dialog = await screen.findByRole("dialog", { name: /browse magic items/i });
-    expect(dialog).toHaveAttribute("data-stable-size", "true");
+    expect(
+      await screen.findByRole("dialog", { name: /browse magic items/i }),
+    ).toBeInTheDocument();
   });
 
   test("search filters the list", async () => {
