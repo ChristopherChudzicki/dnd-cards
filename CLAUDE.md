@@ -39,8 +39,7 @@ See README's "Design system" section for the full picture. Short version:
 - Don't use `git -C <path>` — run git from the working directory.
 - Don't push or create PRs without explicit instruction.
 
-## Off-limits without asking
+## Sensitive — proceed carefully
 
-- **Print-scoped components**: `src/cards/Card.tsx`, `src/cards/AutoFitCard.tsx`, `src/views/PrintView.tsx`, and `@page` rules. These target print dimensions in absolute units; changes risk breaking 4-per-sheet output.
-- `src/cards/ItemEditor.tsx` is **not** off-limits — it's a screen form that uses the design system like any other view.
-- Database schema and RLS policies — changes go through `supabase/migrations`.
+- **Print output**: `src/cards/Card.tsx`, `src/cards/AutoFitCard.tsx`, the printed sheet preview half of `src/views/PrintView.module.css`, and `@page` / `@media print` rules. These target physical paper dimensions in absolute units; visual changes can break 4-per-sheet output. The screen toolbar inside `PrintView.tsx` is ordinary screen UI — that's fine to refactor.
+- **Database schema and RLS policies**: changes go through `supabase/migrations`. Don't edit live tables or bypass migrations.

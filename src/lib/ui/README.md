@@ -46,7 +46,9 @@ export function Button({ className, ...rest }: ButtonProps) {
 
 ## Tokens
 
-Every value in primitive CSS comes from a token in `src/index.css`. No hex, rem, or px literals — only `var(--*)` references. Two scopes:
+Primitive CSS uses tokens for color, space, radius, shadow, and font. Component-internal geometry — focus outline width, switch track size, modal max-width, transition timing, etc. — may stay as literals when no semantic token fits. The litmus test: would multiple primitives ever share this value? If yes, tokenize it. If it's intrinsic to one component's visual identity, a literal is fine.
+
+Two scopes for tokens:
 
 - **Screen tokens** (`--color-*`, `--space-*`, `--radius-*`, `--shadow-*`, `--fs-*`, etc.) — used by everything in `src/lib/ui/` and most of `src/views/`.
 - **Print tokens** (`--print-*`) — used only by `src/cards/Card.tsx`, `src/cards/AutoFitCard.tsx`, and `src/views/PrintView.tsx` (sheet preview half). Never reference these in screen UI.
