@@ -5,7 +5,6 @@ import {
   GridLayout,
   GridList,
   GridListItem,
-  Heading,
   SearchField,
   Size,
   Virtualizer,
@@ -13,6 +12,7 @@ import {
 import { CURATED_ICONS } from "../../cards/curatedIcons";
 import { ensureFullSet } from "../../cards/resolveIcon";
 import { Button } from "./Button";
+import { DialogHeader } from "./DialogHeader";
 import { DialogShell } from "./DialogShell";
 import styles from "./IconPickerDialog.module.css";
 import { IconPreview } from "./IconPreview";
@@ -39,7 +39,7 @@ export function IconPickerDialog({ value, onChange, id }: Props) {
       >
         {triggerLabel} ▾
       </Button>
-      <DialogShell aria-label="Pick an icon" size="lg">
+      <DialogShell aria-label="Pick an icon" size="lg" bleed>
         {({ close }) => (
           <PickerBody
             onChange={(next) => {
@@ -136,8 +136,8 @@ function PickerBody({ onChange, onCancel }: BodyProps) {
 
   return (
     <>
-      <Heading slot="title">Pick an icon</Heading>
-      <div className={styles.header}>
+      <DialogHeader title="Pick an icon" onClose={onCancel} />
+      <div className={styles.controls}>
         <SearchField aria-label="Search icons" value={search} onChange={handleSearchChange}>
           <Input className={styles.searchSlot} />
         </SearchField>
@@ -178,11 +178,6 @@ function PickerBody({ onChange, onCancel }: BodyProps) {
             )}
           </GridList>
         </Virtualizer>
-      </div>
-      <div className={styles.actions}>
-        <Button variant="secondary" onPress={onCancel}>
-          Cancel
-        </Button>
       </div>
       {hovered && (
         <div

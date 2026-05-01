@@ -1,7 +1,9 @@
-.header {
+.controls {
   display: flex;
   align-items: center;
   gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--color-border);
 }
 
 .searchSlot {
@@ -12,7 +14,7 @@
   height: 50vh;
   overflow-x: hidden;
   overflow-y: auto;
-  padding: var(--space-1);
+  padding: var(--space-3) var(--space-4);
 }
 
 .tile {
@@ -40,12 +42,6 @@
 .autoTile {
   font-size: var(--fs-xs);
   font-weight: 600;
-}
-
-.actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: var(--space-2);
 }
 
 .tooltipDelegationWrapper {
