@@ -16,6 +16,8 @@ Thin wrappers around `react-aria-components` (and a couple of native elements) t
 | `ToggleButtonGroup` | A segmented selector — wraps `ToggleButton` children. |
 | `DialogShell` | The outer scaffolding (overlay + modal + dialog) for any modal. |
 | `DialogHeader` | The standard header strip for any dialog: title, optional middle slot, close X. |
+| `LoadingState` | A centered "Loading…" indicator (`role="status"`). Use whenever a view is waiting on a query. |
+| `EmptyHero` | A centered hero block for page-level empty states: title + optional description + actions. Inline "no rows yet" notes can stay as plain `<p>` — reach for this when the empty state replaces a whole view. |
 | `IconPickerDialog` | The game-icons picker (used by the card editor). |
 | `IconPreview` | A static icon render. |
 | `UserMenu` | The signed-in user dropdown. |
