@@ -70,6 +70,18 @@ body,
   --shadow-lg: 0 16px 40px rgba(26, 20, 16, 0.18);
   --shadow-accent: 0 4px 12px rgba(122, 53, 48, 0.4);
   --shadow-accent-sm: 0 1px 3px rgba(122, 53, 48, 0.35);
+
+  /* Print-scoped tokens — used only by src/cards/* and PrintView for printable card components.
+     Never reference these in screen UI. */
+  --print-color-paper: #fff;
+  --print-color-ink: #111;
+  --print-color-ink-muted: #555;
+  --print-color-ink-faint: #666;
+  --print-color-border-strong: #222;
+  --print-color-border: #ddd;
+  --print-color-image-bg: #f0f0f0;
+  --print-color-image-frame: #d0d0d0;
+  --print-shadow-card: 0 2px 10px rgba(0, 0, 0, 0.08);
 }
 
 body {
