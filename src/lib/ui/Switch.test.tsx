@@ -32,4 +32,24 @@ describe("<Switch>", () => {
     await userEvent.click(sw);
     expect(sw).toBeChecked();
   });
+
+  it("toggles via Space key", async () => {
+    const onChange = vi.fn();
+    render(<Switch onChange={onChange}>Show all</Switch>);
+    const sw = screen.getByRole("switch", { name: "Show all" });
+    sw.focus();
+    await userEvent.keyboard(" ");
+    expect(onChange).toHaveBeenCalledWith(true);
+  });
+
+  it("does not call onChange when disabled", async () => {
+    const onChange = vi.fn();
+    render(
+      <Switch isDisabled onChange={onChange}>
+        Show all
+      </Switch>,
+    );
+    await userEvent.click(screen.getByRole("switch", { name: "Show all" }));
+    expect(onChange).not.toHaveBeenCalled();
+  });
 });
