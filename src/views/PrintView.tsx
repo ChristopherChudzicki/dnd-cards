@@ -2,6 +2,7 @@ import { useState } from "react";
 import { AutoFitCard } from "../cards/AutoFitCard";
 import type { ItemCard } from "../cards/types";
 import { useDeckCards } from "../decks/queries";
+import { Button } from "../lib/ui/Button";
 import styles from "./PrintView.module.css";
 
 type PerPage = 2 | 4;
@@ -34,9 +35,9 @@ export function PrintView({ deckId }: Props) {
             <option value={2}>2</option>
           </select>
         </label>
-        <button type="button" onClick={() => window.print()} disabled={items.length === 0}>
+        <Button variant="primary" onPress={() => window.print()} isDisabled={items.length === 0}>
           Print
-        </button>
+        </Button>
         <span className={styles.tip}>
           Tip: in the print dialog, choose <em>Margins: None</em> and uncheck{" "}
           <em>Headers and footers</em> for best results.

@@ -1,29 +1,29 @@
 .controls {
   display: flex;
-  gap: 1rem;
+  gap: var(--space-4);
   align-items: center;
-  padding: 0.75rem 0;
+  padding: var(--space-3) 0;
   flex-wrap: wrap;
 }
 
-.controls button,
 .controls select {
   font: inherit;
-  padding: 0.4rem 0.8rem;
-  border: 1px solid #bbb;
-  border-radius: 0.3rem;
-  background: #fff;
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text);
   cursor: pointer;
 }
 
-.controls button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+.controls select:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
 }
 
 .tip {
-  font-size: 0.85rem;
-  color: #666;
+  font-size: var(--fs-sm);
+  color: var(--color-text-faint);
 }
 
 .sheet {
