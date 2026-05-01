@@ -7,7 +7,6 @@ import {
   GridList,
   GridListItem,
   Heading,
-  Input,
   Modal,
   ModalOverlay,
   Button as RACButton,
@@ -16,6 +15,7 @@ import {
   Switch,
   Virtualizer,
 } from "react-aria-components";
+import { Input } from "./Input";
 import { CURATED_ICONS } from "../../cards/curatedIcons";
 import { ensureFullSet } from "../../cards/resolveIcon";
 import { Button } from "./Button";
@@ -145,7 +145,7 @@ function PickerBody({ onChange, onCancel }: BodyProps) {
       <Heading slot="title">Pick an icon</Heading>
       <div className={styles.header}>
         <SearchField aria-label="Search icons" value={search} onChange={handleSearchChange}>
-          <Input className={styles.search} />
+          <Input aria-label="Search icons" className={styles.searchSlot} />
         </SearchField>
         <Switch isSelected={showAll} onChange={handleShowAllChange} className={styles.switch}>
           <div className={styles.switchIndicator} />
