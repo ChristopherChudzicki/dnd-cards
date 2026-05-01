@@ -16,7 +16,7 @@ See README's "Design system" section for the full picture. Short version:
 - **Screen tokens** live in `src/index.css` (`--color-*`, `--space-*`, `--radius-*`, etc.). All screen UI references them; no inline hexes/rems in scope.
 - **Print-scoped tokens** are namespaced `--print-*` and used only by printable card components (`Card`, `AutoFitCard`, `PrintView`). They never apply to screen UI.
 - Use `react-aria-components` for new interactive primitives. **No** emotion / styled-components / MUI / Tailwind / shadcn.
-- Shared UI primitives live in `src/lib/ui/`. Prefer reusing them over hand-rolling new patterns.
+- Shared UI primitives live in `src/lib/ui/`. Before hand-rolling any input, button, dialog, switch, or toggle, check `src/lib/ui/README.md` — there's almost certainly an existing primitive.
 - The card preview shown in the editor renders the same `<Card>` (or `<AutoFitCard>`) component as `PrintView`, so screen preview matches print output exactly.
 
 ## Tests
