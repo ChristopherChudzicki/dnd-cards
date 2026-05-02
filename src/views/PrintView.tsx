@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { AutoFitCard } from "../cards/AutoFitCard";
+import { Card } from "../cards/Card";
 import type { ItemCard } from "../cards/types";
+import { useExpandedCards } from "../cards/useExpandedCards";
 import { useDeckCards } from "../decks/queries";
 import { Button } from "../lib/ui/Button";
 import { LoadingState } from "../lib/ui/LoadingState";
@@ -19,12 +20,14 @@ export function PrintView({ deckId }: Props) {
   const cardsQuery = useDeckCards(deckId);
   const [perPage, setPerPage] = useState<PerPage>(4);
 
-  if (cardsQuery.isLoading) return <LoadingState />;
-
   const cards = cardsQuery.data ?? [];
   const items = cards.filter((c): c is ItemCard => c.kind === "item");
-  const pages = items.length === 0 ? [] : chunk(items, perPage);
   const layout = perPage === 4 ? "4-up" : "2-up";
+  const { physicalCards } = useExpandedCards(items, layout);
+
+  if (cardsQuery.isLoading) return <LoadingState />;
+
+  const pages = physicalCards.length === 0 ? [] : chunk(physicalCards, perPage);
 
   return (
     <div>
@@ -50,13 +53,18 @@ export function PrintView({ deckId }: Props) {
       <div className={styles.sheet}>
         {pages.map((pageCards) => (
           <div
-            key={pageCards[0]?.id ?? "empty"}
+            key={`page-${pageCards[0]?.card.id ?? "empty"}-${pageCards[0]?.pagination?.page ?? 0}`}
             data-testid="page"
             className={`${styles.page} ${perPage === 4 ? styles.fourUp : styles.twoUp}`}
           >
-            {pageCards.map((card) => (
-              <div key={card.id} className={styles.slot}>
-                <AutoFitCard card={card} layout={layout} />
+            {pageCards.map((entry) => (
+              <div key={`${entry.card.id}-${entry.pagination?.page ?? 0}`} className={styles.slot}>
+                <Card
+                  card={entry.card}
+                  layout={layout}
+                  bodyOverride={entry.bodyChunk}
+                  pagination={entry.pagination}
+                />
               </div>
             ))}
           </div>

@@ -13,9 +13,9 @@ describe("<Card>", () => {
   });
 
   test("renders cost/weight when present", () => {
-    const card = itemCardFactory.build({ costWeight: "500 gp · 15 lb" });
+    const card = itemCardFactory.build();
     render(<Card card={card} layout="4-up" />);
-    expect(screen.getByText("500 gp · 15 lb")).toBeInTheDocument();
+    expect(screen.getByText(card.costWeight!)).toBeInTheDocument();
   });
 
   test("omits footer when cost/weight is absent", () => {
@@ -28,7 +28,7 @@ describe("<Card>", () => {
     const card = itemCardFactory.build({ imageUrl: "https://example.com/pic.png" });
     render(<Card card={card} layout="4-up" />);
     const img = screen.getByTestId("card-image");
-    expect(img).toHaveAttribute("src", "https://example.com/pic.png");
+    expect(img).toHaveAttribute("src", card.imageUrl!);
   });
 
   test("splits body on blank lines into paragraphs", () => {
@@ -42,6 +42,7 @@ describe("<Card>", () => {
     const card = itemCardFactory.build({ imageUrl: "https://example.com/broken.png" });
     render(<Card card={card} layout="4-up" />);
     const img = screen.getByTestId("card-image");
+    expect(img).toHaveAttribute("src", card.imageUrl!);
     fireEvent.error(img);
     expect(screen.queryByTestId("card-image")).not.toBeInTheDocument();
     expect(screen.getByTestId("card-fallback-icon")).toBeInTheDocument();
@@ -93,5 +94,52 @@ describe("<Card>", () => {
       iconKey: "definitely-removed-icon",
     });
     expect(() => render(<Card card={card} layout="4-up" />)).not.toThrow();
+  });
+});
+
+describe("<Card> with pagination", () => {
+  test("does not suffix title when paginated", () => {
+    const card = itemCardFactory.build();
+    render(<Card card={card} layout="4-up" pagination={{ page: 2, total: 4 }} />);
+    expect(screen.getByRole("heading", { name: card.name })).toBeInTheDocument();
+  });
+
+  test("renders pagination indicator in the footer", () => {
+    const card = itemCardFactory.build();
+    render(<Card card={card} layout="4-up" pagination={{ page: 2, total: 4 }} />);
+    expect(screen.getByTestId("card-pagination")).toHaveTextContent(/^Card 2 of 4$/);
+  });
+
+  test("hides type line on continuation pages", () => {
+    const card = itemCardFactory.build();
+    render(<Card card={card} layout="4-up" pagination={{ page: 2, total: 3 }} />);
+    expect(screen.queryByText(card.typeLine)).not.toBeInTheDocument();
+  });
+
+  test("shows type line on the first page when paginated", () => {
+    const card = itemCardFactory.build();
+    render(<Card card={card} layout="4-up" pagination={{ page: 1, total: 3 }} />);
+    expect(screen.getByText(card.typeLine)).toBeInTheDocument();
+  });
+
+  test("renders bodyOverride instead of card.body", () => {
+    const card = itemCardFactory.build();
+    render(<Card card={card} layout="4-up" bodyOverride="chunk text" />);
+    expect(screen.getByText("chunk text")).toBeInTheDocument();
+    expect(screen.queryByText(card.body)).not.toBeInTheDocument();
+  });
+
+  test("retains costWeight on continuation pages alongside pagination", () => {
+    const card = itemCardFactory.build();
+    render(<Card card={card} layout="4-up" pagination={{ page: 2, total: 2 }} />);
+    expect(screen.getByText(card.costWeight!)).toBeInTheDocument();
+    expect(screen.getByTestId("card-pagination")).toBeInTheDocument();
+  });
+
+  test("renders footer with pagination only when card has no costWeight", () => {
+    const card = itemCardFactory.build({ costWeight: undefined });
+    render(<Card card={card} layout="4-up" pagination={{ page: 1, total: 3 }} />);
+    expect(screen.getByTestId("card-footer")).toBeInTheDocument();
+    expect(screen.getByTestId("card-pagination")).toHaveTextContent(/^Card 1 of 3$/);
   });
 });
