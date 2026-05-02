@@ -95,3 +95,38 @@ describe("<Card>", () => {
     expect(() => render(<Card card={card} layout="4-up" />)).not.toThrow();
   });
 });
+
+describe("<Card> with pagination", () => {
+  test("suffixes title with (pX of N) when paginated", () => {
+    const card = itemCardFactory.build();
+    render(<Card card={card} layout="4-up" pagination={{ page: 2, total: 4 }} />);
+    expect(
+      screen.getByRole("heading", { name: `${card.name} (p2 of 4)` }),
+    ).toBeInTheDocument();
+  });
+
+  test("hides type line on continuation pages", () => {
+    const card = itemCardFactory.build();
+    render(<Card card={card} layout="4-up" pagination={{ page: 2, total: 3 }} />);
+    expect(screen.queryByText(card.typeLine)).not.toBeInTheDocument();
+  });
+
+  test("shows type line on the first page when paginated", () => {
+    const card = itemCardFactory.build();
+    render(<Card card={card} layout="4-up" pagination={{ page: 1, total: 3 }} />);
+    expect(screen.getByText(card.typeLine)).toBeInTheDocument();
+  });
+
+  test("renders bodyOverride instead of card.body", () => {
+    const card = itemCardFactory.build({ body: "original body" });
+    render(<Card card={card} layout="4-up" bodyOverride="chunk text" />);
+    expect(screen.getByText("chunk text")).toBeInTheDocument();
+    expect(screen.queryByText("original body")).not.toBeInTheDocument();
+  });
+
+  test("retains footer on continuation pages when costWeight is set", () => {
+    const card = itemCardFactory.build({ costWeight: "500 gp · 15 lb" });
+    render(<Card card={card} layout="4-up" pagination={{ page: 2, total: 2 }} />);
+    expect(screen.getByText("500 gp · 15 lb")).toBeInTheDocument();
+  });
+});
