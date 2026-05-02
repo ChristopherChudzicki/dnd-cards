@@ -39,7 +39,7 @@
     "@testing-library/user-event": "^14.6.1",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
-    "@vitejs/plugin-react": "^4.3.4",
+    "@vitejs/plugin-react": "^6.0.1",
     "@vitest/ui": "^4.1.4",
     "fishery": "^2.4.0",
     "jsdom": "^29.0.2",
@@ -47,7 +47,7 @@
     "supabase": "^2.95.3",
     "tsx": "^4.21.0",
     "typescript": "^6.0.3",
-    "vite": "^6.0.5",
+    "vite": "^8.0.10",
     "vitest": "^4.1.4"
   }
 }
