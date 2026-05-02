@@ -144,6 +144,7 @@ export function EditorView({ deckId, cardId }: Props) {
               variant="secondary"
               onPress={() => setPreviewPage((p) => Math.max(0, p - 1))}
               isDisabled={clampedPage === 0}
+              aria-label="Previous preview page"
             >
               ←
             </Button>
@@ -154,6 +155,7 @@ export function EditorView({ deckId, cardId }: Props) {
               variant="secondary"
               onPress={() => setPreviewPage((p) => Math.min(totalPages4 - 1, p + 1))}
               isDisabled={clampedPage === totalPages4 - 1}
+              aria-label="Next preview page"
             >
               →
             </Button>

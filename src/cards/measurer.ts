@@ -21,7 +21,7 @@ type CachedMeasurer = {
 };
 
 const cache = new Map<CardLayout, CachedMeasurer>();
-const SENTINEL_SUFFIX = " (p9 of 9)";
+const SENTINEL_SUFFIX = " (p99 of 99)";
 
 export function acquireMeasurer(layout: CardLayout): CardMeasurer {
   let entry = cache.get(layout);
@@ -56,7 +56,7 @@ export function acquireMeasurer(layout: CardLayout): CardMeasurer {
   };
 
   const measureFirst = (card: ItemCard, chunk: string): boolean => {
-    if (!entry) return true;
+    if (!entry) throw new Error("measurer used after release");
     entry.firstTitle.textContent = card.name + SENTINEL_SUFFIX;
     entry.firstTypeLine.textContent = card.typeLine;
     setFooter(entry.firstFooter, card.costWeight);
@@ -65,7 +65,7 @@ export function acquireMeasurer(layout: CardLayout): CardMeasurer {
   };
 
   const measureContinuation = (card: ItemCard, chunk: string): boolean => {
-    if (!entry) return true;
+    if (!entry) throw new Error("measurer used after release");
     entry.contTitle.textContent = card.name + SENTINEL_SUFFIX;
     setFooter(entry.contFooter, card.costWeight);
     setBodyContent(entry.contBody, chunk);

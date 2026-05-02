@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { CardLayout } from "./Card";
 import { expandCard, type PhysicalCard } from "./expandCard";
 import { acquireMeasurer, type CardMeasurer } from "./measurer";
@@ -10,31 +10,30 @@ export function useExpandedCards(
   items: ItemCard[],
   layout: CardLayout,
 ): { physicalCards: PhysicalCard[] } {
-  const measurerRef = useRef<{ layout: CardLayout; m: CardMeasurer } | null>(null);
+  const [measurer, setMeasurer] = useState<CardMeasurer>(() => acquireMeasurer(layout));
+  const [currentLayout, setCurrentLayout] = useState<CardLayout>(layout);
 
-  if (typeof document !== "undefined") {
-    if (measurerRef.current === null) {
-      measurerRef.current = { layout, m: acquireMeasurer(layout) };
-    } else if (measurerRef.current.layout !== layout) {
-      measurerRef.current.m.release();
-      measurerRef.current = { layout, m: acquireMeasurer(layout) };
-    }
+  let effectiveMeasurer = measurer;
+  if (currentLayout !== layout) {
+    const next = acquireMeasurer(layout);
+    setMeasurer(next);
+    setCurrentLayout(layout);
+    effectiveMeasurer = next;
   }
 
+  // Releases the measurer when it is swapped out (layout change) or when the
+  // component unmounts.
   useEffect(
     () => () => {
-      measurerRef.current?.m.release();
-      measurerRef.current = null;
+      measurer.release();
     },
-    [],
+    [measurer],
   );
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: measurerRef is a ref; layout is included so the memo invalidates when the measurer swaps
-  const physicalCards = useMemo<PhysicalCard[]>(() => {
-    const m = measurerRef.current?.m;
-    if (!m) return [];
-    return items.flatMap((item) => expandCard(item, m));
-  }, [items, layout]);
+  const physicalCards = useMemo<PhysicalCard[]>(
+    () => items.flatMap((item) => expandCard(item, effectiveMeasurer)),
+    [items, effectiveMeasurer],
+  );
 
   return { physicalCards };
 }
