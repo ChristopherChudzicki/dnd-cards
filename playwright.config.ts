@@ -16,6 +16,11 @@ export default defineConfig({
     reuseExistingServer: !process.env.CI,
     stdout: "ignore",
     stderr: "pipe",
+    env: {
+      VITE_SUPABASE_URL: "http://localhost:54321",
+      VITE_SUPABASE_ANON_KEY:
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.test-anon-key.signature",
+    },
   },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
 });
