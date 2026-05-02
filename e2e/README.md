@@ -13,16 +13,16 @@ npm run test:e2e:ui       # Playwright GUI runner (useful for debugging)
 
 `seedDeck` in `fixtures.ts` sets up a fake authenticated session and stubs Supabase network calls so specs run against a predictable data set. There are four non-obvious facts that will trip up a debugger:
 
-1. **Auth storage key is `sb-localhost-auth-token`.**  
+1. **Auth storage key is `sb-localhost-auth-token`.**
    supabase-js derives the key from the Supabase URL hostname (`localhost`). If `VITE_SUPABASE_URL` changes, the key must change too. See `AUTH_STORAGE_KEY` in `fixtures.ts`.
 
-2. **`exp` must be in the future.**  
+2. **`exp` must be in the future.**
    When supabase-js reads a session and the token is expired, it fires `_callRefreshToken`, which hits `/auth/v1/token`. That endpoint is not stubbed. `seedDeck` sets `exp` to `now + 3600` — don't reduce this.
 
-3. **Fake signature is fine.**  
+3. **Fake signature is fine.**
    supabase-js does not verify JWT signatures when reading sessions from storage. It only base64-decodes the payload. `makeFakeJwt` in `src/test/fakeJwt.ts` exploits this.
 
-4. **`playwright.config.ts` sets `webServer.env` for the Supabase vars.**  
+4. **`playwright.config.ts` sets `webServer.env` for the Supabase vars.**
    `src/api/supabase.ts` throws at module-evaluation time when `VITE_SUPABASE_URL` or `VITE_SUPABASE_ANON_KEY` are missing. The config injects dummy values so Vite starts cleanly; the actual network calls are intercepted by `page.route()` anyway.
 
 ## Diagnosing failures
