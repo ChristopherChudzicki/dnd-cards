@@ -8,13 +8,13 @@ test("print view paginates an oversized item across multiple physical cards at 4
   await page.goto(`/deck/${TEST_DECK_ID}/print`);
 
   const sheet = page.locator('[data-testid="page"]');
-  const titles = sheet.getByRole("heading").filter({ hasText: /\(p\d+ of \d+\)/ });
-  await expect(titles.first()).toBeVisible();
-  const total = await titles.count();
+  const paginationIndicators = sheet.locator('[data-testid="card-pagination"]');
+  await expect(paginationIndicators.first()).toBeVisible();
+  const total = await paginationIndicators.count();
   expect(total).toBeGreaterThan(1);
 
-  await expect(titles.first()).toHaveText(new RegExp(`\\(p1 of ${total}\\)`));
-  await expect(titles.last()).toHaveText(new RegExp(`\\(p${total} of ${total}\\)`));
+  await expect(paginationIndicators.first()).toHaveText(`Card 1 of ${total}`);
+  await expect(paginationIndicators.last()).toHaveText(`Card ${total} of ${total}`);
 
   const occurrences = await sheet.getByText(longItem.typeLine!, { exact: true }).count();
   expect(occurrences).toBe(1);

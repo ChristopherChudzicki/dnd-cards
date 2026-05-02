@@ -46,8 +46,10 @@ describe("<PrintView>", () => {
     server.use(http.get(`${SB}/rest/v1/cards`, () => HttpResponse.json([card])));
     render(wrap(<PrintView deckId="d1" />));
     await waitFor(() => {
-      expect(screen.getByRole("heading", { name: /\(p1 of 3\)/i })).toBeInTheDocument();
-      expect(screen.getByRole("heading", { name: /\(p3 of 3\)/i })).toBeInTheDocument();
+      const indicators = screen.getAllByTestId("card-pagination");
+      expect(indicators).toHaveLength(3);
+      expect(indicators[0]).toHaveTextContent("Card 1 of 3");
+      expect(indicators[2]).toHaveTextContent("Card 3 of 3");
     });
   });
 });

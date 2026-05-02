@@ -7,7 +7,7 @@ export type CardMeasurer = {
   measureContinuation: (card: ItemCard, chunk: string) => boolean;
 };
 
-const SENTINEL_SUFFIX = " (p99 of 99)";
+const SENTINEL_PAGINATION = "Card 9 of 9";
 const cache = new Map<CardLayout, CardMeasurer>();
 
 export function getMeasurer(layout: CardLayout): CardMeasurer {
@@ -81,27 +81,30 @@ function build(layout: CardLayout): CardMeasurer {
     );
   };
 
-  const setFooter = (el: HTMLElement, costWeight: string | undefined) => {
+  const setFooter = (el: HTMLElement, costWeight: string | undefined, pagination: string) => {
+    el.replaceChildren();
     if (costWeight) {
-      el.style.display = "";
-      el.textContent = costWeight;
-    } else {
-      el.style.display = "none";
-      el.textContent = "";
+      const left = document.createElement("span");
+      left.textContent = costWeight;
+      el.appendChild(left);
     }
+    const right = document.createElement("span");
+    right.textContent = pagination;
+    right.className = cardStyles.footerRight ?? "";
+    el.appendChild(right);
   };
 
   return {
     measureFirst: (card, chunk) => {
-      firstTitle.textContent = card.name + SENTINEL_SUFFIX;
+      firstTitle.textContent = card.name;
       firstTypeLine.textContent = card.typeLine;
-      setFooter(firstFooter, card.costWeight);
+      setFooter(firstFooter, card.costWeight, SENTINEL_PAGINATION);
       setBodyContent(firstBody, chunk);
       return firstBody.scrollHeight <= firstBody.clientHeight;
     },
     measureContinuation: (card, chunk) => {
-      contTitle.textContent = card.name + SENTINEL_SUFFIX;
-      setFooter(contFooter, card.costWeight);
+      contTitle.textContent = card.name;
+      setFooter(contFooter, card.costWeight, SENTINEL_PAGINATION);
       setBodyContent(contBody, chunk);
       return contBody.scrollHeight <= contBody.clientHeight;
     },

@@ -98,10 +98,16 @@ describe("<Card>", () => {
 });
 
 describe("<Card> with pagination", () => {
-  test("suffixes title with (pX of N) when paginated", () => {
+  test("does not suffix title when paginated", () => {
     const card = itemCardFactory.build();
     render(<Card card={card} layout="4-up" pagination={{ page: 2, total: 4 }} />);
-    expect(screen.getByRole("heading", { name: `${card.name} (p2 of 4)` })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: card.name })).toBeInTheDocument();
+  });
+
+  test("renders pagination indicator in the footer", () => {
+    const card = itemCardFactory.build();
+    render(<Card card={card} layout="4-up" pagination={{ page: 2, total: 4 }} />);
+    expect(screen.getByTestId("card-pagination")).toHaveTextContent(/^Card 2 of 4$/);
   });
 
   test("hides type line on continuation pages", () => {
@@ -123,9 +129,17 @@ describe("<Card> with pagination", () => {
     expect(screen.queryByText(card.body)).not.toBeInTheDocument();
   });
 
-  test("retains footer on continuation pages when costWeight is set", () => {
+  test("retains costWeight on continuation pages alongside pagination", () => {
     const card = itemCardFactory.build();
     render(<Card card={card} layout="4-up" pagination={{ page: 2, total: 2 }} />);
     expect(screen.getByText(card.costWeight!)).toBeInTheDocument();
+    expect(screen.getByTestId("card-pagination")).toBeInTheDocument();
+  });
+
+  test("renders footer with pagination only when card has no costWeight", () => {
+    const card = itemCardFactory.build({ costWeight: undefined });
+    render(<Card card={card} layout="4-up" pagination={{ page: 1, total: 3 }} />);
+    expect(screen.getByTestId("card-footer")).toBeInTheDocument();
+    expect(screen.getByTestId("card-pagination")).toHaveTextContent(/^Card 1 of 3$/);
   });
 });

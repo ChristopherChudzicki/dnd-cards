@@ -108,4 +108,11 @@
   font-size: 0.85em;
   color: var(--print-color-ink-faint);
   flex-shrink: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 1em;
+}
+
+.footerRight {
+  margin-left: auto;
 }

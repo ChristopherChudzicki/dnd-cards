@@ -29,7 +29,7 @@ beforeEach(() => {
 });
 
 describe("measurer", () => {
-  test("measureFirst writes title with sentinel suffix and the type line", () => {
+  test("measureFirst writes title (no suffix) and the type line", () => {
     const measurer = getMeasurer("4-up");
     const card = itemCardFactory.build();
     measurer.measureFirst(card, "body chunk");
@@ -39,7 +39,7 @@ describe("measurer", () => {
       '[data-shape="first"] [data-slot="typeLine"]',
     );
 
-    expect(titleEl?.textContent).toBe(`${card.name} (p99 of 99)`);
+    expect(titleEl?.textContent).toBe(card.name);
     expect(typeLineEl?.textContent).toBe(card.typeLine);
   });
 
@@ -49,7 +49,7 @@ describe("measurer", () => {
     expect(typeLineEl).toBeNull();
   });
 
-  test("footer is hidden when costWeight is undefined", () => {
+  test("footer always renders pagination sentinel during measurement", () => {
     const measurer = getMeasurer("4-up");
     const card = itemCardFactory.build({ costWeight: undefined });
     measurer.measureFirst(card, "body chunk");
@@ -57,10 +57,10 @@ describe("measurer", () => {
     const footerEl = document.querySelector<HTMLElement>(
       '[data-shape="first"] [data-slot="footer"]',
     );
-    expect(footerEl?.style.display).toBe("none");
+    expect(footerEl?.textContent).toContain("Card 9 of 9");
   });
 
-  test("footer renders costWeight when present", () => {
+  test("footer renders both costWeight and pagination sentinel when costWeight is set", () => {
     const measurer = getMeasurer("4-up");
     const card = itemCardFactory.build();
     measurer.measureFirst(card, "body chunk");
@@ -68,8 +68,8 @@ describe("measurer", () => {
     const footerEl = document.querySelector<HTMLElement>(
       '[data-shape="first"] [data-slot="footer"]',
     );
-    expect(footerEl?.style.display).toBe("");
-    expect(footerEl?.textContent).toBe(card.costWeight);
+    expect(footerEl?.textContent).toContain(card.costWeight!);
+    expect(footerEl?.textContent).toContain("Card 9 of 9");
   });
 
   test("body chunk splits into <p> elements on blank-line paragraph breaks", () => {

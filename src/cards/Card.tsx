@@ -32,10 +32,8 @@ export function Card({ card, layout, pagination, bodyOverride }: Props) {
   const iconKey = card.iconKey ?? pickIconKey(card);
 
   const isFirstPage = !pagination || pagination.page === 1;
-  const titleText = pagination
-    ? `${card.name} (p${pagination.page} of ${pagination.total})`
-    : card.name;
   const bodyText = bodyOverride ?? card.body;
+  const showFooter = card.costWeight !== undefined || pagination !== undefined;
 
   return (
     <div className={`${styles.card} ${layoutClass}`} data-role="card-root">
@@ -53,7 +51,7 @@ export function Card({ card, layout, pagination, bodyOverride }: Props) {
         </div>
       )}
       <div className={styles.header}>
-        <h3 className={styles.title}>{titleText}</h3>
+        <h3 className={styles.title}>{card.name}</h3>
         {isFirstPage && <div className={styles.typeLine}>{card.typeLine}</div>}
       </div>
       <hr className={styles.divider} />
@@ -62,9 +60,14 @@ export function Card({ card, layout, pagination, bodyOverride }: Props) {
           <p key={p}>{p}</p>
         ))}
       </div>
-      {card.costWeight && (
+      {showFooter && (
         <div className={styles.footer} data-testid="card-footer">
-          {card.costWeight}
+          {card.costWeight && <span>{card.costWeight}</span>}
+          {pagination && (
+            <span className={styles.footerRight} data-testid="card-pagination">
+              Card {pagination.page} of {pagination.total}
+            </span>
+          )}
         </div>
       )}
     </div>
