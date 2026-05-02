@@ -80,22 +80,22 @@ describe("EditorView", () => {
     await screen.findByRole("button", { name: /save/i }); // wait for render
     expect(screen.queryByTestId("template-notice")).not.toBeInTheDocument();
   });
-});
 
-it("shows '1 card' counts label when body fits", async () => {
-  const card = makeCardRow.build({ id: "c1", deck_id: "d1" });
-  server.use(http.get(`${SB}/rest/v1/cards`, () => HttpResponse.json([card])));
-  render(wrap(<EditorView deckId="d1" cardId="c1" />));
-  expect(await screen.findByTestId("preview-counts")).toHaveTextContent(/^1 card$/);
-});
+  it("shows '1 card' counts label when body fits", async () => {
+    const card = makeCardRow.build({ id: "c1", deck_id: "d1" });
+    server.use(http.get(`${SB}/rest/v1/cards`, () => HttpResponse.json([card])));
+    render(wrap(<EditorView deckId="d1" cardId="c1" />));
+    expect(await screen.findByText("1 card")).toBeInTheDocument();
+  });
 
-it("shows multi-card counts label and paginator when body overflows at 4-up", async () => {
-  const card = makeCardRow.build({ id: "c1", deck_id: "d1" });
-  vi.spyOn(paginateModule, "paginateBody").mockImplementation(({ body }) =>
-    body === "" ? [""] : ["chunk-a", "chunk-b", "chunk-c"],
-  );
-  server.use(http.get(`${SB}/rest/v1/cards`, () => HttpResponse.json([card])));
-  render(wrap(<EditorView deckId="d1" cardId="c1" />));
-  expect(await screen.findByTestId("preview-paginator")).toBeInTheDocument();
-  expect(screen.getByTestId("preview-counts")).toHaveTextContent(/3 cards \(4-up\)/);
+  it("shows multi-card counts label and paginator when body overflows at 4-up", async () => {
+    const card = makeCardRow.build({ id: "c1", deck_id: "d1" });
+    vi.spyOn(paginateModule, "paginateBody").mockImplementation(({ body }) =>
+      body === "" ? [""] : ["chunk-a", "chunk-b", "chunk-c"],
+    );
+    server.use(http.get(`${SB}/rest/v1/cards`, () => HttpResponse.json([card])));
+    render(wrap(<EditorView deckId="d1" cardId="c1" />));
+    expect(await screen.findByTestId("preview-paginator")).toBeInTheDocument();
+    expect(screen.getByText(/^3 cards \(4-up\) · /)).toBeInTheDocument();
+  });
 });

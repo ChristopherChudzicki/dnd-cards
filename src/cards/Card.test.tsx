@@ -13,9 +13,9 @@ describe("<Card>", () => {
   });
 
   test("renders cost/weight when present", () => {
-    const card = itemCardFactory.build({ costWeight: "500 gp · 15 lb" });
+    const card = itemCardFactory.build();
     render(<Card card={card} layout="4-up" />);
-    expect(screen.getByText("500 gp · 15 lb")).toBeInTheDocument();
+    expect(screen.getByText(card.costWeight!)).toBeInTheDocument();
   });
 
   test("omits footer when cost/weight is absent", () => {

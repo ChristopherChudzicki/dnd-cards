@@ -25,20 +25,6 @@ describe("useExpandedCards", () => {
     expect(result.current.physicalCards).toHaveLength(3);
   });
 
-  test("expands a single overflowing item into multiple PhysicalCards", () => {
-    Object.defineProperty(HTMLElement.prototype, "scrollHeight", {
-      configurable: true,
-      get() {
-        const ret = (this as unknown as { __flips?: number }).__flips ?? 0;
-        (this as unknown as { __flips?: number }).__flips = ret + 1;
-        return ret === 0 ? 1000 : 100;
-      },
-    });
-    const item = itemCardFactory.build({ body: "alpha beta gamma delta epsilon" });
-    const { result } = renderHook(() => useExpandedCards([item], "4-up"));
-    expect(result.current.physicalCards.length).toBeGreaterThanOrEqual(1);
-  });
-
   test("releases measurer on unmount", () => {
     const items = itemCardFactory.buildList(1);
     const { unmount } = renderHook(() => useExpandedCards(items, "4-up"));

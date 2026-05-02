@@ -5,7 +5,7 @@ import { HttpResponse, http } from "msw";
 import type { ReactNode } from "react";
 import { describe, expect, test, vi } from "vitest";
 import * as paginateModule from "../cards/paginate";
-import { makeCardRow, makeItemPayload } from "../test/factories";
+import { makeCardRow } from "../test/factories";
 import { SB_URL as SB, server } from "../test/msw";
 import { PrintView } from "./PrintView";
 
@@ -40,17 +40,14 @@ describe("<PrintView>", () => {
 });
 
 test("renders multiple physical cards for an oversized item at 4-up", async () => {
-  const card = makeCardRow.build({
-    payload: { ...makeItemPayload.build(), body: "long ".repeat(200) },
-  });
-  const spy = vi
-    .spyOn(paginateModule, "paginateBody")
-    .mockImplementation(({ body }) => (body === "" ? [""] : ["chunk-a", "chunk-b", "chunk-c"]));
+  const card = makeCardRow.build();
+  vi.spyOn(paginateModule, "paginateBody").mockImplementation(({ body }) =>
+    body === "" ? [""] : ["chunk-a", "chunk-b", "chunk-c"],
+  );
   server.use(http.get(`${SB}/rest/v1/cards`, () => HttpResponse.json([card])));
   render(wrap(<PrintView deckId="d1" />));
   await waitFor(() => {
     expect(screen.getByRole("heading", { name: /\(p1 of 3\)/i })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: /\(p3 of 3\)/i })).toBeInTheDocument();
   });
-  spy.mockRestore();
 });

@@ -75,4 +75,44 @@ describe("paginateBody", () => {
     });
     expect(result).toEqual(["para one", "para two"]);
   });
+
+  test("character-fallback splits a long token in the middle of body", () => {
+    // first measurer: budget 5; second: budget 10
+    // tokens: "alpha", "supercalifragilistic", "beta"
+    // First chunk: "alpha" (5 chars)
+    // Continuation: must split "supercalifragilistic" (20 chars) at character boundary
+    const result = paginateBody({
+      body: "alpha supercalifragilistic beta",
+      measureFirst: fitsUpTo(5),
+      measureContinuation: fitsUpTo(10),
+    });
+    expect(result[0]).toBe("alpha");
+    // All chars from the original body are preserved (inter-chunk spaces are trimmed)
+    expect(result.join("")).toBe("alpha supercalifragilistic beta".replace(/\s+/g, ""));
+    expect(result.every((c) => c.length <= 10)).toBe(true);
+  });
+
+  test("treats all-whitespace body as a single empty-after-trim chunk", () => {
+    const result = paginateBody({
+      body: "   ",
+      measureFirst: fitsUpTo(0),
+      measureContinuation: fitsUpTo(0),
+    });
+    // Whitespace-only body: measureFirst("   ") with budget 0 returns false (3 > 0).
+    // greedyFit finds no word boundaries (no \S+ matches), falls back to characterFit.
+    // characterFit returns Math.max(best, 1) → " " (one space).
+    // Pin behavior: at minimum, we should not infinite-loop and should make forward progress.
+    expect(result.length).toBeGreaterThan(0);
+    expect(result.join("").length).toBeLessThanOrEqual("   ".length);
+  });
+
+  test("preserves trailing whitespace within a fitting chunk", () => {
+    const result = paginateBody({
+      body: "alpha beta   ",
+      measureFirst: fitsUpTo(100),
+      measureContinuation: fitsUpTo(100),
+    });
+    // Whole body fits → single chunk including trailing whitespace untouched.
+    expect(result).toEqual(["alpha beta   "]);
+  });
 });

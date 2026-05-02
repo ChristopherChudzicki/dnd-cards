@@ -16,13 +16,9 @@ test("print view paginates an oversized item across multiple physical cards at 4
   await expect(titles.first()).toHaveText(new RegExp(`\\(p1 of ${total}\\)`));
   await expect(titles.last()).toHaveText(new RegExp(`\\(p${total} of ${total}\\)`));
 
-  if (longItem.typeLine) {
-    const occurrences = await sheet.getByText(longItem.typeLine, { exact: true }).count();
-    expect(occurrences).toBe(1);
-  }
+  const occurrences = await sheet.getByText(longItem.typeLine!, { exact: true }).count();
+  expect(occurrences).toBe(1);
 
-  if (longItem.costWeight) {
-    const footers = await sheet.getByText(longItem.costWeight, { exact: true }).count();
-    expect(footers).toBe(total);
-  }
+  const footers = await sheet.getByText(longItem.costWeight!, { exact: true }).count();
+  expect(footers).toBe(total);
 });
