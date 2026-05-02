@@ -118,15 +118,15 @@ describe("<Card> with pagination", () => {
   });
 
   test("renders bodyOverride instead of card.body", () => {
-    const card = itemCardFactory.build({ body: "original body" });
+    const card = itemCardFactory.build();
     render(<Card card={card} layout="4-up" bodyOverride="chunk text" />);
     expect(screen.getByText("chunk text")).toBeInTheDocument();
-    expect(screen.queryByText("original body")).not.toBeInTheDocument();
+    expect(screen.queryByText(card.body)).not.toBeInTheDocument();
   });
 
   test("retains footer on continuation pages when costWeight is set", () => {
-    const card = itemCardFactory.build({ costWeight: "500 gp · 15 lb" });
+    const card = itemCardFactory.build();
     render(<Card card={card} layout="4-up" pagination={{ page: 2, total: 2 }} />);
-    expect(screen.getByText("500 gp · 15 lb")).toBeInTheDocument();
+    expect(screen.getByText(card.costWeight!)).toBeInTheDocument();
   });
 });
