@@ -54,4 +54,4 @@ For rationale, see the [UI refinement spec](docs/superpowers/specs/2026-04-29-ui
 - Design: [`docs/superpowers/specs/2026-04-19-dnd-cards-design.md`](docs/superpowers/specs/2026-04-19-dnd-cards-design.md)
 - Implementation plan: [`docs/superpowers/plans/2026-04-19-dnd-cards-v1.md`](docs/superpowers/plans/2026-04-19-dnd-cards-v1.md)
 
-Deck data lives in `localStorage` under the key `dnd-cards:deck:v1`. You can also **Import JSON / Export JSON** from the deck view.
+Deck data is persisted in Supabase (decks + cards tables, gated by row-level security on the deck owner). For local development, run a local Supabase via `supabase start` and use the **dev** sign-in button on the login page (creates `dev@local` / `devpass` on first run). You can also **Import JSON / Export JSON** from the deck view.

@@ -88,6 +88,7 @@ export function acquireMeasurer(layout: CardLayout): CardMeasurer {
 function build(layout: CardLayout): CachedMeasurer {
   const container = document.createElement("div");
   container.setAttribute("data-measurer", layout);
+  container.setAttribute("aria-hidden", "true");
   container.style.cssText =
     "position:absolute;left:-99999px;top:0;visibility:hidden;pointer-events:none;";
 

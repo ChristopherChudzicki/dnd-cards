@@ -7,7 +7,8 @@ test("print view paginates an oversized item across multiple physical cards at 4
   await seedDeck(page, [longItem]);
   await page.goto(`/deck/${TEST_DECK_ID}/print`);
 
-  const titles = page.getByRole("heading").filter({ hasText: /\(p\d+ of \d+\)/ });
+  const sheet = page.locator('[data-testid="page"]');
+  const titles = sheet.getByRole("heading").filter({ hasText: /\(p\d+ of \d+\)/ });
   await expect(titles.first()).toBeVisible();
   const total = await titles.count();
   expect(total).toBeGreaterThan(1);
@@ -16,18 +17,12 @@ test("print view paginates an oversized item across multiple physical cards at 4
   await expect(titles.last()).toHaveText(new RegExp(`\\(p${total} of ${total}\\)`));
 
   if (longItem.typeLine) {
-    const occurrences = await page
-      .getByText(longItem.typeLine, { exact: true })
-      .filter({ visible: true })
-      .count();
+    const occurrences = await sheet.getByText(longItem.typeLine, { exact: true }).count();
     expect(occurrences).toBe(1);
   }
 
   if (longItem.costWeight) {
-    const footers = await page
-      .getByText(longItem.costWeight, { exact: true })
-      .filter({ visible: true })
-      .count();
+    const footers = await sheet.getByText(longItem.costWeight, { exact: true }).count();
     expect(footers).toBe(total);
   }
 });
