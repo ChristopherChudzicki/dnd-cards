@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { AutoFitCard } from "../cards/AutoFitCard";
 import { Card } from "../cards/Card";
 import type { ItemCard } from "../cards/types";
 import { useExpandedCards } from "../cards/useExpandedCards";
@@ -58,25 +57,16 @@ export function PrintView({ deckId }: Props) {
             data-testid="page"
             className={`${styles.page} ${perPage === 4 ? styles.fourUp : styles.twoUp}`}
           >
-            {pageCards.map((entry) =>
-              entry.needsScaleFit ? (
-                <div key={entry.card.id} className={styles.slot}>
-                  <AutoFitCard card={entry.card} layout={layout} />
-                </div>
-              ) : (
-                <div
-                  key={`${entry.card.id}-${entry.pagination?.page ?? 0}`}
-                  className={styles.slot}
-                >
-                  <Card
-                    card={entry.card}
-                    layout={layout}
-                    bodyOverride={entry.bodyChunk}
-                    pagination={entry.pagination}
-                  />
-                </div>
-              ),
-            )}
+            {pageCards.map((entry) => (
+              <div key={`${entry.card.id}-${entry.pagination?.page ?? 0}`} className={styles.slot}>
+                <Card
+                  card={entry.card}
+                  layout={layout}
+                  bodyOverride={entry.bodyChunk}
+                  pagination={entry.pagination}
+                />
+              </div>
+            ))}
           </div>
         ))}
       </div>

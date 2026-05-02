@@ -13,9 +13,7 @@ describe("expandCard", () => {
   test("single physical card with no pagination metadata when body fits", () => {
     const card = itemCardFactory.build({ body: "tiny" });
     const result = expandCard(card, measurerFromBudget(1000, 1000));
-    expect(result).toEqual([
-      { card, bodyChunk: "tiny", pagination: undefined, needsScaleFit: true },
-    ]);
+    expect(result).toEqual([{ card, bodyChunk: "tiny", pagination: undefined }]);
   });
 
   test("multiple physical cards with pagination metadata when body splits", () => {
@@ -27,6 +25,5 @@ describe("expandCard", () => {
       { page: 2, total: 3 },
       { page: 3, total: 3 },
     ]);
-    expect(result.every((p) => p.needsScaleFit === false)).toBe(true);
   });
 });

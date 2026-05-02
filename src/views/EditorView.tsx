@@ -1,6 +1,5 @@
 import { useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { AutoFitCard } from "../cards/AutoFitCard";
 import { Card } from "../cards/Card";
 import { ItemEditor } from "../cards/ItemEditor";
 import type { ItemCard } from "../cards/types";
@@ -128,16 +127,12 @@ export function EditorView({ deckId, cardId }: Props) {
       </div>
       <div className={styles.preview}>
         <div className={styles.previewLabel}>Preview (4-up size)</div>
-        {totalPages4 === 1 || !visibleChunk ? (
-          <AutoFitCard card={draft} layout="4-up" />
-        ) : (
-          <Card
-            card={draft}
-            layout="4-up"
-            bodyOverride={visibleChunk.bodyChunk}
-            pagination={visibleChunk.pagination}
-          />
-        )}
+        <Card
+          card={draft}
+          layout="4-up"
+          bodyOverride={visibleChunk?.bodyChunk}
+          pagination={visibleChunk?.pagination}
+        />
         {showPaginator && (
           <div className={styles.paginator} data-testid="preview-paginator">
             <Button

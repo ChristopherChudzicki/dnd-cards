@@ -23,7 +23,6 @@ describe("useExpandedCards", () => {
     const items = itemCardFactory.buildList(3);
     const { result } = renderHook(() => useExpandedCards(items, "4-up"));
     expect(result.current.physicalCards).toHaveLength(3);
-    expect(result.current.physicalCards.every((p) => p.needsScaleFit)).toBe(true);
   });
 
   test("expands a single overflowing item into multiple PhysicalCards", () => {
