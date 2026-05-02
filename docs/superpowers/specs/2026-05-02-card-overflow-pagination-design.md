@@ -116,6 +116,7 @@ The right-hand preview pane gets:
   - `3 cards (4-up) · 2 cards (2-up)` when they differ or either is >1.
 - The preview itself stays at 4-up size, showing one card at a time. When the 4-up split has more than one chunk, a paginator (`← Page 2 of 3 →`) appears below the preview. The visible-page index is local `useState`, clamped if the chunk count shrinks while typing.
 - The preview renders `<AutoFitCard>` when there's only one chunk, `<Card>` with `bodyOverride` + `pagination` when there are multiple.
+- **Debounced measurement.** The editor recomputes splits on every keystroke, which is wasteful during fast typing. The `body` input that feeds `useExpandedCards` is debounced (200ms). Other draft fields (name, type line, footer) update the preview synchronously since they don't trigger remeasure. While the debounce window is open the preview keeps showing the previous splits — visually fine, just slightly stale. The visible-page index stays clamped against the latest computed chunk count.
 
 ## Edge cases
 
