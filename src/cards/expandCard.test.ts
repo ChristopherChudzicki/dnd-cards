@@ -22,9 +22,11 @@ describe("expandCard", () => {
     const card = itemCardFactory.build({ body: "alpha beta gamma" });
     const result = expandCard(card, measurerFromBudget(5, 5));
     expect(result.map((p) => p.bodyChunk)).toEqual(["alpha", "beta", "gamma"]);
-    expect(result[0].pagination).toEqual({ page: 1, total: 3 });
-    expect(result[1].pagination).toEqual({ page: 2, total: 3 });
-    expect(result[2].pagination).toEqual({ page: 3, total: 3 });
+    expect(result.map((p) => p.pagination)).toEqual([
+      { page: 1, total: 3 },
+      { page: 2, total: 3 },
+      { page: 3, total: 3 },
+    ]);
     expect(result.every((p) => p.needsScaleFit === false)).toBe(true);
   });
 });
