@@ -21,7 +21,10 @@ export function Card({ card, layout }: Props) {
   const layoutClass = layout === "4-up" ? styles["four-up"] : styles["two-up"];
   const [brokenUrl, setBrokenUrl] = useState<string | null>(null);
 
-  const showImage = card.imageUrl !== undefined && brokenUrl !== card.imageUrl;
+  // Treat empty string the same as undefined: rendering <img src=""> makes the
+  // browser refetch the document URL, which doesn't fire onError reliably and
+  // leaves the styled-but-empty image element visible instead of falling back.
+  const showImage = !!card.imageUrl && brokenUrl !== card.imageUrl;
   const iconKey = card.iconKey ?? pickIconKey(card);
 
   return (

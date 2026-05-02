@@ -47,6 +47,13 @@ describe("<Card>", () => {
     expect(screen.getByTestId("card-fallback-icon")).toBeInTheDocument();
   });
 
+  test("treats an empty-string imageUrl as no image and shows the fallback icon", () => {
+    const card = itemCardFactory.build({ imageUrl: "" });
+    render(<Card card={card} layout="4-up" />);
+    expect(screen.queryByTestId("card-image")).not.toBeInTheDocument();
+    expect(screen.getByTestId("card-fallback-icon")).toBeInTheDocument();
+  });
+
   test("shows a fallback icon when the card has no imageUrl", () => {
     const card = itemCardFactory.build({ imageUrl: undefined });
     render(<Card card={card} layout="4-up" />);
