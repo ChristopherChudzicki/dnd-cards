@@ -1,8 +1,8 @@
 import type { Page } from "@playwright/test";
+import { SB_URL, TEST_USER_ID } from "../src/test/constants";
+import { makeFakeJwt } from "../src/test/fakeJwt";
 
-const SB_URL = "http://localhost:54321";
-const TEST_DECK_ID = "e2e-deck-00000000-0000-0000-0000-000000000001";
-const TEST_USER_ID = "11111111-1111-1111-1111-111111111111";
+const TEST_DECK_ID = "00000000-0000-0000-0000-000000000001";
 const AUTH_STORAGE_KEY = "sb-localhost-auth-token";
 
 export type SeedItem = {
@@ -12,13 +12,6 @@ export type SeedItem = {
   body: string;
   costWeight?: string;
 };
-
-function makeFakeJwt(claims: Record<string, unknown>): string {
-  const b64url = (s: string) => btoa(s).replace(/=+$/, "").replace(/\+/g, "-").replace(/\//g, "_");
-  const header = b64url(JSON.stringify({ alg: "HS256", typ: "JWT" }));
-  const payload = b64url(JSON.stringify(claims));
-  return `${header}.${payload}.fake-signature`;
-}
 
 export async function seedDeck(page: Page, items: SeedItem[]): Promise<void> {
   const now = new Date().toISOString();
@@ -86,18 +79,41 @@ export async function seedDeck(page: Page, items: SeedItem[]): Promise<void> {
   }));
 
   await page.route(`${SB_URL}/rest/v1/decks*`, (route) => {
-    route.fulfill({ json: [deckRow] });
+    const method = route.request().method();
+    if (method === "GET") {
+      route.fulfill({ json: [deckRow] });
+      return;
+    }
+    route.abort("failed");
+    throw new Error(
+      `e2e fixture: unsupported ${method} on /rest/v1/decks. ` +
+        "seedDeck currently mocks reads only; extend it before adding write-path specs.",
+    );
   });
 
   await page.route(`${SB_URL}/rest/v1/cards*`, (route) => {
-    route.fulfill({ json: cardRows });
+    const method = route.request().method();
+    if (method === "GET") {
+      route.fulfill({ json: cardRows });
+      return;
+    }
+    route.abort("failed");
+    throw new Error(
+      `e2e fixture: unsupported ${method} on /rest/v1/cards. ` +
+        "seedDeck currently mocks reads only; extend it before adding write-path specs.",
+    );
   });
 
   await page.route(`${SB_URL}/auth/v1/**`, (route) => {
-    route.fulfill({
-      status: 200,
-      json: user,
-    });
+    const url = route.request().url();
+    if (url.includes("/auth/v1/user")) {
+      route.fulfill({ status: 200, json: user });
+      return;
+    }
+    route.abort("failed");
+    throw new Error(
+      `e2e fixture: unhandled auth endpoint ${url}. Add explicit handling in seedDeck.`,
+    );
   });
 }
 
