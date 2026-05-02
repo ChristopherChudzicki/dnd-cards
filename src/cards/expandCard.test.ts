@@ -6,7 +6,6 @@ import type { CardMeasurer } from "./measurer";
 const measurerFromBudget = (firstMax: number, contMax: number): CardMeasurer => ({
   measureFirst: (_card, chunk) => chunk.length <= firstMax,
   measureContinuation: (_card, chunk) => chunk.length <= contMax,
-  release: () => {},
 });
 
 describe("expandCard", () => {

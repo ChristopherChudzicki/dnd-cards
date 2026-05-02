@@ -1,48 +1,36 @@
-import { afterEach, beforeEach, describe, expect, test } from "vitest";
+import { beforeEach, describe, expect, test } from "vitest";
 import { itemCardFactory } from "./factories";
-import { acquireMeasurer } from "./measurer";
+import { getMeasurer } from "./measurer";
 
-// What this test covers vs. what e2e covers:
+// Unit-tests the slot-population paths in measurer.ts (title text, type-line
+// presence, footer toggle, body innerHTML structure) by stubbing
+// scrollHeight/clientHeight at the prototype level. It verifies the measurer
+// writes the right content into the right DOM slots and reads scrollHeight/
+// clientHeight on the body element to decide fit.
 //
-// This file unit-tests the slot-population paths in measurer.ts (title text,
-// type-line presence, footer toggle, body innerHTML structure) by stubbing
-// scrollHeight/clientHeight at the prototype level. It verifies that the
-// measurer writes the right content into the right DOM slots and reads
-// scrollHeight/clientHeight on the body element to decide fit.
-//
-// What it CAN'T verify (because JSDOM has no real layout): that real CSS
-// produces the expected body height, that title wrapping under the sentinel
-// suffix shrinks the body budget by the right amount, or that the per-layout
-// (4-up vs 2-up) sizes line up with print dimensions. Those invariants are
-// the job of the Playwright e2e specs, which run the app against a real
-// browser and assert on the rendered chunk count and continuation-page
-// behavior end-to-end.
+// What this can't verify (because JSDOM has no real layout): real CSS produces
+// the expected body height, the sentinel suffix shrinks the body budget by the
+// right amount, or per-layout (4-up vs 2-up) sizes match print dimensions.
+// Those invariants live in the Playwright e2e specs.
+
+beforeEach(() => {
+  Object.defineProperty(HTMLElement.prototype, "scrollHeight", {
+    configurable: true,
+    get() {
+      return 100;
+    },
+  });
+  Object.defineProperty(HTMLElement.prototype, "clientHeight", {
+    configurable: true,
+    get() {
+      return 200;
+    },
+  });
+});
 
 describe("measurer", () => {
-  let measurer: ReturnType<typeof acquireMeasurer> | null = null;
-
-  beforeEach(() => {
-    Object.defineProperty(HTMLElement.prototype, "scrollHeight", {
-      configurable: true,
-      get() {
-        return 100;
-      },
-    });
-    Object.defineProperty(HTMLElement.prototype, "clientHeight", {
-      configurable: true,
-      get() {
-        return 200;
-      },
-    });
-  });
-
-  afterEach(() => {
-    measurer?.release();
-    measurer = null;
-  });
-
-  test("measureFirst writes the title with the sentinel suffix and the type line", () => {
-    measurer = acquireMeasurer("4-up");
+  test("measureFirst writes title with sentinel suffix and the type line", () => {
+    const measurer = getMeasurer("4-up");
     const card = itemCardFactory.build();
     measurer.measureFirst(card, "body chunk");
 
@@ -55,17 +43,14 @@ describe("measurer", () => {
     expect(typeLineEl?.textContent).toBe(card.typeLine);
   });
 
-  test("measureContinuation has no type line slot in its scaffold", () => {
-    measurer = acquireMeasurer("4-up");
-    const card = itemCardFactory.build();
-    measurer.measureContinuation(card, "body chunk");
-
+  test("continuation scaffold has no type line slot", () => {
+    getMeasurer("4-up");
     const typeLineEl = document.querySelector('[data-shape="continuation"] [data-slot="typeLine"]');
     expect(typeLineEl).toBeNull();
   });
 
   test("footer is hidden when costWeight is undefined", () => {
-    measurer = acquireMeasurer("4-up");
+    const measurer = getMeasurer("4-up");
     const card = itemCardFactory.build({ costWeight: undefined });
     measurer.measureFirst(card, "body chunk");
 
@@ -76,7 +61,7 @@ describe("measurer", () => {
   });
 
   test("footer renders costWeight when present", () => {
-    measurer = acquireMeasurer("4-up");
+    const measurer = getMeasurer("4-up");
     const card = itemCardFactory.build();
     measurer.measureFirst(card, "body chunk");
 
@@ -87,8 +72,8 @@ describe("measurer", () => {
     expect(footerEl?.textContent).toBe(card.costWeight);
   });
 
-  test("body chunk is split into <p> elements on blank-line paragraph breaks", () => {
-    measurer = acquireMeasurer("4-up");
+  test("body chunk splits into <p> elements on blank-line paragraph breaks", () => {
+    const measurer = getMeasurer("4-up");
     const card = itemCardFactory.build();
     measurer.measureFirst(card, "para one\n\npara two");
 
@@ -99,7 +84,7 @@ describe("measurer", () => {
   });
 
   test("returns true when scrollHeight <= clientHeight (fits)", () => {
-    measurer = acquireMeasurer("4-up");
+    const measurer = getMeasurer("4-up");
     const card = itemCardFactory.build();
     expect(measurer.measureFirst(card, "any body")).toBe(true);
   });
@@ -111,18 +96,14 @@ describe("measurer", () => {
         return 500;
       },
     });
-    measurer = acquireMeasurer("4-up");
+    const measurer = getMeasurer("4-up");
     const card = itemCardFactory.build();
     expect(measurer.measureFirst(card, "any body")).toBe(false);
   });
 
-  test("throws when used after release", () => {
-    measurer = acquireMeasurer("4-up");
-    measurer.release();
-    measurer.release(); // double-release is a no-op
-    const m = measurer;
-    measurer = null; // prevent afterEach from double-releasing
-    const card = itemCardFactory.build();
-    expect(() => m.measureFirst(card, "x")).toThrow(/measurer used after release/);
+  test("getMeasurer returns the same instance across calls (idempotent)", () => {
+    const a = getMeasurer("4-up");
+    const b = getMeasurer("4-up");
+    expect(a).toBe(b);
   });
 });

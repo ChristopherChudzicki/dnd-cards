@@ -5,87 +5,21 @@ import type { ItemCard } from "./types";
 export type CardMeasurer = {
   measureFirst: (card: ItemCard, chunk: string) => boolean;
   measureContinuation: (card: ItemCard, chunk: string) => boolean;
-  release: () => void;
 };
 
-type CachedMeasurer = {
-  container: HTMLDivElement;
-  refCount: number;
-  firstTitle: HTMLElement;
-  firstTypeLine: HTMLElement;
-  firstBody: HTMLElement;
-  firstFooter: HTMLElement;
-  contTitle: HTMLElement;
-  contBody: HTMLElement;
-  contFooter: HTMLElement;
-};
-
-const cache = new Map<CardLayout, CachedMeasurer>();
 const SENTINEL_SUFFIX = " (p99 of 99)";
+const cache = new Map<CardLayout, CardMeasurer>();
 
-export function acquireMeasurer(layout: CardLayout): CardMeasurer {
-  let entry = cache.get(layout);
-  if (!entry) {
-    entry = build(layout);
-    cache.set(layout, entry);
+export function getMeasurer(layout: CardLayout): CardMeasurer {
+  let m = cache.get(layout);
+  if (!m) {
+    m = build(layout);
+    cache.set(layout, m);
   }
-  entry.refCount++;
-
-  const setBodyContent = (el: HTMLElement, text: string) => {
-    el.replaceChildren(
-      ...text
-        .split(/\n\s*\n/)
-        .map((p) => p.trim())
-        .filter(Boolean)
-        .map((p) => {
-          const node = document.createElement("p");
-          node.textContent = p;
-          return node;
-        }),
-    );
-  };
-
-  const setFooter = (el: HTMLElement, costWeight: string | undefined) => {
-    if (costWeight) {
-      el.style.display = "";
-      el.textContent = costWeight;
-    } else {
-      el.style.display = "none";
-      el.textContent = "";
-    }
-  };
-
-  const measureFirst = (card: ItemCard, chunk: string): boolean => {
-    if (!entry) throw new Error("measurer used after release");
-    entry.firstTitle.textContent = card.name + SENTINEL_SUFFIX;
-    entry.firstTypeLine.textContent = card.typeLine;
-    setFooter(entry.firstFooter, card.costWeight);
-    setBodyContent(entry.firstBody, chunk);
-    return entry.firstBody.scrollHeight <= entry.firstBody.clientHeight;
-  };
-
-  const measureContinuation = (card: ItemCard, chunk: string): boolean => {
-    if (!entry) throw new Error("measurer used after release");
-    entry.contTitle.textContent = card.name + SENTINEL_SUFFIX;
-    setFooter(entry.contFooter, card.costWeight);
-    setBodyContent(entry.contBody, chunk);
-    return entry.contBody.scrollHeight <= entry.contBody.clientHeight;
-  };
-
-  const release = () => {
-    if (!entry) return;
-    entry.refCount--;
-    if (entry.refCount <= 0) {
-      entry.container.remove();
-      cache.delete(layout);
-      entry = undefined;
-    }
-  };
-
-  return { measureFirst, measureContinuation, release };
+  return m;
 }
 
-function build(layout: CardLayout): CachedMeasurer {
+function build(layout: CardLayout): CardMeasurer {
   const container = document.createElement("div");
   container.setAttribute("data-measurer", layout);
   container.setAttribute("aria-hidden", "true");
@@ -125,15 +59,51 @@ function build(layout: CardLayout): CachedMeasurer {
     return el;
   };
 
+  const firstTitle = find("first", "title");
+  const firstTypeLine = find("first", "typeLine");
+  const firstBody = find("first", "body");
+  const firstFooter = find("first", "footer");
+  const contTitle = find("continuation", "title");
+  const contBody = find("continuation", "body");
+  const contFooter = find("continuation", "footer");
+
+  const setBodyContent = (el: HTMLElement, text: string) => {
+    el.replaceChildren(
+      ...text
+        .split(/\n\s*\n/)
+        .map((p) => p.trim())
+        .filter(Boolean)
+        .map((p) => {
+          const node = document.createElement("p");
+          node.textContent = p;
+          return node;
+        }),
+    );
+  };
+
+  const setFooter = (el: HTMLElement, costWeight: string | undefined) => {
+    if (costWeight) {
+      el.style.display = "";
+      el.textContent = costWeight;
+    } else {
+      el.style.display = "none";
+      el.textContent = "";
+    }
+  };
+
   return {
-    container,
-    refCount: 0,
-    firstTitle: find("first", "title"),
-    firstTypeLine: find("first", "typeLine"),
-    firstBody: find("first", "body"),
-    firstFooter: find("first", "footer"),
-    contTitle: find("continuation", "title"),
-    contBody: find("continuation", "body"),
-    contFooter: find("continuation", "footer"),
+    measureFirst: (card, chunk) => {
+      firstTitle.textContent = card.name + SENTINEL_SUFFIX;
+      firstTypeLine.textContent = card.typeLine;
+      setFooter(firstFooter, card.costWeight);
+      setBodyContent(firstBody, chunk);
+      return firstBody.scrollHeight <= firstBody.clientHeight;
+    },
+    measureContinuation: (card, chunk) => {
+      contTitle.textContent = card.name + SENTINEL_SUFFIX;
+      setFooter(contFooter, card.costWeight);
+      setBodyContent(contBody, chunk);
+      return contBody.scrollHeight <= contBody.clientHeight;
+    },
   };
 }
