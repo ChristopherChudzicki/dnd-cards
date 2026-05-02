@@ -36,6 +36,14 @@ If your spec fails immediately after `seedDeck`, check in order:
 
 ## Extending `seedDeck`
 
+### Why `seedDeck` couples auth + data
+
+Currently `seedDeck` injects an authenticated session AND seeds deck/card rows in
+one call. No spec needs unauthenticated state today. If a future spec needs to
+verify the redirect-to-login path or anonymous browsing, split into a separate
+`signInAs(page, user?)` helper at that point — don't pre-emptively over-shape
+the API.
+
 `seedDeck` mocks reads only. The `/rest/v1/decks*` and `/rest/v1/cards*` handlers currently abort non-GET requests loudly so write-path specs fail at the right place.
 
 To add write support, update the relevant route handler in `fixtures.ts`:

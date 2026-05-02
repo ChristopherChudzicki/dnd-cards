@@ -61,7 +61,7 @@ export async function seedDeck(page: Page, items: SeedItem[]): Promise<void> {
   };
 
   const cardRows = items.map((it, i) => ({
-    id: it.id ?? `seed-card-${i}`,
+    id: it.id ?? `00000000-0000-4000-8000-${i.toString().padStart(12, "0")}`,
     deck_id: TEST_DECK_ID,
     position: i,
     payload: {
@@ -78,39 +78,39 @@ export async function seedDeck(page: Page, items: SeedItem[]): Promise<void> {
     updated_at: now,
   }));
 
-  await page.route(`${SB_URL}/rest/v1/decks*`, (route) => {
+  await page.route(`${SB_URL}/rest/v1/decks*`, async (route) => {
     const method = route.request().method();
     if (method === "GET") {
-      route.fulfill({ json: [deckRow] });
+      await route.fulfill({ json: [deckRow] });
       return;
     }
-    route.abort("failed");
+    await route.abort("failed");
     throw new Error(
       `e2e fixture: unsupported ${method} on /rest/v1/decks. ` +
         "seedDeck currently mocks reads only; extend it before adding write-path specs.",
     );
   });
 
-  await page.route(`${SB_URL}/rest/v1/cards*`, (route) => {
+  await page.route(`${SB_URL}/rest/v1/cards*`, async (route) => {
     const method = route.request().method();
     if (method === "GET") {
-      route.fulfill({ json: cardRows });
+      await route.fulfill({ json: cardRows });
       return;
     }
-    route.abort("failed");
+    await route.abort("failed");
     throw new Error(
       `e2e fixture: unsupported ${method} on /rest/v1/cards. ` +
         "seedDeck currently mocks reads only; extend it before adding write-path specs.",
     );
   });
 
-  await page.route(`${SB_URL}/auth/v1/**`, (route) => {
+  await page.route(`${SB_URL}/auth/v1/**`, async (route) => {
     const url = route.request().url();
     if (url.includes("/auth/v1/user")) {
-      route.fulfill({ status: 200, json: user });
+      await route.fulfill({ status: 200, json: user });
       return;
     }
-    route.abort("failed");
+    await route.abort("failed");
     throw new Error(
       `e2e fixture: unhandled auth endpoint ${url}. Add explicit handling in seedDeck.`,
     );
@@ -127,7 +127,7 @@ const LONG_BODY = Array.from(
 ).join(" ");
 
 export const longItem: SeedItem = {
-  id: "wand-of-wonder",
+  id: "00000000-0000-4000-8000-100000000001",
   name: "Wand of Wonder",
   typeLine: "Wand, rare (requires attunement by a spellcaster)",
   body: LONG_BODY,

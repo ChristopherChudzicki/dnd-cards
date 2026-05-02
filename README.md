@@ -37,7 +37,7 @@ UI styling is driven by CSS custom-property tokens defined in [`src/index.css`](
 - CSS modules. No styled-components, emotion, MUI, Tailwind, or shadcn.
 - Self-hosted Inter (body) and Cinzel (display headings) via fontsource.
 
-**Token scopes** — `src/index.css` defines two namespaces: screen tokens (`--color-*`, `--space-*`, `--radius-*`, `--shadow-*`, `--fs-*`, etc.) used by all screen UI, and print tokens (`--print-*`) used only by `Card`, `AutoFitCard`, and `PrintView`. Never reference `--print-*` in screen UI.
+**Token scopes** — `src/index.css` defines two namespaces: screen tokens (`--color-*`, `--space-*`, `--radius-*`, `--shadow-*`, `--fs-*`, etc.) used by all screen UI, and print tokens (`--print-*`) used only by `Card` and `PrintView`. Never reference `--print-*` in screen UI.
 
 **Shared primitives** live in `src/lib/ui/`: buttons, inputs, textarea, switch, toggle buttons, dialogs, icon picker, and user menu. See [`src/lib/ui/README.md`](src/lib/ui/README.md) for the full primitive catalog, the wrapper pattern, and conventions.
 

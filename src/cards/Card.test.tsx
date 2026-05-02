@@ -28,7 +28,7 @@ describe("<Card>", () => {
     const card = itemCardFactory.build({ imageUrl: "https://example.com/pic.png" });
     render(<Card card={card} layout="4-up" />);
     const img = screen.getByTestId("card-image");
-    expect(img).toHaveAttribute("src", "https://example.com/pic.png");
+    expect(img).toHaveAttribute("src", card.imageUrl!);
   });
 
   test("splits body on blank lines into paragraphs", () => {
@@ -42,6 +42,7 @@ describe("<Card>", () => {
     const card = itemCardFactory.build({ imageUrl: "https://example.com/broken.png" });
     render(<Card card={card} layout="4-up" />);
     const img = screen.getByTestId("card-image");
+    expect(img).toHaveAttribute("src", card.imageUrl!);
     fireEvent.error(img);
     expect(screen.queryByTestId("card-image")).not.toBeInTheDocument();
     expect(screen.getByTestId("card-fallback-icon")).toBeInTheDocument();

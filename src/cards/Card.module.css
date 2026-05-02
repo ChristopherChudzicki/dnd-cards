@@ -1,8 +1,7 @@
 .card {
-  --scale: 1;
   --card-base: 17px;
 
-  font-size: calc(var(--card-base) * var(--scale));
+  font-size: var(--card-base);
   width: var(--card-width);
   height: var(--card-height);
   padding: 1.15em;

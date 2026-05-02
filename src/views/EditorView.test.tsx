@@ -95,7 +95,7 @@ describe("EditorView", () => {
     );
     server.use(http.get(`${SB}/rest/v1/cards`, () => HttpResponse.json([card])));
     render(wrap(<EditorView deckId="d1" cardId="c1" />));
-    expect(await screen.findByTestId("preview-paginator")).toBeInTheDocument();
+    expect(await screen.findByRole("button", { name: /next preview page/i })).toBeInTheDocument();
     expect(screen.getByText(/^3 cards \(4-up\) · /)).toBeInTheDocument();
   });
 });

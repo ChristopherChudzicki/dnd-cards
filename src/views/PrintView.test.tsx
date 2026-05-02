@@ -37,17 +37,17 @@ describe("<PrintView>", () => {
     await userEvent.selectOptions(screen.getByLabelText(/cards per page/i), "2");
     expect(screen.getAllByTestId("page")).toHaveLength(2);
   });
-});
 
-test("renders multiple physical cards for an oversized item at 4-up", async () => {
-  const card = makeCardRow.build();
-  vi.spyOn(paginateModule, "paginateBody").mockImplementation(({ body }) =>
-    body === "" ? [""] : ["chunk-a", "chunk-b", "chunk-c"],
-  );
-  server.use(http.get(`${SB}/rest/v1/cards`, () => HttpResponse.json([card])));
-  render(wrap(<PrintView deckId="d1" />));
-  await waitFor(() => {
-    expect(screen.getByRole("heading", { name: /\(p1 of 3\)/i })).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: /\(p3 of 3\)/i })).toBeInTheDocument();
+  test("renders multiple physical cards for an oversized item at 4-up", async () => {
+    const card = makeCardRow.build();
+    vi.spyOn(paginateModule, "paginateBody").mockImplementation(({ body }) =>
+      body === "" ? [""] : ["chunk-a", "chunk-b", "chunk-c"],
+    );
+    server.use(http.get(`${SB}/rest/v1/cards`, () => HttpResponse.json([card])));
+    render(wrap(<PrintView deckId="d1" />));
+    await waitFor(() => {
+      expect(screen.getByRole("heading", { name: /\(p1 of 3\)/i })).toBeInTheDocument();
+      expect(screen.getByRole("heading", { name: /\(p3 of 3\)/i })).toBeInTheDocument();
+    });
   });
 });
