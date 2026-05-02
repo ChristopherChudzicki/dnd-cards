@@ -6,9 +6,11 @@ import type { ItemCard } from "./types";
 
 export type { PhysicalCard };
 
-// Each layout's hidden measurer scaffold mounts once on first use and lives
-// for the SPA's lifetime — see measurer.ts. The store never changes, so
-// subscribe is a no-op.
+// Why useSyncExternalStore: the measurer scaffold is module-level DOM living
+// outside React (see measurer.ts). useSyncExternalStore reads it synchronously
+// during render, so the first render already has correct chunks — an
+// alternative useEffect+useState approach would flicker through one render of
+// empty chunks. The store never changes, so subscribe is a no-op.
 const subscribe = () => () => {};
 
 export function useExpandedCards(
