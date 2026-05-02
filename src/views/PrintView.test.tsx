@@ -43,9 +43,9 @@ test("renders multiple physical cards for an oversized item at 4-up", async () =
   const card = makeCardRow.build({
     payload: { ...makeItemPayload.build(), body: "long ".repeat(200) },
   });
-  const spy = vi.spyOn(paginateModule, "paginateBody").mockImplementation(({ body }) =>
-    body === "" ? [""] : ["chunk-a", "chunk-b", "chunk-c"],
-  );
+  const spy = vi
+    .spyOn(paginateModule, "paginateBody")
+    .mockImplementation(({ body }) => (body === "" ? [""] : ["chunk-a", "chunk-b", "chunk-c"]));
   server.use(http.get(`${SB}/rest/v1/cards`, () => HttpResponse.json([card])));
   render(wrap(<PrintView deckId="d1" />));
   await waitFor(() => {

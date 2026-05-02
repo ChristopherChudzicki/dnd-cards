@@ -100,9 +100,7 @@ describe("<Card> with pagination", () => {
   test("suffixes title with (pX of N) when paginated", () => {
     const card = itemCardFactory.build();
     render(<Card card={card} layout="4-up" pagination={{ page: 2, total: 4 }} />);
-    expect(
-      screen.getByRole("heading", { name: `${card.name} (p2 of 4)` }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: `${card.name} (p2 of 4)` })).toBeInTheDocument();
   });
 
   test("hides type line on continuation pages", () => {

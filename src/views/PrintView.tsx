@@ -52,20 +52,20 @@ export function PrintView({ deckId }: Props) {
       {items.length === 0 && <p>No item cards in this deck yet.</p>}
 
       <div className={styles.sheet}>
-        {pages.map((pageCards, pageIdx) => (
+        {pages.map((pageCards) => (
           <div
-            key={`page-${pageIdx}-${pageCards[0]?.card.id ?? "empty"}`}
+            key={`page-${pageCards[0]?.card.id ?? "empty"}-${pageCards[0]?.pagination?.page ?? 0}`}
             data-testid="page"
             className={`${styles.page} ${perPage === 4 ? styles.fourUp : styles.twoUp}`}
           >
-            {pageCards.map((entry, slotIdx) =>
+            {pageCards.map((entry) =>
               entry.needsScaleFit ? (
-                <div key={`${entry.card.id}-${slotIdx}`} className={styles.slot}>
+                <div key={entry.card.id} className={styles.slot}>
                   <AutoFitCard card={entry.card} layout={layout} />
                 </div>
               ) : (
                 <div
-                  key={`${entry.card.id}-${entry.pagination?.page ?? slotIdx}`}
+                  key={`${entry.card.id}-${entry.pagination?.page ?? 0}`}
                   className={styles.slot}
                 >
                   <Card

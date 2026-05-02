@@ -1,5 +1,5 @@
-import cardStyles from "./Card.module.css";
 import type { CardLayout } from "./Card";
+import cardStyles from "./Card.module.css";
 import type { ItemCard } from "./types";
 
 export type CardMeasurer = {
