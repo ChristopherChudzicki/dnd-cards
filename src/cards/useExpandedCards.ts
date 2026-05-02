@@ -6,10 +6,9 @@ import type { ItemCard } from "./types";
 
 export type { PhysicalCard };
 
-// Card measurement is an SPA-global capability, not a per-component lifecycle.
-// Each layout's measurer scaffold mounts once on first use and stays mounted.
-// `getMeasurer` is idempotent, so concurrent renders that get discarded mid-flight
-// don't leak (no refcount to drift, no DOM to clean up).
+// Each layout's hidden measurer scaffold mounts once on first use and lives
+// for the SPA's lifetime — see measurer.ts. The store never changes, so
+// subscribe is a no-op.
 const subscribe = () => () => {};
 
 export function useExpandedCards(
